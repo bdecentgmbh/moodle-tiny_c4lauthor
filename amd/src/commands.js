@@ -1206,10 +1206,6 @@ export const getSetup = async() => {
                             <textarea id="${textareaId}" style="visibility:hidden">${html}</textarea>
                         </div>
                     </div>
-                    <div class="tiny_c4lauthor__footer">
-                        <button class="btn btn-secondary" data-action="cancel">${cancelStr}</button>
-                        <button class="btn btn-primary" data-action="apply">${applyStr}</button>
-                    </div>
                 </div>
                 <div class="tiny_c4lauthor__ai-container" style="display:none"></div>
                 <div class="tiny_c4lauthor__code-container" style="display:none">
@@ -1218,6 +1214,10 @@ export const getSetup = async() => {
                     </div>
                 </div>
                 <div class="tiny_c4lauthor__precision-container" style="display:none"></div>
+                <div class="tiny_c4lauthor__footer">
+                    <button class="btn btn-secondary" data-action="cancel">${cancelStr}</button>
+                    <button class="btn btn-primary" data-action="apply">${applyStr}</button>
+                </div>
             </div>`,
             show: true,
             removeOnClose: true,
