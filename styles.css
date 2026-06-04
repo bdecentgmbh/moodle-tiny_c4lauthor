@@ -161,6 +161,18 @@ svg.c4lauthor-mask__icon {
   margin: -0.4rem -0.4rem -0.4rem 0;
 }
 
+.modal-dialog:has(.tiny_c4lauthor) .modal-header {
+  position: relative;
+}
+
+.modal-dialog:has(.tiny_c4lauthor) .modal-title {
+  flex: 1;
+}
+
+.modal-dialog:has(.tiny_c4lauthor) .btn-close {
+  margin: -0.4rem -0.4rem -0.4rem 0;
+}
+
 .modal-dialog:has(.tiny_c4lauthor) .modal-content {
   height: 100%;
   display: flex;
@@ -2320,6 +2332,222 @@ p.c4l-spacer + p.c4l-spacer {
 .c4lv-furtherreading.c4l-full-width-variant {
   /* 100% - 6% due to the shadow */
   max-width: 94%;
+}
+
+/**
+ * Precision Mode UI styles — two-panel field editor for the C4L Author plugin.
+ *
+ * @package    tiny_c4lauthor
+ * @copyright  2026 Roger Segú <rogersegu@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+.tiny_c4lauthor__precision-container {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.tiny_c4lauthor__precision {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.tiny_c4lauthor__precision-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.tiny_c4lauthor__precision-preview {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  order: 1;
+  border-left: 1px solid #e9ecef;
+}
+
+.tiny_c4lauthor__precision-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.tiny_c4lauthor__precision-form {
+  width: 300px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  order: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+.tiny_c4lauthor__precision-form::-webkit-scrollbar {
+  width: 6px;
+}
+.tiny_c4lauthor__precision-form::-webkit-scrollbar-track {
+  background: transparent;
+}
+.tiny_c4lauthor__precision-form::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.tiny_c4lauthor__precision-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #6e767e;
+  font-size: 14px;
+  padding: 20px;
+  line-height: 1.5;
+}
+
+.tiny_c4lauthor__precision-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+.tiny_c4lauthor__precision-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tiny_c4lauthor__precision-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6e767e;
+}
+
+.tiny_c4lauthor__precision-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #CBD1E1;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #495057;
+  transition: border-color 0.15s;
+}
+.tiny_c4lauthor__precision-input:focus {
+  outline: none;
+  border-color: #1679f9;
+  box-shadow: 0 0 0 2px rgba(22, 121, 249, 0.1);
+}
+
+.tiny_c4lauthor__precision-textarea {
+  min-height: 2.5rem;
+  resize: vertical;
+  overflow: hidden;
+}
+
+.tiny_c4lauthor__precision-list-item {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+.tiny_c4lauthor__precision-list-item .tiny_c4lauthor__precision-textarea {
+  flex: 1;
+  min-height: 48px;
+}
+
+.tiny_c4lauthor__precision-remove-btn {
+  background: #f0f2f5;
+  border: 1px solid #f0f2f5;
+  border-radius: 4px;
+  color: #4a5057;
+  cursor: pointer;
+  padding: 1px 4px 2px 4px;
+  font-size: 14px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.tiny_c4lauthor__precision-remove-btn:hover {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.tiny_c4lauthor__precision-add-btn {
+  background: none;
+  border: 1px dashed #e9ecef;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: #1679f9;
+  cursor: pointer;
+  margin-top: 4px;
+  margin-right: 24px;
+}
+.tiny_c4lauthor__precision-add-btn:hover {
+  background: #ecf3ff;
+  border-color: #c0d4f5;
+}
+
+/**
+ * View switcher styles — segmented button bar in the C4L Author modal header.
+ *
+ * @package    tiny_c4lauthor
+ * @copyright  2026 Roger Segú <rogersegu@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+.tiny_c4lauthor__view-switcher {
+  display: inline-flex;
+  align-items: center;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.tiny_c4lauthor__view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-right-color: #dee2e6;
+  box-sizing: border-box;
+  background: transparent;
+  color: #495057;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.tiny_c4lauthor__view-btn:last-child:not(.tiny_c4lauthor__view-btn--active) {
+  border-right-color: transparent;
+}
+.tiny_c4lauthor__view-btn:hover:not(.tiny_c4lauthor__view-btn--active) {
+  background: #e9ecef;
+  border-color: #e9ecef;
+}
+.tiny_c4lauthor__view-btn--active {
+  background: #1679f9;
+  border-color: #1679f9;
+  color: #fff;
+}
+.tiny_c4lauthor__view-btn svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
 }
 
 /*# sourceMappingURL=styles.css.map */

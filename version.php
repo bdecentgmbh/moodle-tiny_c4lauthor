@@ -24,8 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026051401;
+$plugin->version   = 2026060300;
 $plugin->requires  = 2024100703.00;
 $plugin->component = 'tiny_c4lauthor';
 $plugin->maturity  = MATURITY_BETA;
-$plugin->release   = '1.0.1-beta';
+$plugin->release   = '1.0-beta';

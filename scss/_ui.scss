@@ -153,6 +153,18 @@ svg.c4lauthor-mask__icon {
     margin: -0.4rem -0.4rem -0.4rem 0;
 }
 
+.modal-dialog:has(.tiny_c4lauthor) .modal-header {
+    position: relative;
+}
+
+.modal-dialog:has(.tiny_c4lauthor) .modal-title {
+    flex: 1;
+}
+
+.modal-dialog:has(.tiny_c4lauthor) .btn-close {
+    margin: -0.4rem -0.4rem -0.4rem 0;
+}
+
 .modal-dialog:has(.tiny_c4lauthor) .modal-content {
     height: 100%;
     display: flex;

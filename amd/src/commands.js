@@ -64,6 +64,7 @@ import {
 } from 'tiny_html/codemirror-lazy';
 import {callSuggest} from './ai_api';
 import {mountAiView} from './ai_ui';
+import {mountPreciseView} from './precise_ui';
 import {applyChanges as aiApplyChanges, stripAllC4L as aiStripAllC4L} from './ai_apply';
 import {
     contentFingerprint as aiContentFingerprint,
@@ -1117,7 +1118,8 @@ export const getSetup = async() => {
            allStr, contextualStr, proceduralStr, evaluativeStr, helperStr, templatesStr, customStr,
            convertToStr, noComponentStr, notConvertibleStr, moreStr, discardStr, discardBtnStr, keepEditingStr,
            overlayOpenStr, overlayRestoreStr, aiButtonStr,
-           codeButtonStr, codeBackStr, codeApplyStr,
+           codeButtonStr,
+           precisionButtonStr, regularViewStr,
            deleteComponentStr, moveUpStr, moveDownStr,
     ] = await Promise.all([
         getString('buttontitle', component),
@@ -1142,8 +1144,8 @@ export const getSetup = async() => {
         getString('overlay_openmask_restore', component),
         getString('ai_button', component),
         getString('code_button', component),
-        getString('code_back', component),
-        getString('code_apply', component),
+        getString('precision_button', component),
+        getString('view_regular', component),
         getString('delete_component', component),
         getString('move_up', component),
         getString('move_down', component),
@@ -1213,12 +1215,9 @@ export const getSetup = async() => {
                 <div class="tiny_c4lauthor__code-container" style="display:none">
                     <div class="tiny_c4lauthor__code-view">
                         <div class="tiny_c4lauthor__code-editor-wrap"></div>
-                        <div class="tiny_c4lauthor__code-footer">
-                            <button class="btn btn-secondary" data-action="code-back">${codeBackStr}</button>
-                            <button class="btn btn-primary" data-action="code-apply">${codeApplyStr}</button>
-                        </div>
                     </div>
                 </div>
+                <div class="tiny_c4lauthor__precision-container" style="display:none"></div>
             </div>`,
             show: true,
             removeOnClose: true,
@@ -1227,66 +1226,86 @@ export const getSetup = async() => {
 
         const root = modal.getRoot();
 
-        // Inject the "AI suggest" button into the modal header (only if AI is enabled).
+        // Inject the unified view switcher into the modal header.
         const headerEl = root[0].querySelector('.modal-header');
-        if (headerEl && isAiEnabled(editor)) {
-            const closeBtn = headerEl.querySelector('.close, .btn-close, [data-action="hide"]');
-            const aiHeaderBtn = document.createElement('button');
-            aiHeaderBtn.className = 'tiny_c4lauthor__ai-header-btn';
-            aiHeaderBtn.type = 'button';
-            const aiIconSvg = '<svg class="tiny_c4lauthor__ai-header-icon" width="14" height="14" ' +
-                'viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-                '<path d="M7.12 7.23C6.49 6.64 6.01 5.85 5.64 5.08C5.27 5.85 4.78 6.64 4.16 ' +
-                '7.23C3.53 7.83 2.69 8.29 1.88 8.64C2.69 8.99 3.53 9.45 4.16 10.05C4.78 10.65 ' +
-                '5.27 11.44 5.64 12.21C6.01 11.44 6.49 10.65 7.12 10.05C7.75 9.45 8.58 8.99 9.39 ' +
-                '8.64C8.58 8.29 7.75 7.83 7.12 7.23ZM8.13 6.53C8.85 7.15 9.9 7.62 10.89 7.96C11.4 ' +
-                '8.14 11.4 9.15 10.89 9.32C9.9 9.66 8.85 10.13 8.13 10.75L7.99 10.88C7.27 11.56 ' +
-                '6.73 12.63 6.35 13.63C6.17 14.12 5.1 14.12 4.92 13.63C4.56 12.7 4.07 11.69 3.42 ' +
-                '11.01L3.28 10.88C2.57 10.2 1.44 9.68 0.39 9.32C-0.13 9.15-0.13 8.14 0.39 ' +
-                '7.96C1.37 7.62 2.43 7.15 3.15 6.53L3.28 6.41C4 5.72 4.54 4.65 4.92 3.65C5.1 ' +
-                '3.16 6.17 3.16 6.35 3.65C6.73 4.65 7.27 5.72 7.99 6.41L8.13 6.53Z" ' +
-                'fill="currentColor"/>' +
-                '<path fill-rule="evenodd" clip-rule="evenodd" d="M13.55 2.31C13.64 2.35 13.73 ' +
-                '2.38 13.82 2.41C14.05 2.48 14.06 2.9 13.86 3.02L13.82 3.04C13.73 3.07 13.64 ' +
-                '3.1 13.55 3.13C13.09 3.3 12.62 3.54 12.31 3.83C11.93 4.19 11.66 4.76 11.47 ' +
-                '5.27L11.45 5.31C11.32 5.5 10.89 5.49 10.81 5.27C10.64 4.82 10.41 4.33 10.1 ' +
-                '3.98L9.97 3.83C9.59 3.48 9 3.22 8.45 3.04C8.21 2.96 8.21 2.49 8.45 2.41C8.93 ' +
-                '2.25 9.45 2.03 9.82 1.74L9.97 1.61C10.34 1.26 10.62 0.69 10.81 0.17C10.89-0.06 ' +
-                '11.38-0.06 11.47 0.17L11.54 0.37C11.73 0.83 11.98 1.3 12.31 1.61C12.62 1.91 ' +
-                '13.09 2.14 13.55 2.31ZM11.14 2.11C11.23 2.22 11.33 2.34 11.43 2.44C11.54 2.54 ' +
-                '11.66 2.63 11.78 2.72C11.66 2.81 11.54 2.9 11.43 3.01C11.33 3.11 11.23 3.22 ' +
-                '11.14 3.34C11.04 3.22 10.95 3.11 10.84 3.01C10.73 2.9 10.61 2.81 10.49 ' +
-                '2.72C10.61 2.63 10.73 2.54 10.84 2.44C10.95 2.34 11.04 2.22 11.14 2.11Z" ' +
-                'fill="currentColor"/></svg>';
-            aiHeaderBtn.innerHTML = aiIconSvg + ' ' + aiButtonStr;
-            aiHeaderBtn.setAttribute('data-action', 'ai-open');
-            if (closeBtn) {
-                headerEl.insertBefore(aiHeaderBtn, closeBtn);
-            } else {
-                headerEl.appendChild(aiHeaderBtn);
-            }
-        }
-
-        // Inject the "Code" button into the modal header.
+        const precisionIconSvg =
+            '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+            '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>' +
+            '<circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2" fill="none"/>' +
+            '<circle cx="12" cy="12" r="2" fill="currentColor"/>' +
+            '<line x1="12" y1="0" x2="12" y2="4" stroke="currentColor" stroke-width="2"/>' +
+            '<line x1="12" y1="20" x2="12" y2="24" stroke="currentColor" stroke-width="2"/>' +
+            '<line x1="0" y1="12" x2="4" y2="12" stroke="currentColor" stroke-width="2"/>' +
+            '<line x1="20" y1="12" x2="24" y2="12" stroke="currentColor" stroke-width="2"/>' +
+            '</svg>';
+        const codeIconSvg =
+            '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+            '<path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm' +
+            '5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z" fill="currentColor"/></svg>';
         if (headerEl) {
-            const closeBtnForCode = headerEl.querySelector(
-                '.close, .btn-close, [data-action="hide"]'
-            );
-            const codeHeaderBtn = document.createElement('button');
-            codeHeaderBtn.className = 'tiny_c4lauthor__code-header-btn';
-            codeHeaderBtn.type = 'button';
-            const codeIconSvg =
-                '<svg class="tiny_c4lauthor__code-header-icon" width="14" height="14" ' +
-                'viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-                '<path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm' +
-                '5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z" ' +
-                'fill="currentColor"/></svg>';
-            codeHeaderBtn.innerHTML = codeIconSvg + ' ' + codeButtonStr;
-            codeHeaderBtn.setAttribute('data-action', 'code-open');
-            if (closeBtnForCode) {
-                headerEl.insertBefore(codeHeaderBtn, closeBtnForCode);
+            const closeBtn = headerEl.querySelector('.close, .btn-close, [data-action="hide"]');
+            const switcher = document.createElement('div');
+            switcher.className = 'tiny_c4lauthor__view-switcher';
+
+            const views = [
+                {key: 'regular', label: regularViewStr, icon: null},
+                {key: 'precision', label: precisionButtonStr, icon: precisionIconSvg},
+                {key: 'code', label: codeButtonStr, icon: codeIconSvg},
+            ];
+
+            views.forEach((v, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'tiny_c4lauthor__view-btn' +
+                    (i === 0 ? ' tiny_c4lauthor__view-btn--active' : '');
+                btn.type = 'button';
+                btn.setAttribute('data-action', 'view-switch');
+                btn.setAttribute('data-view', v.key);
+                btn.innerHTML = (v.icon ? v.icon + ' ' : '') + v.label;
+                switcher.appendChild(btn);
+            });
+
+            if (closeBtn) {
+                headerEl.insertBefore(switcher, closeBtn);
             } else {
-                headerEl.appendChild(codeHeaderBtn);
+                headerEl.appendChild(switcher);
+            }
+
+            // Inject the "AI suggest" button to the right of the switcher (only if AI is enabled).
+            if (isAiEnabled(editor)) {
+                const aiHeaderBtn = document.createElement('button');
+                aiHeaderBtn.className = 'tiny_c4lauthor__ai-header-btn';
+                aiHeaderBtn.type = 'button';
+                const aiHeaderIconSvg = '<svg class="tiny_c4lauthor__ai-header-icon" width="14" height="14" ' +
+                    'viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                    '<path d="M7.12 7.23C6.49 6.64 6.01 5.85 5.64 5.08C5.27 5.85 4.78 6.64 4.16 ' +
+                    '7.23C3.53 7.83 2.69 8.29 1.88 8.64C2.69 8.99 3.53 9.45 4.16 10.05C4.78 10.65 ' +
+                    '5.27 11.44 5.64 12.21C6.01 11.44 6.49 10.65 7.12 10.05C7.75 9.45 8.58 8.99 9.39 ' +
+                    '8.64C8.58 8.29 7.75 7.83 7.12 7.23ZM8.13 6.53C8.85 7.15 9.9 7.62 10.89 7.96C11.4 ' +
+                    '8.14 11.4 9.15 10.89 9.32C9.9 9.66 8.85 10.13 8.13 10.75L7.99 10.88C7.27 11.56 ' +
+                    '6.73 12.63 6.35 13.63C6.17 14.12 5.1 14.12 4.92 13.63C4.56 12.7 4.07 11.69 3.42 ' +
+                    '11.01L3.28 10.88C2.57 10.2 1.44 9.68 0.39 9.32C-0.13 9.15-0.13 8.14 0.39 ' +
+                    '7.96C1.37 7.62 2.43 7.15 3.15 6.53L3.28 6.41C4 5.72 4.54 4.65 4.92 3.65C5.1 ' +
+                    '3.16 6.17 3.16 6.35 3.65C6.73 4.65 7.27 5.72 7.99 6.41L8.13 6.53Z" ' +
+                    'fill="currentColor"/>' +
+                    '<path fill-rule="evenodd" clip-rule="evenodd" d="M13.55 2.31C13.64 2.35 13.73 ' +
+                    '2.38 13.82 2.41C14.05 2.48 14.06 2.9 13.86 3.02L13.82 3.04C13.73 3.07 13.64 ' +
+                    '3.1 13.55 3.13C13.09 3.3 12.62 3.54 12.31 3.83C11.93 4.19 11.66 4.76 11.47 ' +
+                    '5.27L11.45 5.31C11.32 5.5 10.89 5.49 10.81 5.27C10.64 4.82 10.41 4.33 10.1 ' +
+                    '3.98L9.97 3.83C9.59 3.48 9 3.22 8.45 3.04C8.21 2.96 8.21 2.49 8.45 2.41C8.93 ' +
+                    '2.25 9.45 2.03 9.82 1.74L9.97 1.61C10.34 1.26 10.62 0.69 10.81 0.17C10.89-0.06 ' +
+                    '11.38-0.06 11.47 0.17L11.54 0.37C11.73 0.83 11.98 1.3 12.31 1.61C12.62 1.91 ' +
+                    '13.09 2.14 13.55 2.31ZM11.14 2.11C11.23 2.22 11.33 2.34 11.43 2.44C11.54 2.54 ' +
+                    '11.66 2.63 11.78 2.72C11.66 2.81 11.54 2.9 11.43 3.01C11.33 3.11 11.23 3.22 ' +
+                    '11.14 3.34C11.04 3.22 10.95 3.11 10.84 3.01C10.73 2.9 10.61 2.81 10.49 ' +
+                    '2.72C10.61 2.63 10.73 2.54 10.84 2.44C10.95 2.34 11.04 2.22 11.14 2.11Z" ' +
+                    'fill="currentColor"/></svg>';
+                aiHeaderBtn.innerHTML = aiHeaderIconSvg + ' ' + aiButtonStr;
+                aiHeaderBtn.setAttribute('data-action', 'ai-open');
+                if (closeBtn) {
+                    headerEl.insertBefore(aiHeaderBtn, closeBtn);
+                } else {
+                    headerEl.appendChild(aiHeaderBtn);
+                }
             }
         }
 
@@ -1525,37 +1544,124 @@ export const getSetup = async() => {
             innerEditor.selection.setCursorLocation(newP, 0);
         }, true);
 
-        // View swap — main view, AI view and code view share the modal body.
+        // View swap — all views share the modal body.
         const mainView = root[0].querySelector('.tiny_c4lauthor__main-view');
         const aiContainer = root[0].querySelector('.tiny_c4lauthor__ai-container');
         const codeContainer = root[0].querySelector('.tiny_c4lauthor__code-container');
+        const precisionContainer = root[0].querySelector('.tiny_c4lauthor__precision-container');
         let aiController = null;
         let aiCachedHtml = null;
         let aiCachedResult = null;
+        let precisionController = null;
+        let cmInstance = null;
+        let currentView = 'regular';
 
-        // References to header buttons for enabling/disabling.
-        const aiHeaderBtn = root[0].querySelector('[data-action="ai-open"]');
-        const codeHeaderBtn = root[0].querySelector('[data-action="code-open"]');
-
-        const disableBtn = (btn) => {
-            if (btn) {
-                btn.disabled = true;
-                btn.style.opacity = '0.4';
-                btn.style.pointerEvents = 'none';
-            }
-        };
-        const enableBtn = (btn) => {
-            if (btn) {
-                btn.disabled = false;
-                btn.style.opacity = '';
-                btn.style.pointerEvents = '';
-            }
+        const updateSwitcherActive = (viewName) => {
+            const btns = root[0].querySelectorAll('[data-action="view-switch"]');
+            btns.forEach((btn) => {
+                btn.classList.toggle('tiny_c4lauthor__view-btn--active',
+                    btn.getAttribute('data-view') === viewName);
+            });
         };
 
-        const showMainView = () => {
-            if (aiController) {
-                aiController.destroy();
-                aiController = null;
+        const applyCurrentView = () => {
+            if (currentView === 'code' && cmInstance && innerEditor) {
+                const newHtml = cmInstance.state.doc.toString();
+                innerEditor.undoManager.transact(() => {
+                    innerEditor.setContent(newHtml);
+                });
+            }
+            // Precision: edits are applied reactively to the inner editor.
+        };
+
+        const destroyCurrentView = () => {
+            if (currentView === 'precision' && precisionController) {
+                precisionController.destroy();
+                precisionController = null;
+            }
+            if (currentView === 'code' && cmInstance) {
+                cmInstance.destroy();
+                cmInstance = null;
+            }
+        };
+
+        /**
+         * Get the scroll ratio (0–1) from the current view's scroll container.
+         */
+        const getScrollRatio = () => {
+            let el = null;
+            if (currentView === 'regular' && innerEditor) {
+                const iDoc = innerEditor.getDoc();
+                el = iDoc ? iDoc.documentElement : null;
+            } else if (currentView === 'code' && cmInstance) {
+                el = codeContainer.querySelector('.cm-scroller');
+            } else if (currentView === 'precision') {
+                const iframe = precisionContainer.querySelector('.tiny_c4lauthor__precision-iframe');
+                if (iframe && iframe.contentDocument) {
+                    el = iframe.contentDocument.documentElement;
+                }
+            }
+            if (!el || el.scrollHeight <= el.clientHeight) {
+                return 0;
+            }
+            return el.scrollTop / (el.scrollHeight - el.clientHeight);
+        };
+
+        /**
+         * Set the scroll ratio (0–1) on a view's scroll container.
+         * Deferred with rAF so the DOM has had time to layout.
+         *
+         * @param {string} viewName
+         * @param {number} ratio
+         */
+        const setScrollRatio = (viewName, ratio) => {
+            if (ratio <= 0) {
+                return;
+            }
+            const apply = () => {
+                let el = null;
+                if (viewName === 'regular' && innerEditor) {
+                    const iDoc = innerEditor.getDoc();
+                    el = iDoc ? iDoc.documentElement : null;
+                } else if (viewName === 'code') {
+                    el = codeContainer.querySelector('.cm-scroller');
+                } else if (viewName === 'precision') {
+                    const iframe = precisionContainer.querySelector('.tiny_c4lauthor__precision-iframe');
+                    if (iframe && iframe.contentDocument) {
+                        el = iframe.contentDocument.documentElement;
+                    }
+                }
+                if (el && el.scrollHeight > el.clientHeight) {
+                    el.scrollTo({top: ratio * (el.scrollHeight - el.clientHeight), behavior: 'instant'});
+                }
+            };
+            // Double-rAF to ensure layout is complete after view switch.
+            requestAnimationFrame(() => requestAnimationFrame(apply));
+        };
+
+        // AI header button + view switcher references (needed by switchView and AI handlers).
+        const aiHeaderBtnEl = root[0].querySelector('[data-action="ai-open"]');
+        const viewSwitcherEl = root[0].querySelector('.tiny_c4lauthor__view-switcher');
+        const mainFooter = root[0].querySelector('.tiny_c4lauthor__footer');
+
+        const disableAiBtn = () => {
+            if (aiHeaderBtnEl) {
+                aiHeaderBtnEl.disabled = true;
+                aiHeaderBtnEl.style.opacity = '0.4';
+                aiHeaderBtnEl.style.pointerEvents = 'none';
+            }
+        };
+        const enableAiBtn = () => {
+            if (aiHeaderBtnEl) {
+                aiHeaderBtnEl.disabled = false;
+                aiHeaderBtnEl.style.opacity = '';
+                aiHeaderBtnEl.style.pointerEvents = '';
+            }
+        };
+
+        const hideAllViews = () => {
+            if (mainView) {
+                mainView.style.display = 'none';
             }
             if (aiContainer) {
                 aiContainer.style.display = 'none';
@@ -1563,44 +1669,24 @@ export const getSetup = async() => {
             if (codeContainer) {
                 codeContainer.style.display = 'none';
             }
-            if (mainView) {
-                mainView.style.display = '';
+            if (precisionContainer) {
+                precisionContainer.style.display = 'none';
             }
-            // Re-enable all header buttons.
-            enableBtn(aiHeaderBtn);
-            enableBtn(codeHeaderBtn);
         };
 
-        // Code view — edit raw HTML with CodeMirror.
-        let cmInstance = null;
-        const openCodeView = () => {
-            if (!innerEditor || !codeContainer || !mainView) {
+        const buildCodeView = (scrollRatio) => {
+            if (!innerEditor || !codeContainer) {
                 return;
-            }
-            // Disable AI button while Code view is open.
-            disableBtn(aiHeaderBtn);
-            mainView.style.display = 'none';
-            if (aiContainer) {
-                aiContainer.style.display = 'none';
             }
             codeContainer.style.display = 'flex';
             codeContainer.style.flex = '1';
             codeContainer.style.minHeight = '0';
             codeContainer.style.flexDirection = 'column';
 
-            const wrap = codeContainer.querySelector(
-                '.tiny_c4lauthor__code-editor-wrap'
-            );
+            const wrap = codeContainer.querySelector('.tiny_c4lauthor__code-editor-wrap');
             const currentHtml = innerEditor.getContent({format: 'html'}) || '';
-
-            // Destroy previous CodeMirror instance if any.
-            if (cmInstance) {
-                cmInstance.destroy();
-                cmInstance = null;
-            }
             wrap.innerHTML = '';
 
-            // Create CodeMirror with HTML syntax highlighting.
             const state = CMState.create({
                 doc: currentHtml,
                 extensions: [
@@ -1618,25 +1704,121 @@ export const getSetup = async() => {
             });
             cmInstance = new CMView({state, parent: wrap});
             cmInstance.focus();
+            setScrollRatio('code', scrollRatio);
+        };
+
+        const buildPrecisionView = async(scrollRatio) => {
+            if (!innerEditor || !precisionContainer) {
+                return;
+            }
+            precisionContainer.style.display = 'flex';
+            precisionContainer.style.flex = '1';
+            precisionContainer.style.minHeight = '0';
+            precisionContainer.style.flexDirection = 'column';
+
+            precisionController = await mountPreciseView(precisionContainer, {
+                getEditorContent: () => innerEditor.getContent({format: 'html'}) || '',
+                setEditorContent: (html) => {
+                    innerEditor.undoManager.transact(() => {
+                        innerEditor.setContent(html);
+                    });
+                },
+                getContentCss: () => contentCss,
+            });
+
+            // Precision iframe loads async — wait for it before restoring scroll.
+            const pIframe = precisionContainer.querySelector('.tiny_c4lauthor__precision-iframe');
+            if (pIframe && scrollRatio > 0) {
+                pIframe.addEventListener('load', () => {
+                    setScrollRatio('precision', scrollRatio);
+                }, {once: true});
+            }
+        };
+
+        const switchView = async(targetView) => {
+            if (targetView === currentView) {
+                return;
+            }
+
+            const scrollRatio = getScrollRatio();
+            applyCurrentView();
+            destroyCurrentView();
+            hideAllViews();
+
+            currentView = targetView;
+            updateSwitcherActive(targetView);
+
+            if (targetView === 'regular') {
+                if (mainView) {
+                    mainView.style.display = '';
+                }
+                setScrollRatio('regular', scrollRatio);
+            } else if (targetView === 'code') {
+                buildCodeView(scrollRatio);
+            } else if (targetView === 'precision') {
+                await buildPrecisionView(scrollRatio);
+            }
+        };
+
+        // View switcher click handler.
+        root.on('click', '[data-action="view-switch"]', (e) => {
+            e.preventDefault();
+            const target = e.currentTarget.getAttribute('data-view');
+            switchView(target);
+        });
+
+        // AI Suggest — separate from the view switcher, with its own footer.
+        const showMainViewFromAi = async() => {
+            if (aiController) {
+                aiController.destroy();
+                aiController = null;
+            }
+            if (aiContainer) {
+                aiContainer.style.display = 'none';
+            }
+            // Rebuild whichever view was active before AI was opened,
+            // so any AI-applied changes are reflected.
+            if (currentView === 'regular' && mainView) {
+                mainView.style.display = '';
+            } else if (currentView === 'code') {
+                buildCodeView(0);
+            } else if (currentView === 'precision') {
+                await buildPrecisionView(0);
+            }
+            if (viewSwitcherEl) {
+                viewSwitcherEl.style.display = '';
+            }
+            if (mainFooter) {
+                mainFooter.style.display = '';
+            }
+            enableAiBtn();
         };
 
         const openAiView = async() => {
-            if (!innerEditor || !aiContainer || !mainView) {
+            if (!innerEditor || !aiContainer) {
                 return;
             }
-            // Disable Code button while AI view is open.
-            disableBtn(codeHeaderBtn);
+            // Apply, destroy & hide current view — we'll rebuild on return.
+            applyCurrentView();
+            destroyCurrentView();
+            hideAllViews();
+            disableAiBtn();
+            if (viewSwitcherEl) {
+                viewSwitcherEl.style.display = 'none';
+            }
+            if (mainFooter) {
+                mainFooter.style.display = 'none';
+            }
+
             const loTitle = await getString('ai_learning_outcomes_title', component);
             const initialHtml = innerEditor.getContent({format: 'html'}) || '';
             let activeHtml = initialHtml;
             const storageKey = AI_STORAGE_PREFIX + getContextId(editor) + '_' + editor.id;
             let validation = aiValidateContent(activeHtml);
 
-            mainView.style.display = 'none';
-            aiContainer.style.display = '';
+            aiContainer.style.display = 'flex';
             aiContainer.style.flex = '1';
             aiContainer.style.minHeight = '0';
-            aiContainer.style.display = 'flex';
             aiContainer.style.flexDirection = 'column';
 
             const runAnalyse = async() => {
@@ -1708,7 +1890,7 @@ export const getSetup = async() => {
                     }
                 },
                 onBack: () => {
-                    showMainView();
+                    showMainViewFromAi();
                 },
                 onApply: (toWrap, toUnwrap) => {
                     const newHtml = aiApplyChanges(activeHtml, toWrap, toUnwrap, loTitle);
@@ -1723,7 +1905,7 @@ export const getSetup = async() => {
                     }
                     aiCachedHtml = null;
                     aiCachedResult = null;
-                    showMainView();
+                    showMainViewFromAi();
                 },
             });
 
@@ -1734,30 +1916,6 @@ export const getSetup = async() => {
         root.on('click', '[data-action="ai-open"]', (e) => {
             e.preventDefault();
             openAiView();
-        });
-
-        // Code view open.
-        root.on('click', '[data-action="code-open"]', (e) => {
-            e.preventDefault();
-            openCodeView();
-        });
-
-        // Code view "Back" — discard changes, return to WYSIWYG.
-        root.on('click', '[data-action="code-back"]', (e) => {
-            e.preventDefault();
-            showMainView();
-        });
-
-        // Code view "Apply code" — sync CodeMirror back to inner editor.
-        root.on('click', '[data-action="code-apply"]', (e) => {
-            e.preventDefault();
-            if (cmInstance && innerEditor) {
-                const newHtml = cmInstance.state.doc.toString();
-                innerEditor.undoManager.transact(() => {
-                    innerEditor.setContent(newHtml);
-                });
-            }
-            showMainView();
         });
 
         // Sidebar collapse/expand — toggle via the permanent 20px strip.
@@ -1942,11 +2100,18 @@ export const getSetup = async() => {
         // Intercept Escape key on the modal element.
         root[0].addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                // If code view is visible, go back to main view.
-                if (codeContainer && codeContainer.style.display !== 'none') {
+                // If AI view is visible, go back to whichever view was active before.
+                if (aiContainer && aiContainer.style.display !== 'none') {
                     e.preventDefault();
                     e.stopPropagation();
-                    showMainView();
+                    showMainViewFromAi();
+                    return;
+                }
+                // If a non-regular switcher view is active, go back to regular.
+                if (currentView !== 'regular') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    switchView('regular');
                     return;
                 }
                 // If a TinyMCE dialog is open, let it handle Escape.

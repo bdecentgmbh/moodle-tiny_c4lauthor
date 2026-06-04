@@ -1,0 +1,49 @@
+/**
+ * View switcher styles — segmented button bar in the C4L Author modal header.
+ *
+ * @package    tiny_c4lauthor
+ * @copyright  2026 Roger Segú <rogersegu@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+.tiny_c4lauthor__view-switcher {
+    display: inline-flex;
+    align-items: center;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid $tab-border;
+    border-radius: 8px;
+    overflow: hidden;
+    background: $c4l-white;
+}
+
+.tiny_c4lauthor__view-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 16px;
+    border: 1px solid transparent;
+    border-right-color: $tab-border;
+    box-sizing: border-box;
+    background: transparent;
+    color: $c4l-dark-gray;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+    &:last-child:not(&--active) { border-right-color: transparent; }
+    &:hover:not(&--active) {
+        background: #e9ecef;
+        border-color: #e9ecef;
+    }
+    &--active {
+        background: #1679f9;
+        border-color: #1679f9;
+        color: $c4l-white;
+    }
+    svg { width: 12px; height: 12px; flex-shrink: 0; }
+}
