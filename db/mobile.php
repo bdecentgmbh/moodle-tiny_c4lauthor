@@ -15,17 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Tiny c4lauthor plugin version details.
+ * Tiny c4lauthor mobile app support.
  *
  * @package    tiny_c4lauthor
- * @copyright  2026 Roger Segú, 2022 Marc Català
+ * @copyright  2026 Roger Segú
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026060400;
-$plugin->requires  = 2024100703.00;
-$plugin->component = 'tiny_c4lauthor';
-$plugin->maturity  = MATURITY_BETA;
-$plugin->release   = '1.0-beta';
+$addons = [
+    'tiny_c4lauthor' => [
+        'handlers' => [
+            'c4lauthorstyles' => [
+                'delegate' => '',
+                'styles' => [
+                    'url' => $CFG->wwwroot . '/lib/editor/tiny/plugins/c4lauthor/mobileapp/styles.css',
+                    'version' => '2026060400',
+                ],
+            ],
+        ],
+    ],
+];

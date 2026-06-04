@@ -1,0 +1,13 @@
+# Files excluded from git archive (the Moodle Plugin Directory packaging
+# pipeline uses `git archive` to build the install ZIP). Anything marked
+# with export-ignore stays in the repo for developers but is stripped
+# from the distribution that end users receive.
+
+.github/                                    export-ignore
+.gitattributes                              export-ignore
+.gitignore                                  export-ignore
+.claude/                                    export-ignore
+*.css.map                                   export-ignore
+*.min.js.map                                export-ignore
+.DS_Store                                   export-ignore
+*/.DS_Store                                 export-ignore
