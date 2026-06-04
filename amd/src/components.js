@@ -513,14 +513,14 @@ const components = [
         type: "procedural",
         imageClass: "c4l-statement-icon",
         wrapperClass: "c4lv-statement",
-        code: `<div class="c4lv-statement {{VARIANTS}}"><section id="task-compound-layout">
+        code: `<p class="c4l-spacer">&nbsp;</p><div class="c4lv-statement {{VARIANTS}}"><section id="task-compound-layout">
 <div class="task-statement">
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
 Duis aute irure dolor in reprehenderit in voluptate velit esse.</p>
 </div>
-</section></div>`,
+</section></div><p class="c4l-spacer">&nbsp;</p>`,
         text: "Enunciat de la tasca.",
         docs: {
             description: "{{#docs_statement_desc}}",
@@ -534,7 +534,7 @@ Duis aute irure dolor in reprehenderit in voluptate velit esse.</p>
         type: "evaluative",
         imageClass: "c4l-assessment-icon",
         wrapperClass: "c4lv-assessment",
-        code: `<div class="c4lv-assessment {{VARIANTS}}"><section id="task-compound-layout">
+        code: `<p class="c4l-spacer">&nbsp;</p><div class="c4lv-assessment {{VARIANTS}}"><section id="task-compound-layout">
 <div class="teacher-assessment">
 <div class="teacher-assessment-frame"></div>
 <div class="teacher-assessment-text">
@@ -546,7 +546,7 @@ Duis aute irure dolor in reprehenderit in voluptate velit
 esse cillum dolore eu fugiat nulla pariatur.</p>
 </div>
 </div>
-</section></div>`,
+</section></div><p class="c4l-spacer">&nbsp;</p>`,
         text: "Informació sobre la valoració.",
         docs: {
             description: "{{#docs_assessment_desc}}",
