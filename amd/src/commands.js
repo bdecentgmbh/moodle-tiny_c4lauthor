@@ -479,21 +479,9 @@ const buildSidebar = (filterLabels, userIsStudent, allowedComps, enableTooltips)
  * @returns {string|null}
  */
 const getC4lComponentName = (el) => {
-    if (!el || !el.classList) {
-        return null;
-    }
     for (const cls of el.classList) {
         if (cls.startsWith('c4lv-')) {
             return cls.substring(5);
-        }
-    }
-    // Fallback: match against the wrapperClass of any known component
-    // (covers legacy components that still use the c4l- prefix, e.g. content
-    // saved before the c4lv- rename).
-    for (const cls of el.classList) {
-        const comp = c4lComponents.find((c) => c.wrapperClass === cls);
-        if (comp) {
-            return comp.name;
         }
     }
     return null;
