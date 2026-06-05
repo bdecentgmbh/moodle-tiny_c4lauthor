@@ -521,7 +521,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
 Duis aute irure dolor in reprehenderit in voluptate velit esse.</p>
 </div>
 </section></div><p class="c4l-spacer">&nbsp;</p>`,
-        text: "Enunciat de la tasca.",
+        text: "Task statement.",
         docs: {
             description: "{{#docs_statement_desc}}",
             useCases: [],
@@ -547,7 +547,7 @@ esse cillum dolore eu fugiat nulla pariatur.</p>
 </div>
 </div>
 </section></div><p class="c4l-spacer">&nbsp;</p>`,
-        text: "Informació sobre la valoració.",
+        text: "Information about the assessment.",
         docs: {
             description: "{{#docs_assessment_desc}}",
             useCases: [],
