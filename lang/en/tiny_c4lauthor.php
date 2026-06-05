@@ -268,4 +268,4 @@ $string['tag'] = 'Tag';
 $string['templates'] = 'Templates';
 $string['textplaceholder'] = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
 $string['tip'] = 'Tip';
-$string['view_regular'] = 'Regular';
+$string['view_regular'] = 'Content';
