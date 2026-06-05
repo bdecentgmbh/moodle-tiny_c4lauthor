@@ -1242,13 +1242,23 @@ export const getSetup = async() => {
             '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
             '<path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm' +
             '5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z" fill="currentColor"/></svg>';
+        const regularIconSvg =
+            '<svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+            '<path d="M7 11.6665H12.25" stroke="currentColor" stroke-width="1.2" ' +
+            'stroke-linecap="round" stroke-linejoin="round"/>' +
+            '<path d="M9.625 2.04164C9.85706 1.80957 10.1718 1.6792 10.5 1.6792C10.6625 1.6792 10.8234 ' +
+            '1.71121 10.9735 1.77339C11.1237 1.83558 11.2601 1.92673 11.375 2.04164C11.4899 2.15654 ' +
+            '11.5811 2.29296 11.6432 2.44309C11.7054 2.59322 11.7374 2.75413 11.7374 2.91664C11.7374 ' +
+            '3.07914 11.7054 3.24005 11.6432 3.39018C11.5811 3.54032 11.4899 3.67673 11.375 3.79164L4.08333 ' +
+            '11.0833L1.75 11.6666L2.33333 9.3333L9.625 2.04164Z" stroke="currentColor" ' +
+            'stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
         if (headerEl) {
             const closeBtn = headerEl.querySelector('.close, .btn-close, [data-action="hide"]');
             const switcher = document.createElement('div');
             switcher.className = 'tiny_c4lauthor__view-switcher';
 
             const views = [
-                {key: 'regular', label: regularViewStr, icon: null},
+                {key: 'regular', label: regularViewStr, icon: regularIconSvg},
                 {key: 'precision', label: precisionButtonStr, icon: precisionIconSvg},
                 {key: 'code', label: codeButtonStr, icon: codeIconSvg},
             ];
