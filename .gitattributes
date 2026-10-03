@@ -7,6 +7,13 @@
 .gitattributes                              export-ignore
 .gitignore                                  export-ignore
 .claude/                                    export-ignore
+
+# The stylesheet build. Moodle never compiles a plugin's scss itself: it serves
+# the committed styles.css and editor_styles.css, so neither the sources nor the
+# sass tooling is needed at runtime. Both stay in the repo for developers.
+scss/                                       export-ignore
+package.json                                export-ignore
+
 *.css.map                                   export-ignore
 *.min.js.map                                export-ignore
 .DS_Store                                   export-ignore
