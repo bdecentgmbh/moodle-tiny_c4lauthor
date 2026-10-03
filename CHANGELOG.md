@@ -18,6 +18,10 @@
 
 ### Changed
 
+- `styles.css` and `editor_styles.css` ship expanded rather than minified, which is
+  what every tiny plugin in core does and what lets stylelint check them. Minifying
+  here saved nothing, since Moodle minifies the aggregated CSS when serving it. The
+  declarations are unchanged; the diffs are now readable.
 - Component badges and glyphs are drawn as alpha masks rather than coloured SVGs, so
   one asset serves both colour modes and takes its colour from a token. Component
   rendering in light mode is unchanged.
