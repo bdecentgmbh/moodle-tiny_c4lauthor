@@ -1,13 +1,15 @@
-/* stylelint-disable */
 /*
  * C4L Author — Mobile app styles.
  * Renders C4L components in the Moodle mobile app webview.
- * Icons use inline data URIs since [[pix:...]] is not available in the app.
+ * Icons use inline data URIs since [[pix:...]] is not available in the app,
+ * which is why the url-scheme rule is switched off for this file alone.
  *
  * @package    tiny_c4lauthor
  * @copyright  2026 Roger Segú
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+/* stylelint-disable function-url-scheme-disallowed-list */
 
 /* ── Utilities ── */
 
@@ -231,9 +233,18 @@ p.c4l-spacer + p.c4l-spacer {
 
 .c4l-quote,
 .c4lv-quote {
-    font-family: Iowan Old Style, Apple Garamond, Baskerville, Times New Roman,
-        Droid Serif, Times, Source Serif Pro, serif, Apple Color Emoji,
-        Segoe UI Emoji, Segoe UI Symbol;
+    font-family:
+        Iowan Old Style,
+        Apple Garamond,
+        Baskerville,
+        Times New Roman,
+        Droid Serif,
+        Times,
+        Source Serif Pro,
+        serif,
+        Apple Color Emoji,
+        Segoe UI Emoji,
+        Segoe UI Symbol;
     font-size: 16px;
     line-height: 24px;
     margin: 24px auto;
@@ -401,9 +412,18 @@ p.c4l-spacer + p.c4l-spacer {
 
 .c4l-readingcontext {
     padding: 30px 40px 19px 40px;
-    font-family: Iowan Old Style, Apple Garamond, Baskerville, Times New Roman,
-        Droid Serif, Times, Source Serif Pro, serif, Apple Color Emoji,
-        Segoe UI Emoji, Segoe UI Symbol;
+    font-family:
+        Iowan Old Style,
+        Apple Garamond,
+        Baskerville,
+        Times New Roman,
+        Droid Serif,
+        Times,
+        Source Serif Pro,
+        serif,
+        Apple Color Emoji,
+        Segoe UI Emoji,
+        Segoe UI Symbol;
 }
 
 .c4l-readingcontext .c4l-readingcontext-caption {
@@ -440,9 +460,18 @@ p.c4l-spacer + p.c4l-spacer {
 }
 
 .c4lv-readingcontext.c4l-comfort-reading-variant {
-    font-family: Iowan Old Style, Apple Garamond, Baskerville, Times New Roman,
-        Droid Serif, Times, Source Serif Pro, serif, Apple Color Emoji,
-        Segoe UI Emoji, Segoe UI Symbol;
+    font-family:
+        Iowan Old Style,
+        Apple Garamond,
+        Baskerville,
+        Times New Roman,
+        Droid Serif,
+        Times,
+        Source Serif Pro,
+        serif,
+        Apple Color Emoji,
+        Segoe UI Emoji,
+        Segoe UI Symbol;
 }
 
 /* ── Example ── */
@@ -638,7 +667,7 @@ p.c4l-spacer + p.c4l-spacer {
 .c4l-aiuseallowed,
 .c4lv-aiuseallowed {
     font-size: 12px;
-    color: #127A1D;
+    color: #127a1d;
     background-color: #edf7f0;
     padding: 6px 14px;
     font-weight: 700;
@@ -670,8 +699,8 @@ p.c4l-spacer + p.c4l-spacer {
 .c4l-aiusenotallowed,
 .c4lv-aiusenotallowed {
     font-size: 12px;
-    color: #DF1801;
-    background-color: #FFF2F2;
+    color: #df1801;
+    background-color: #fff2f2;
     padding: 6px 14px;
     font-weight: 700;
     margin-left: 6px;
@@ -702,8 +731,8 @@ p.c4l-spacer + p.c4l-spacer {
 .c4l-aiusereported,
 .c4lv-aiusereported {
     font-size: 12px;
-    color: #B45400;
-    background-color: #FFF8E7;
+    color: #b45400;
+    background-color: #fff8e7;
     padding: 6px 14px;
     font-weight: 700;
     margin-left: 6px;
@@ -923,7 +952,7 @@ p.c4l-spacer + p.c4l-spacer {
 
 .c4l-conceptreview .c4l-concept-review-title,
 .c4lv-conceptreview .c4l-concept-review-title {
-    color: #B00CA9;
+    color: #b00ca9;
     font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
@@ -961,7 +990,7 @@ p.c4l-spacer + p.c4l-spacer {
 
 .c4l-furtherreading > .c4l-further-reading-title,
 .c4lv-furtherreading > .c4l-further-reading-title {
-    color: #0271BF;
+    color: #0271bf;
     font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
@@ -1148,7 +1177,7 @@ p.c4l-spacer + p.c4l-spacer {
 }
 
 #task-compound-layout .task-statement {
-    background: #ffffff;
+    background: #fff;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
     border-radius: 10px;
     font-size: 15px;
@@ -1261,13 +1290,31 @@ p.c4l-spacer + p.c4l-spacer {
         grid-gap: 24px;
         align-items: center;
     }
-    .c4l-combo.c4l-text-image-variant .text { order: 1; }
-    .c4l-combo.c4l-text-image-variant .image { order: 2; }
-    .c4l-combo.c4l-image-text-variant .text { order: 2; }
-    .c4l-combo.c4l-image-text-variant .image { order: 1; }
-    .c4l-linkblock .link-stripe { width: 60px; min-width: 60px; }
-    .c4l-linkblock .link-content { padding: 24px 28px; line-height: 24px; }
-    .c4l-linkblock .link-name { font-size: 17px; }
-    .c4l-linkblock .link-url { font-size: 14px; }
+    .c4l-combo.c4l-text-image-variant .text {
+        order: 1;
+    }
+    .c4l-combo.c4l-text-image-variant .image {
+        order: 2;
+    }
+    .c4l-combo.c4l-image-text-variant .text {
+        order: 2;
+    }
+    .c4l-combo.c4l-image-text-variant .image {
+        order: 1;
+    }
+    .c4l-linkblock .link-stripe {
+        width: 60px;
+        min-width: 60px;
+    }
+    .c4l-linkblock .link-content {
+        padding: 24px 28px;
+        line-height: 24px;
+    }
+    .c4l-linkblock .link-name {
+        font-size: 17px;
+    }
+    .c4l-linkblock .link-url {
+        font-size: 14px;
+    }
 }
 
