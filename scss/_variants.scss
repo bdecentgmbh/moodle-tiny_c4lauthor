@@ -13,7 +13,8 @@
 
 .c4l-statement.c4l-full-width-variant,
 .c4lv-statement.c4l-full-width-variant {
-    max-width: 100%;
+    /* 100% - 4% for the shadow and the tag, which hangs off the left edge */
+    max-width: 96%;
 }
 
 .c4l-tip.c4l-full-width-variant,
@@ -38,11 +39,15 @@
 .c4lv-quote.c4l-full-width-variant,
 .c4lv-dodontcards.c4l-full-width-variant,
 .c4lv-figure.c4l-full-width-variant,
-.c4lv-learningoutcomes.c4l-full-width-variant,
 .c4lv-expectedfeedback.c4l-full-width-variant,
 .c4lv-allpurposecard.c4l-full-width-variant,
 .c4lv-custom-component.c4l-full-width-variant {
     max-width: 100%;
+}
+
+.c4lv-learningoutcomes.c4l-full-width-variant {
+    /* 100% - 1% for the title tab, which hangs 39px off the left edge */
+    max-width: 99%;
 }
 
 .c4lv-tip.c4l-full-width-variant,

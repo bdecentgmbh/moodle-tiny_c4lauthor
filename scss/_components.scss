@@ -857,12 +857,14 @@
         filter: drop-shadow(0 1.55601px 3.11202px var(--c4l-shadow-xsoft));
     }
 
+    /* The fold sits under the title tab. 27.5px measured against this plugin's
+       markup, where the title is an <li> of the outer list; tiny_c4l's 15.5px
+       belongs to its own markup, where the title is an <h6> beside a nested
+       <ul>. The mixin sets the 3x2 box, so it is not repeated here. */
     > .c4l-learningoutcomes-title::before {
         @include c4l-mask(url([[pix:tiny_c4lauthor|c4l_learningoutcomes_shadow]]), 3px, 2px, var(--c4l-learningoutcomes-title-shade));
         position: absolute;
-        width: 3px;
-        height: 2px;
-        top: 15.5px;
+        top: 27.5px;
         left: 0.5px;
     }
 
