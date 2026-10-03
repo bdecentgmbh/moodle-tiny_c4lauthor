@@ -1,51 +1,50 @@
-// C4L Author design tokens — organised by UI component.
+// C4L Author design tokens — indirections onto the custom properties in _tokens.scss.
 
-$c4l-white: #fff;
-$c4l-primary: #1679f9;
-$c4l-primary-light: #c0d4f5;
-$c4l-primary-pale: #ecf3ff;
-$c4l-dark-gray: #495057;
-$c4l-regular-gray: #6e767e;
-$c4l-background-gray: #e9ecef;
+$c4l-white:                   var(--c4l-ui-surface);
+$c4l-primary:                 var(--c4l-ui-accent);
+$c4l-primary-light:           var(--c4l-ui-variant-border);
+$c4l-primary-pale:            var(--c4l-ui-variant-bg);
+$c4l-dark-gray:               var(--c4l-ui-text-strong);
+$c4l-regular-gray:            var(--c4l-ui-text);
+$c4l-background-gray:         var(--c4l-ui-raised);
 
 // ── Overlay (click-to-open mask) ──
-$overlay-bg:                  rgba(255, 255, 255, 0.82);
+$overlay-bg:                  var(--c4l-ui-overlay-bg);
 $overlay-close-text:          $c4l-regular-gray;
-$overlay-icon:                #6c757d;
 $overlay-text:                $c4l-dark-gray;
 
 // ── Modal footer ──
 $footer-bg:                   $c4l-white;
-$footer-border:               $c4l-background-gray;
+$footer-border:               var(--c4l-ui-border);
 
 // ── Sidebar ──
 $sidebar-bg:                  $c4l-white;
 
 // ── Sidebar toggle strip ──
-$sidebar-toggle-bg:           #eaedf0;
+$sidebar-toggle-bg:           $c4l-background-gray;
 $sidebar-toggle-color:        $c4l-dark-gray;
-$sidebar-toggle-hover:        #dee2e6;
+$sidebar-toggle-hover:        var(--c4l-ui-divider);
 
 // ── Sidebar filter tabs ──
 $tab-bg:                      transparent;
 $tab-text:                    $c4l-dark-gray;
-$tab-border:                  #dee2e6;
+$tab-border:                  var(--c4l-ui-border);
 $tab-hover:                   $c4l-background-gray;
-$tab-active-bg:               $c4l-primary;
-$tab-active-text:             #fff;
-$tab-active-hover:            $c4l-primary;
+$tab-active-bg:               var(--c4l-ui-variant-on-bg);
+$tab-active-text:             var(--c4l-ui-variant-ink);
+$tab-active-hover:            var(--c4l-ui-variant-on-bg);
 
 // ── Sidebar group header ──
 $group-header-text:           $c4l-regular-gray;
 
 // ── Sidebar component buttons ──
-$comp-btn-text:               #1e1e1e;
-$comp-btn-hover:              #f0f3f7;
+$comp-btn-text:               $c4l-dark-gray;
+$comp-btn-hover:              $c4l-background-gray;
 
 // ── Sidebar "More" dropdown ──
-$more-menu-bg:                #fff;
-$more-menu-border:            #dee2e6;
-$more-menu-shadow:            rgba(0, 0, 0, 0.12);
+$more-menu-bg:                $c4l-white;
+$more-menu-border:            var(--c4l-ui-border);
+$more-menu-shadow:            var(--c4l-ui-shadow);
 $more-item-text:              $c4l-dark-gray;
 $more-item-hover:             $c4l-background-gray;
 
@@ -58,27 +57,27 @@ $ai-btn-border:               $c4l-primary;
 $ai-view-bg:                  $c4l-white;
 
 // ── AI suggestion cards ──
-$ai-card-border:              #D1EBDB;
-$ai-card-selected-bg:         #DFF2E6;
-$ai-card-hover:               #f7fdfa;
-$ai-card-icon-bg:             #fff;
-$ai-card-icon-border:         #CFECDA;
+$ai-card-border:              var(--c4l-ui-ai-border);
+$ai-card-selected-bg:         var(--c4l-ui-ai-selected);
+$ai-card-hover:               var(--c4l-ui-ai-hover);
+$ai-card-icon-bg:             $c4l-white;
+$ai-card-icon-border:         var(--c4l-ui-ai-icon-border);
 
 // ── AI redo label / footer ──
-$ai-footer-bg:                #fff;
-$ai-footer-border:            $c4l-background-gray;
+$ai-footer-bg:                $c4l-white;
+$ai-footer-border:            var(--c4l-ui-border);
 $ai-footer-text:              $c4l-dark-gray;
 $ai-redo-text:                $c4l-dark-gray;
 
 // ── AI alert banner ──
-$ai-alert-bg:                 #dff2e6;
-$ai-alert-border:             #f0f7f2;
-$ai-alert-text:               #3c6e47;
-$ai-alert-btn-border:         #b5d6c1;
+$ai-alert-bg:                 var(--c4l-ui-ai-alert-bg);
+$ai-alert-border:             var(--c4l-ui-ai-alert-border);
+$ai-alert-text:               var(--c4l-ui-ai-alert-ink);
+$ai-alert-btn-border:         var(--c4l-ui-ai-alert-btn-border);
 
 // ── AI skeleton / loader ──
 $ai-skeleton-from:            $c4l-background-gray;
-$ai-skeleton-mid:             #f3f4f6;
+$ai-skeleton-mid:             var(--c4l-ui-skeleton-mid);
 
 // ── Variant toolbar (inner editor iframe) ──
 $variant-bg:                  $c4l-primary-pale;

@@ -1,0 +1,32 @@
+/* C4L MIXINS */
+
+@mixin c4l-mask-glyph($image, $width, $height, $color) {
+    content: "";
+    background-color: $color;
+    -webkit-mask-image: $image;
+    mask-image: $image;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: $width $height;
+    mask-size: $width $height;
+}
+
+@mixin c4l-mask($image, $width, $height, $color) {
+    @include c4l-mask-glyph($image, $width, $height, $color);
+    display: inline-block;
+    width: $width;
+    height: $height;
+}
+
+@mixin c4l-mask-folded($image, $width, $height, $color, $shade, $fold-position) {
+    @include c4l-mask($image, $width, $height, $color);
+    background-color: transparent;
+    background-image:
+        linear-gradient($shade, $shade),
+        linear-gradient($color, $color);
+    background-repeat: no-repeat;
+    background-size: 3px 2px, 100% 100%;
+    background-position: $fold-position, 0 0;
+}

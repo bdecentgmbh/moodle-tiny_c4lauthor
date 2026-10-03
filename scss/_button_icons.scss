@@ -168,3 +168,132 @@
 .c4l-assessment-icon .c4l-button-text::before {
     content: url([[pix:tiny_c4lauthor|c4l-assessment-icon]]) !important;
 }
+
+/* Dark mode — masks from pix/mask/, coloured by --c4l-ui-icon-* */
+
+[data-bs-theme=dark] {
+    .c4l-keyconcept-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/noun_project_icons/c4l_keyconcept_icon]]), 18px, 18px, var(--c4l-ui-icon-contextual));
+        content: "" !important;
+    }
+
+    .c4l-tip-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/noun_project_icons/c4l_tip_icon]]), 12px, 18px, var(--c4l-ui-icon-contextual));
+        content: "" !important;
+    }
+
+    .c4l-reminder-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/noun_project_icons/c4l_reminder_icon]]), 15px, 18px, var(--c4l-ui-icon-contextual));
+        content: "" !important;
+    }
+
+    .c4l-attention-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l_attention_icon]]), 20px, 20px, var(--c4l-ui-icon-procedural));
+        content: "" !important;
+    }
+
+    .c4l-quote-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/noun_project_icons/c4l_quote_icon]]), 19px, 18px, var(--c4l-ui-icon-contextual));
+        content: "" !important;
+    }
+
+    .c4l-dodontcards-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l_dodontcards_icon]]), 24px, 18px, var(--c4l-ui-icon-contextual));
+        content: "" !important;
+    }
+
+    .c4l-readingcontext-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/noun_project_icons/c4l_readingcontext_icon]]), 24px, 18px, var(--c4l-ui-icon-contextual));
+        content: "" !important;
+    }
+
+    .c4l-example-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l_example_icon]]), 14px, 18px, var(--c4l-ui-icon-contextual));
+        content: "" !important;
+    }
+
+    .c4l-figure-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l_figure_icon]]), 20px, 18px, var(--c4l-ui-icon-contextual));
+        content: "" !important;
+    }
+
+    .c4l-tag-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/noun_project_icons/c4l_tag_icon]]), 18px, 18px, var(--c4l-ui-icon-contextual));
+        content: "" !important;
+    }
+
+    .c4l-estimatedtime-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/noun_project_icons/c4l_estimatedtime_icon]]), 18px, 18px, var(--c4l-ui-icon-procedural));
+        content: "" !important;
+    }
+
+    .c4l-duedate-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/noun_project_icons/c4l_duedate_icon]]), 18px, 18px, var(--c4l-ui-icon-procedural));
+        content: "" !important;
+    }
+
+    .c4l-proceduralcontext-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l_proceduralcontext_icon]]), 23px, 18px, var(--c4l-ui-icon-procedural));
+        content: "" !important;
+    }
+
+    .c4l-learningoutcomes-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l_learningoutcomes_icon]]), 22px, 16px, var(--c4l-ui-icon-procedural));
+        content: "" !important;
+    }
+
+    .c4l-conceptreview-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l_conceptreview_icon]]), 16px, 16px, var(--c4l-ui-icon-contextual));
+        content: "" !important;
+    }
+
+    .c4l-furtherreading-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l_furtherreading_icon]]), 14px, 14px, var(--c4l-ui-icon-contextual));
+        content: "" !important;
+    }
+
+    .c4l-gradingvalue-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/noun_project_icons/c4l_gradingvalue_icon]]), 20px, 18px, var(--c4l-ui-icon-evaluative));
+        content: "" !important;
+    }
+
+    .c4l-aiuseallowed-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/noun_project_icons/c4l_aiuseallowed_icon]]), 19px, 19px, var(--c4l-ui-icon-evaluative));
+        content: "" !important;
+    }
+
+    .c4l-aiusenotallowed-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/noun_project_icons/c4l_aiusenotallowed_icon]]), 19px, 19px, var(--c4l-ui-icon-evaluative));
+        content: "" !important;
+    }
+
+    .c4l-aiusereported-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/noun_project_icons/c4l_aiusereported_icon]]), 19px, 19px, var(--c4l-ui-icon-evaluative));
+        content: "" !important;
+    }
+
+    .c4l-expectedfeedback-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/noun_project_icons/c4l_expectedfeedback_icon]]), 20px, 18px, var(--c4l-ui-icon-evaluative));
+        content: "" !important;
+    }
+
+    .c4l-allpurposecard-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l_allpurposecard_icon]]), 17px, 18px, var(--c4l-ui-icon-helper));
+        content: "" !important;
+    }
+
+    .c4l-inlinetag-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l_inlinetag_icon]]), 26px, 18px, var(--c4l-ui-icon-contextual));
+        content: "" !important;
+    }
+
+    .c4l-statement-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l-statement-icon]]), 18px, 18px, var(--c4l-ui-icon-procedural));
+        content: "" !important;
+    }
+
+    .c4l-assessment-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l-assessment-icon]]), 15px, 18px, var(--c4l-ui-icon-evaluative));
+        content: "" !important;
+    }
+}

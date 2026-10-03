@@ -7,6 +7,8 @@
  */
 /* stylelint-disable */
 
+@import "tokens";
+@import "mixins";
 @import "variables";
 @import "components";
 @import "overrides";
@@ -74,17 +76,17 @@ p.c4l-spacer + p.c4l-spacer {
 }
 
 .c4lauthor-vt__btn:hover {
-    background: $variant-accent;
-    color: #fff;
+    background: var(--c4l-ui-variant-hover-bg);
+    color: var(--c4l-ui-variant-ink);
 }
 
 .c4lauthor-vt__btn--active {
-    background: $variant-accent;
-    color: #fff;
+    background: var(--c4l-ui-variant-on-bg);
+    color: var(--c4l-ui-variant-ink);
 }
 
 .c4lauthor-vt__btn--active:hover {
-    background: $variant-accent;
+    background: var(--c4l-ui-variant-on-bg);
 }
 
 .c4lauthor-vt__btn--delete {
@@ -95,8 +97,8 @@ p.c4l-spacer + p.c4l-spacer {
 }
 
 .c4lauthor-vt__btn--delete:hover {
-    background: $variant-accent;
-    color: #fff;
+    background: var(--c4l-ui-variant-hover-bg);
+    color: var(--c4l-ui-variant-ink);
 }
 
 .c4lauthor-vt__btn--move {

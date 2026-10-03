@@ -1339,6 +1339,10 @@ export const getSetup = async() => {
             placeholderSelectors: [],
         };
 
+        // Colour mode. Repeated here because the inner editor is not initialised by
+        // editor_tiny, so core's own handling does not reach it.
+        const colourMode = document.documentElement.getAttribute('data-bs-theme') ?? 'light';
+
         // Initialize inner TinyMCE instance.
         let innerEditor = null;
         /* eslint-disable camelcase */
@@ -1346,6 +1350,7 @@ export const getSetup = async() => {
             selector: '#' + textareaId,
             license_key: 'gpl',
             plugins: innerPlugins,
+            skin: colourMode === 'dark' ? 'oxide-dark' : 'oxide',
             toolbar: editor.options.get('toolbar').map((section) => ({
                 name: section.name,
                 items: section.items.filter((b) => b !== buttonName),
@@ -1477,6 +1482,20 @@ export const getSetup = async() => {
 
         if (!innerEditor && editors && editors.length) {
             innerEditor = editors[0];
+        }
+
+        // Container, sink and content document: three separate subtrees, none of which
+        // inherits the attribute from the page.
+        const innerContainer = innerEditor.getContainer();
+        if (innerContainer) {
+            innerContainer.setAttribute('data-bs-theme', colourMode);
+        }
+        document.querySelectorAll('.tox-silver-sink').forEach((sink) => {
+            sink.setAttribute('data-bs-theme', colourMode);
+        });
+        const innerDocument = innerEditor.getDoc();
+        if (innerDocument) {
+            innerDocument.documentElement.setAttribute('data-bs-theme', colourMode);
         }
 
         // Set up contextual variant toolbar.

@@ -696,11 +696,18 @@ export const mountPreciseView = async(container, handlers) => {
     cssUrls.forEach((url) => {
         linkTags += '<link rel="stylesheet" href="' + escapeAttr(url) + '">';
     });
-    const srcdoc = '<!DOCTYPE html><html><head><meta charset="utf-8">' + linkTags +
+
+    // Colour mode. This preview is a document of its own, so the attribute has to be
+    // written onto its root for the stylesheets above to resolve their dark values.
+    const colourMode = document.documentElement.getAttribute('data-bs-theme') ?? 'light';
+
+    const srcdoc = '<!DOCTYPE html><html data-bs-theme="' + escapeAttr(colourMode) + '">' +
+        '<head><meta charset="utf-8">' + linkTags +
         '<style>body{margin:1rem;font-family:-apple-system,BlinkMacSystemFont,' +
         '"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}' +
         '.c4l-spacer{margin:.25rem 0}' +
-        '[data-c4l-selected]{outline:2px solid #b8d7ff;outline-offset:2px;border-radius:0}</style>' +
+        '[data-c4l-selected]{outline:2px solid #b8d7ff;outline-offset:2px;border-radius:0}' +
+        'html[data-bs-theme=dark] [data-c4l-selected]{outline-color:var(--c4l-ui-accent)}</style>' +
         '</head><body class="tiny_c4lauthor__precision-body">' + editorHtml + '</body></html>';
     iframe.setAttribute('srcdoc', srcdoc);
     previewContainer.appendChild(iframe);

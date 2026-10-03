@@ -118,10 +118,12 @@
 .c4lv-keyconcept {
     min-width: 200px;
     max-width: 99%;
-    background-color: #f1f5fe;
+    background-color: var(--c4l-keyconcept-bg);
+    color: var(--c4l-text);
+    box-shadow: 0 0 0 1px var(--c4l-border);
     padding: 24px 36px 30px 36px;
     border: none;
-    border-left: 6px solid #387af1;
+    border-left: 6px solid var(--c4l-keyconcept-accent);
     margin: 36px auto;
     position: relative;
     border-radius: 0;
@@ -137,10 +139,12 @@
 .c4lv-tip {
     min-width: 200px;
     max-width: 99%;
-    background-color: #fbeffa;
+    background-color: var(--c4l-tip-bg);
+    color: var(--c4l-text);
+    box-shadow: 0 0 0 1px var(--c4l-border);
     padding: 24px 48px 30px 36px;
     border: none;
-    border-left: 6px solid #b00ca9;
+    border-left: 6px solid var(--c4l-tip-accent);
     margin: 36px auto;
     position: relative;
     border-radius: 0;
@@ -150,7 +154,8 @@
     }
 
     &::after {
-        content: url([[pix:tiny_c4lauthor|noun_project_icons/c4l_tip]]);
+        @include c4l-mask-folded(url([[pix:tiny_c4lauthor|noun_project_icons/c4l_tip]]), 32px, 30px,
+        var(--c4l-tip-accent), var(--c4l-tip-fold), right 0.5px bottom 0);
         position: absolute;
         top: 6px;
         right: -3px;
@@ -163,10 +168,12 @@
 .c4lv-reminder {
     min-width: 200px;
     max-width: 99%;
-    background-color: #eff8fd;
+    background-color: var(--c4l-reminder-bg);
+    color: var(--c4l-text);
+    box-shadow: 0 0 0 1px var(--c4l-border);
     padding: 24px 48px 30px 36px;
     border: none;
-    border-left: 6px solid #16b9ff;
+    border-left: 6px solid var(--c4l-reminder-accent);
     margin: 36px auto;
     position: relative;
     border-radius: 0;
@@ -176,7 +183,8 @@
     }
 
     &::after {
-        content: url([[pix:tiny_c4lauthor|noun_project_icons/c4l_reminder]]);
+        @include c4l-mask-folded(url([[pix:tiny_c4lauthor|noun_project_icons/c4l_reminder]]), 32px, 30px,
+        var(--c4l-reminder-accent), var(--c4l-reminder-fold), right 0.5px bottom 0);
         position: absolute;
         top: 6px;
         right: -3px;
@@ -189,10 +197,12 @@
 .c4lv-attention {
     min-width: 200px;
     max-width: 99%;
-    background-color: #fef6ed;
+    background-color: var(--c4l-attention-bg);
+    color: var(--c4l-text);
+    box-shadow: 0 0 0 1px var(--c4l-border);
     padding: 24px 48px 30px 36px;
     border: none;
-    border-left: 6px solid #f88923;
+    border-left: 6px solid var(--c4l-attention-accent);
     margin: 36px auto;
     position: relative;
     border-radius: 0;
@@ -202,7 +212,8 @@
     }
 
     &::after {
-        content: url([[pix:tiny_c4lauthor|c4l_attention]]);
+        @include c4l-mask-folded(url([[pix:tiny_c4lauthor|c4l_attention]]), 32px, 30px,
+        var(--c4l-attention-accent), var(--c4l-attention-fold), right 0.5px bottom 0);
         position: absolute;
         top: 6px;
         right: -3px;
@@ -214,9 +225,18 @@
 .c4l-quote,
 .c4lv-quote {
     /*font-family: "Lora", serif; <== Reccomended font -not included: requires link to Google Fonts */
-    font-family: Iowan Old Style, Apple Garamond, Baskerville, Times New Roman,
-        Droid Serif, Times, Source Serif Pro, serif, Apple Color Emoji,
-        Segoe UI Emoji, Segoe UI Symbol;
+    font-family:
+        Iowan Old Style,
+        Apple Garamond,
+        Baskerville,
+        Times New Roman,
+        Droid Serif,
+        Times,
+        Source Serif Pro,
+        serif,
+        Apple Color Emoji,
+        Segoe UI Emoji,
+        Segoe UI Symbol;
     font-size: 16px;
     line-height: 24px;
     margin: 24px auto;
@@ -234,7 +254,7 @@
     }
 
     .c4l-quote-line {
-        border-left: 4px solid #387af1;
+        border-left: 4px solid var(--c4l-quote-line);
         margin-right: 16px;
         margin-top: 4px;
         margin-bottom: 2px;
@@ -255,14 +275,14 @@
     }
 
     .c4l-quote-text p:first-of-type::before {
-        content: url([[pix:tiny_c4lauthor|noun_project_icons/c4l_quote_open]]);
+        @include c4l-mask(url([[pix:tiny_c4lauthor|noun_project_icons/c4l_quote_open]]), 11px, 7px, var(--c4l-quote-line));
         position: relative;
         top: -4px;
         margin-right: 2px;
     }
 
     .c4l-quote-text p:last-of-type::after {
-        content: url([[pix:tiny_c4lauthor|noun_project_icons/c4l_quote_close]]);
+        @include c4l-mask(url([[pix:tiny_c4lauthor|noun_project_icons/c4l_quote_close]]), 11px, 7px, var(--c4l-quote-line));
         position: relative;
         top: -2px;
         margin-left: 2px;
@@ -314,7 +334,9 @@
     .c4l-dodontcards-do {
         min-width: 200px;
         max-width: 100%;
-        background: #f1fbf5;
+        background: var(--c4l-do-bg);
+        color: var(--c4l-text);
+        box-shadow: 0 0 0 1px var(--c4l-border);
         border-radius: 10px;
         padding: 24px 48px 30px 36px;
         margin: 12px auto;
@@ -322,7 +344,7 @@
     }
 
     .c4l-dodontcards-do::before {
-        content: url([[pix:tiny_c4lauthor|c4l_docard]]);
+        @include c4l-mask(url([[pix:tiny_c4lauthor|c4l_docard]]), 25px, 24px, var(--c4l-do-icon));
         position: absolute;
         top: 12px;
         right: 12px;
@@ -331,7 +353,9 @@
     .c4l-dodontcards-dont {
         min-width: 200px;
         max-width: 100%;
-        background: #ffefef;
+        background: var(--c4l-dont-bg);
+        color: var(--c4l-text);
+        box-shadow: 0 0 0 1px var(--c4l-border);
         border-radius: 10px;
         padding: 24px 48px 30px 36px;
         margin: 12px auto;
@@ -339,7 +363,7 @@
     }
 
     .c4l-dodontcards-dont::before {
-        content: url([[pix:tiny_c4lauthor|c4l_dontcard]]);
+        @include c4l-mask(url([[pix:tiny_c4lauthor|c4l_dontcard]]), 24px, 24px, var(--c4l-dont-icon));
         position: absolute;
         top: 12px;
         right: 12px;
@@ -362,8 +386,9 @@
 .c4lv-readingcontext {
     min-width: 200px;
     max-width: 75%;
-    background-color: #fff;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    background-color: var(--c4l-readingcontext-bg);
+    color: var(--c4l-text);
+    box-shadow: 0 4px 24px var(--c4l-shadow-soft), 0 0 0 1px var(--c4l-border);
     box-sizing: border-box;
     margin: 36px auto;
 
@@ -375,9 +400,18 @@
 
 .c4l-readingcontext {
     padding: 30px 40px 19px 40px;
-    font-family: Iowan Old Style, Apple Garamond, Baskerville, Times New Roman,
-        Droid Serif, Times, Source Serif Pro, serif, Apple Color Emoji,
-        Segoe UI Emoji, Segoe UI Symbol;
+    font-family:
+        Iowan Old Style,
+        Apple Garamond,
+        Baskerville,
+        Times New Roman,
+        Droid Serif,
+        Times,
+        Source Serif Pro,
+        serif,
+        Apple Color Emoji,
+        Segoe UI Emoji,
+        Segoe UI Symbol;
 
     .c4l-readingcontext-caption {
         font-size: 16px;
@@ -413,9 +447,18 @@
     }
 
     &.c4l-comfort-reading-variant {
-        font-family: Iowan Old Style, Apple Garamond, Baskerville, Times New Roman,
-        Droid Serif, Times, Source Serif Pro, serif, Apple Color Emoji,
-        Segoe UI Emoji, Segoe UI Symbol;
+        font-family:
+            Iowan Old Style,
+            Apple Garamond,
+            Baskerville,
+            Times New Roman,
+            Droid Serif,
+            Times,
+            Source Serif Pro,
+            serif,
+            Apple Color Emoji,
+            Segoe UI Emoji,
+            Segoe UI Symbol;
     }
 }
 
@@ -425,27 +468,27 @@
 .c4lv-example {
     font-size: 15px;
     line-height: 22px;
-    color: inherit;
-    background: #fff;
+    background: var(--c4l-example-bg);
+    color: var(--c4l-text);
     border-radius: 0;
     margin: 36px auto;
     min-width: 75%;
     max-width: 100%;
     padding: 18px 24px;
     position: relative;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.13);
+    box-shadow: 0 4px 24px var(--c4l-shadow), 0 0 0 1px var(--c4l-border);
 
     h1 {
         font-weight: 700;
         font-size: 11px;
         line-height: 21px;
         letter-spacing: 0.5px;
-        color: #3171e3;
+        color: var(--c4l-example-rule);
         margin: 0 0 24px 0;
         text-transform: uppercase;
         font-family: inherit;
         display: inline-block;
-        border-bottom: 2px solid #3171e3;
+        border-bottom: 2px solid var(--c4l-example-rule);
     }
 }
 
@@ -460,14 +503,14 @@
         width: 100%;
         &:not([src]),
         &[src=""] {
-            content: url([[pix:tiny_c4lauthor|c4l_figure_placeholder]]);
+            content: var(--c4l-figure-placeholder);
         }
     }
 
     figcaption {
         font-size: 13px;
         line-height: 16px;
-        color: #686d79;
+        color: var(--c4l-figure-caption);
         margin-top: 7px;
     }
 
@@ -496,8 +539,9 @@
     display: inline-block;
     font-size: 10px;
     font-weight: 700;
-    color: #2167cf;
-    background-color: #f1f5fe;
+    color: var(--c4l-tag-ink);
+    background-color: var(--c4l-tag-bg);
+    box-shadow: 0 0 0 1px var(--c4l-border);
     border-radius: 30px;
     padding: 4px 17px;
     line-height: 20px;
@@ -512,8 +556,9 @@
 .c4l-estimatedtime,
 .c4lv-estimatedtime {
     font-size: 12px;
-    color: #2167cf;
-    background-color: #f1f5fe;
+    color: var(--c4l-estimatedtime-ink);
+    background-color: var(--c4l-estimatedtime-bg);
+    box-shadow: 0 0 0 1px var(--c4l-border);
     padding: 6px 14px;
     font-weight: 700;
     margin-left: 6px;
@@ -530,7 +575,7 @@
     }
 
     &::before {
-        content: url([[pix:tiny_c4lauthor|noun_project_icons/c4l_estimatedtime]]);
+        @include c4l-mask(url([[pix:tiny_c4lauthor|noun_project_icons/c4l_estimatedtime]]), 17px, 18px, var(--c4l-estimatedtime-ink));
         position: absolute;
         left: 12px;
     }
@@ -541,8 +586,9 @@
 .c4l-duedate,
 .c4lv-duedate {
     font-size: 12px;
-    color: #2167cf;
-    background-color: #f1f5fe;
+    color: var(--c4l-duedate-ink);
+    background-color: var(--c4l-duedate-bg);
+    box-shadow: 0 0 0 1px var(--c4l-border);
     padding: 6px 14px;
     font-weight: 600;
     margin-left: 6px;
@@ -554,7 +600,7 @@
     border-radius: 5px;
 
     &::after {
-        content: url([[pix:tiny_c4lauthor|noun_project_icons/c4l_duedate]]);
+        @include c4l-mask(url([[pix:tiny_c4lauthor|noun_project_icons/c4l_duedate]]), 15px, 17px, var(--c4l-duedate-ink));
         position: absolute;
         left: 12px;
     }
@@ -565,7 +611,7 @@
 .c4l-proceduralcontext,
 .c4lv-proceduralcontext {
     font-style: italic;
-    color: #3a56af;
+    color: var(--c4l-proceduralcontext-ink);
     margin-bottom: 12px;
     padding-top: 24px;
     padding-bottom: 24px;
@@ -577,8 +623,9 @@
 .c4l-gradingvalue,
 .c4lv-gradingvalue {
     font-size: 12px;
-    color: #2167cf;
-    background-color: #f1f5fe;
+    color: var(--c4l-gradingvalue-ink);
+    background-color: var(--c4l-gradingvalue-bg);
+    box-shadow: 0 0 0 1px var(--c4l-border);
     padding: 6px 14px;
     font-weight: 700;
     margin-left: 6px;
@@ -595,7 +642,7 @@
     }
 
     &::after {
-        content: url([[pix:tiny_c4lauthor|noun_project_icons/c4l_gradingvalue]]);
+        @include c4l-mask(url([[pix:tiny_c4lauthor|noun_project_icons/c4l_gradingvalue]]), 16px, 15px, var(--c4l-gradingvalue-ink));
         position: absolute;
         left: 12px;
         top: 6px;
@@ -607,8 +654,9 @@
 .c4l-aiuseallowed,
 .c4lv-aiuseallowed {
     font-size: 12px;
-    color: #127A1D;
-    background-color: #edf7f0;
+    color: var(--c4l-aiuseallowed-ink);
+    background-color: var(--c4l-aiuseallowed-bg);
+    box-shadow: 0 0 0 1px var(--c4l-border);
     padding: 6px 14px;
     font-weight: 700;
     margin-left: 6px;
@@ -625,7 +673,7 @@
     }
 
     &::after {
-        content: url([[pix:tiny_c4lauthor|c4l_aiuseallowed]]);
+        @include c4l-mask(url([[pix:tiny_c4lauthor|c4l_aiuseallowed]]), 19px, 19px, var(--c4l-aiuseallowed-ink));
         position: absolute;
         left: 10px;
         top: 3px;
@@ -637,8 +685,9 @@
 .c4l-aiusenotallowed,
 .c4lv-aiusenotallowed {
     font-size: 12px;
-    color: #DF1801;
-    background-color: #FFF2F2;
+    color: var(--c4l-aiusenotallowed-ink);
+    background-color: var(--c4l-aiusenotallowed-bg);
+    box-shadow: 0 0 0 1px var(--c4l-border);
     padding: 6px 14px;
     font-weight: 700;
     margin-left: 6px;
@@ -655,7 +704,7 @@
     }
 
     &::after {
-        content: url([[pix:tiny_c4lauthor|c4l_aiusenotallowed]]);
+        @include c4l-mask(url([[pix:tiny_c4lauthor|c4l_aiusenotallowed]]), 19px, 19px, var(--c4l-aiusenotallowed-ink));
         position: absolute;
         left: 10px;
         top: 3px;
@@ -667,8 +716,9 @@
 .c4l-aiusereported,
 .c4lv-aiusereported {
     font-size: 12px;
-    color: #B45400;
-    background-color: #FFF8E7;
+    color: var(--c4l-aiusereported-ink);
+    background-color: var(--c4l-aiusereported-bg);
+    box-shadow: 0 0 0 1px var(--c4l-border);
     padding: 6px 14px;
     font-weight: 700;
     margin-left: 6px;
@@ -685,7 +735,7 @@
     }
 
     &::after {
-        content: url([[pix:tiny_c4lauthor|c4l_aiusereported]]);
+        @include c4l-mask(url([[pix:tiny_c4lauthor|c4l_aiusereported]]), 19px, 19px, var(--c4l-aiusereported-ink));
         position: absolute;
         left: 10px;
         top: 3px;
@@ -698,21 +748,23 @@
 .c4lv-expectedfeedback {
     min-width: 200px;
     max-width: 90%;
-    background-color: #fff;
+    background-color: var(--c4l-expectedfeedback-bg);
+    color: var(--c4l-text);
     padding: 24px 36px 30px 36px;
     margin: 36px auto;
     font-style: italic;
     position: relative;
     border-radius: 8px;
     border: none;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.13);
+    box-shadow: 0 4px 24px var(--c4l-shadow), 0 0 0 1px var(--c4l-border);
 
     &::before {
         content: "";
     }
 
     &::after {
-        content: url([[pix:tiny_c4lauthor|noun_project_icons/c4l_expectedfeedback]]);
+        @include c4l-mask-folded(url([[pix:tiny_c4lauthor|noun_project_icons/c4l_expectedfeedback]]), 32px, 30px,
+        var(--c4l-expectedfeedback-icon), var(--c4l-expectedfeedback-fold), right 0.5px top 0);
         position: absolute;
         bottom: 6px;
         right: -3px;
@@ -729,7 +781,9 @@
 .c4lv-allpurposecard {
     min-width: 200px;
     max-width: 100%;
-    background: #f1f5fe;
+    background: var(--c4l-allpurposecard-bg);
+    color: var(--c4l-text);
+    box-shadow: 0 0 0 1px var(--c4l-border);
     border-radius: 10px;
     padding: 24px 48px 30px 36px;
     margin: 24px auto;
@@ -757,8 +811,8 @@
     text-transform: uppercase;
     letter-spacing: 0.2px;
     display: inline-block;
-    color: #fff;
-    background: #3171e3;
+    color: var(--c4l-inlinetag-ink);
+    background: var(--c4l-inlinetag-bg);
     border-radius: 7px;
     padding: 2px 7px 1px 7px;
     position: relative;
@@ -773,7 +827,9 @@
 .c4lv-learningoutcomes {
     min-width: 200px;
     max-width: 99%;
-    background-color: #f2f5fd;
+    background-color: var(--c4l-learningoutcomes-bg);
+    color: var(--c4l-text);
+    box-shadow: 0 0 0 1px var(--c4l-border);
     padding: 24px 48px 30px 36px;
     border: none;
     margin: 36px auto;
@@ -791,18 +847,18 @@
         font-weight: 600;
         font-size: 11px;
         letter-spacing: 0.7px;
-        color: #fff;
-        background-color: #497ae9;
+        color: var(--c4l-learningoutcomes-title-ink);
+        background-color: var(--c4l-learningoutcomes-title-bg);
         text-transform: uppercase;
         font-family: inherit;
         display: inline-block;
         margin-top: 0;
         list-style: none;
-        filter: drop-shadow(0 1.55601px 3.11202px rgba(0, 0, 0, 7%));
+        filter: drop-shadow(0 1.55601px 3.11202px var(--c4l-shadow-xsoft));
     }
 
     > .c4l-learningoutcomes-title::before {
-        content: url([[pix:tiny_c4lauthor|c4l_learningoutcomes_shadow]]);
+        @include c4l-mask(url([[pix:tiny_c4lauthor|c4l_learningoutcomes_shadow]]), 3px, 2px, var(--c4l-learningoutcomes-title-shade));
         position: absolute;
         width: 3px;
         height: 2px;
@@ -821,8 +877,7 @@
     }
 
     > li:not(.c4l-learningoutcomes-title)::before {
-        background-image: url([[pix:tiny_c4lauthor|c4l_learningoutcomes_list_item]]);
-        background-size: 9px 11px;
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|c4l_learningoutcomes_list_item]]), 9px, 11px, var(--c4l-learningoutcomes-marker));
         display: inline-block;
         width: 9px;
         height: 11px;
@@ -850,7 +905,7 @@
         counter-increment: section;
         content: counter(section) ". ";
         font-weight: 700;
-        color: #497ae9;
+        color: var(--c4l-learningoutcomes-marker);
     }
 }
 
@@ -860,15 +915,16 @@
 .c4lv-conceptreview {
     min-width: 200px;
     max-width: 95%;
-    background-color: #fff;
+    background-color: var(--c4l-conceptreview-bg);
+    color: var(--c4l-text);
     padding: 32px 54px 36px 54px;
     margin: 36px auto;
     position: relative;
     border-radius: 12px;
-    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.13);
+    box-shadow: 0 4px 20px 0 var(--c4l-shadow), 0 0 0 1px var(--c4l-border);
 
     .c4l-concept-review-title {
-        color: #B00CA9;
+        color: var(--c4l-conceptreview-title);
         font-size: 12px;
         font-weight: 700;
         text-transform: uppercase;
@@ -881,7 +937,8 @@
     }
 
     &::before {
-        content: url([[pix:tiny_c4lauthor|c4l_conceptreview]]);
+        @include c4l-mask-folded(url([[pix:tiny_c4lauthor|c4l_conceptreview]]), 32px, 30px,
+        var(--c4l-conceptreview-icon), var(--c4l-conceptreview-fold), left 0.5px bottom 0);
         position: absolute;
         top: 24px;
         left: -3px;
@@ -894,23 +951,25 @@
 .c4lv-furtherreading {
     min-width: 200px;
     max-width: 95%;
-    background-color: #fff;
+    background-color: var(--c4l-furtherreading-bg);
+    color: var(--c4l-text);
     padding: 32px 54px 36px 54px;
     margin: 36px auto;
     position: relative;
     border-radius: 12px;
-    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.13);
+    box-shadow: 0 4px 20px 0 var(--c4l-shadow), 0 0 0 1px var(--c4l-border);
     list-style: none;
 
     &::before {
-        content: url([[pix:tiny_c4lauthor|c4l_furtherreading]]);
+        @include c4l-mask-folded(url([[pix:tiny_c4lauthor|c4l_furtherreading]]), 32px, 30px,
+        var(--c4l-furtherreading-icon), var(--c4l-furtherreading-fold), left 0.5px bottom 0);
         position: absolute;
         top: 24px;
         left: -3px;
     }
 
     > .c4l-further-reading-title {
-        color: #0271BF;
+        color: var(--c4l-furtherreading-title);
         font-size: 12px;
         font-weight: 700;
         text-transform: uppercase;
@@ -930,8 +989,7 @@
     }
 
     > li:not(.c4l-further-reading-title)::before {
-        background-image: url([[pix:tiny_c4lauthor|c4l_furtherreading_list_item]]);
-        background-size: 9px 11px;
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|c4l_furtherreading_list_item]]), 9px, 11px, var(--c4l-furtherreading-marker));
         display: inline-block;
         width: 9px;
         height: 11px;
@@ -955,8 +1013,9 @@
 }
 
 #task-compound-layout .task-statement {
-    background: #FFFFFF;
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.12);
+    background: var(--c4l-statement-bg);
+    color: var(--c4l-text);
+    box-shadow: 0 4px 15px var(--c4l-shadow-mid), 0 0 0 1px var(--c4l-border);
     border-radius: 10px;
     font-size: 17px;
     padding: 36px 48px;
@@ -983,21 +1042,27 @@
     flex-direction: row;
     align-items: stretch;
     justify-content: flex-start;
-    background-color: #fff;
+    background-color: var(--c4l-assessment-bg);
+    color: var(--c4l-text);
     padding: 12px;
-    box-shadow: 0 4px 34px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 34px var(--c4l-shadow-mid), 0 0 0 1px var(--c4l-border);
     border-radius: 10px;
 }
 #task-compound-layout .teacher-assessment-frame {
-    background-color: #f1f5fe;
-    background-image: url([[pix:tiny_c4lauthor|fi_clipboard]]);
-    background-repeat: no-repeat;
-    background-position: center;
+    background-color: var(--c4l-assessment-frame-bg);
+    box-shadow: 0 0 0 1px var(--c4l-border);
     min-height: 48px;
     width: 48px;
     min-width: 48px;
     flex-shrink: 0;
     border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &::before {
+        @include c4l-mask(url([[pix:tiny_c4lauthor|fi_clipboard]]), 24px, 24px, var(--c4l-accent-blue));
+    }
 }
 #task-compound-layout .teacher-assessment-text {
     padding-top: 24px;

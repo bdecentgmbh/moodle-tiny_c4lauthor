@@ -1,0 +1,305 @@
+:root,
+[data-bs-theme=light] {
+    /* Surfaces */
+    --c4l-surface: #fff;
+    --c4l-border: transparent;
+    --c4l-text: inherit;
+    --c4l-text-muted: #686d79;
+    --c4l-on-accent: #fff;           /* text on --c4l-solid-* fills */
+
+    /* Tints */
+    --c4l-tint-blue: #f1f5fe;
+    --c4l-tint-blue-alt: #f2f5fd;
+    --c4l-tint-magenta: #fbeffa;
+    --c4l-tint-cyan: #eff8fd;
+    --c4l-tint-orange: #fef6ed;
+    --c4l-tint-green: #f1fbf5;
+    --c4l-tint-green-alt: #edf7f0;
+    --c4l-tint-red: #ffefef;
+    --c4l-tint-red-alt: #fff2f2;
+    --c4l-tint-amber: #fff8e7;
+
+    /* Accents — bars, rules, markers */
+    --c4l-accent-blue: #387af1;
+    --c4l-accent-magenta: #b00ca9;
+    --c4l-accent-cyan: #16b9ff;
+    --c4l-accent-orange: #f88923;
+    --c4l-accent-blue-mid: #3171e3;
+    --c4l-accent-blue-deep: #497ae9;
+    --c4l-accent-green: #1cc460;
+    --c4l-accent-red: #f85449;
+    --c4l-accent-blue-shade: #213e81;
+
+    /* Badge folds */
+    --c4l-accent-magenta-shade: #71096c;
+    --c4l-accent-cyan-shade: #007bb0;
+    --c4l-accent-orange-shade: #ca6100;
+    --c4l-accent-blue-mid-shade: #2b5cb5;
+
+    /* Ink — text sitting on a tint */
+    --c4l-ink-blue: #2167cf;
+    --c4l-ink-indigo: #3a56af;
+    --c4l-ink-magenta: #b00ca9;
+    --c4l-ink-cyan: #0271bf;
+    --c4l-ink-green: #127a1d;
+    --c4l-ink-red: #df1801;
+    --c4l-ink-amber: #b45400;
+
+    /* Solid fills */
+    --c4l-solid-blue: #3171e3;
+    --c4l-solid-blue-deep: #497ae9;
+
+    /* Picker toolbar icons */
+    --c4l-ui-icon-contextual: #1679f9;
+    --c4l-ui-icon-procedural: #d93562;
+    --c4l-ui-icon-evaluative: #f5982b;
+    --c4l-ui-icon-helper: #3aaf2a;
+
+    /* Variant strip */
+    --c4l-ui-variant-bg: #ecf3ff;
+    --c4l-ui-variant-sep: #fff;
+    --c4l-ui-variant-edge: transparent;
+    --c4l-ui-variant-on-bg: #1679f9;
+    --c4l-ui-variant-hover-bg: #1679f9;
+    --c4l-ui-variant-ink: #fff;
+
+    /* Page surface and text greys */
+    --c4l-ui-page: #f6f7f8;
+    --c4l-ui-page-border: #dee2e6;
+    --c4l-ui-text: #535d76;
+    --c4l-ui-text-strong: #424b62;
+    --c4l-ui-text-muted: #9297a1;
+
+    /* Plugin UI — controls */
+    /* Controls */
+    --c4l-ui-surface: #fff;
+    --c4l-ui-border: #dfe2e5;
+    --c4l-ui-button-border: #e4e9ec;
+    --c4l-ui-raised: #e7ebef;
+    --c4l-ui-divider: #dce3f0;
+    --c4l-ui-shadow: rgba(0, 0, 0, .10);
+    --c4l-ui-focus: rgba(22, 121, 249, .3);
+    --c4l-ui-tab-border: #535d76;
+    --c4l-ui-tab-active-bg: #535d76;
+    --c4l-ui-tab-active-ink: #fff;
+    --c4l-ui-panel-border: #e1e5ee;
+    --c4l-ui-link: #1779f9;
+    --c4l-ui-accent: #1679f9;
+
+    --c4l-figure-placeholder: url([[pix:tiny_c4lauthor|c4l_figure_placeholder]]);
+
+    /* Elevation */
+    /* Elevation */
+    --c4l-shadow-soft: rgba(0, 0, 0, .08);
+    --c4l-shadow: rgba(0, 0, 0, .13);
+    --c4l-shadow-xsoft: rgba(0, 0, 0, .07);
+    --c4l-shadow-mid: rgba(0, 0, 0, .12);
+
+    /* C4L Author only */
+    --c4l-ui-overlay-bg: rgba(255, 255, 255, .82);
+    --c4l-ui-overlay-ink: #222f3e;
+    --c4l-ui-danger: #dc3545;
+    --c4l-ui-variant-border: #c0d4f5;
+    --c4l-ui-scrollbar: rgba(0, 0, 0, .2);
+    --c4l-ui-tabs-shadow: 0 2px 2px -2px rgba(34, 47, 62, .1), 0 8px 8px -4px rgba(34, 47, 62, .07);
+
+    --c4l-ui-ai-border: #d1ebdb;
+    --c4l-ui-ai-selected: #dff2e6;
+    --c4l-ui-ai-hover: #f7fdfa;
+    --c4l-ui-ai-icon-border: #cfecda;
+    --c4l-ui-ai-alert-bg: #dff2e6;
+    --c4l-ui-ai-alert-border: #f0f7f2;
+    --c4l-ui-ai-alert-ink: #3c6e47;
+    --c4l-ui-ai-alert-btn-border: #b5d6c1;
+    --c4l-ui-skeleton-mid: #f3f4f6;
+}
+
+[data-bs-theme=dark] {
+    /* ACTIVE 1 — COMPONENTS */
+
+    /* Surfaces */
+    --c4l-surface: #181c20;
+    --c4l-border: #2a3037;
+    --c4l-text: #e6e9ec;
+    --c4l-text-muted: #8d959d;
+    --c4l-on-accent: #0f1214;
+
+    /* Tints */
+    --c4l-tint-blue: var(--c4l-surface);
+    --c4l-tint-blue-alt: var(--c4l-surface);
+    --c4l-tint-magenta: var(--c4l-surface);
+    --c4l-tint-cyan: var(--c4l-surface);
+    --c4l-tint-orange: var(--c4l-surface);
+    --c4l-tint-green: var(--c4l-surface);
+    --c4l-tint-green-alt: var(--c4l-surface);
+    --c4l-tint-red: var(--c4l-surface);
+    --c4l-tint-red-alt: var(--c4l-surface);
+    --c4l-tint-amber: var(--c4l-surface);
+
+    /* Accents */
+    --c4l-accent-blue: #81abf5;
+    --c4l-accent-magenta: #da72d6;
+    --c4l-accent-cyan: #76d6ff;
+    --c4l-accent-orange: #ffa858;
+    --c4l-accent-blue-mid: #81abf5;
+    --c4l-accent-blue-deep: #81abf5;
+    --c4l-accent-green: #8bf0b4;
+    --c4l-accent-red: #ffa29b;
+
+    --c4l-accent-magenta-shade: #7c577a;
+    --c4l-accent-cyan-shade: #7397a6;
+    --c4l-accent-orange-shade: #b56d2b;
+    --c4l-accent-blue-mid-shade: #3a71d1;
+    --c4l-accent-blue-shade: #3f66a8;
+
+    /* Ink */
+    --c4l-ink-blue: #81abf5;
+    --c4l-ink-indigo: #81abf5;
+    --c4l-ink-magenta: #da72d6;
+    --c4l-ink-cyan: #76d6ff;
+    --c4l-ink-green: #8bf0b4;
+    --c4l-ink-red: #ffa29b;
+    --c4l-ink-amber: #ffa858;
+
+    /* Solid fills */
+    --c4l-solid-blue: #81abf5;
+    --c4l-solid-blue-deep: #81abf5;
+
+    /* ACTIVE 2 — PICKER TOOLBAR ICONS */
+
+    --c4l-ui-icon-contextual: #64a4f9;
+    --c4l-ui-icon-procedural: #e46487;
+    --c4l-ui-icon-evaluative: #faca92;
+    --c4l-ui-icon-helper: #ace8a4;
+
+    --c4l-figure-placeholder: url([[pix:tiny_c4lauthor|c4l_figure_placeholder_dark]]);
+
+    /* Elevation */
+    --c4l-shadow-soft: transparent;
+    --c4l-shadow: transparent;
+    --c4l-shadow-xsoft: transparent;
+
+    /* ACTIVE 3 — PLUGIN UI */
+
+    --c4l-ui-page: var(--bs-modal-bg);
+    --c4l-ui-surface: var(--bs-gray-200);
+    --c4l-ui-variant-bg: var(--bs-gray-100);
+    --c4l-ui-text: var(--bs-secondary-color);
+    --c4l-ui-text-strong: var(--bs-gray-700);
+    --c4l-ui-raised: var(--bs-gray-100);
+    --c4l-ui-text-muted: #8d959d;
+
+    /* Borders */
+    --c4l-ui-border: var(--bs-border-color);
+    --c4l-ui-button-border: var(--bs-border-color);
+    --c4l-ui-page-border: var(--bs-border-color);
+    --c4l-ui-panel-border: var(--bs-border-color);
+    --c4l-ui-divider: var(--bs-border-color);
+    --c4l-ui-tab-border: var(--bs-border-color);
+    --c4l-ui-variant-edge: var(--bs-border-color);
+    --c4l-ui-variant-sep: var(--bs-border-color);
+
+    /* Completed from tiny_c4l blocks A and B */
+    --c4l-ui-accent: #81abf5;
+    --c4l-ui-link: #81abf5;
+    --c4l-ui-shadow: transparent;
+    --c4l-ui-focus: rgba(129, 171, 245, .35);
+    --c4l-ui-tab-active-bg: #c3cad1;
+    --c4l-ui-tab-active-ink: #0f1214;
+    --c4l-ui-variant-on-bg: #1679f9;
+    --c4l-ui-variant-hover-bg: #2c3339;
+    --c4l-ui-variant-ink: #fff;
+
+    /* ACTIVE 4 — C4L AUTHOR ONLY */
+
+    /* C4L Author only */
+    --c4l-ui-overlay-bg: rgba(15, 18, 20, .82);
+    --c4l-ui-overlay-ink: #c3cad1;
+    --c4l-ui-danger: #ffa29b;
+    --c4l-ui-variant-border: #35507d;
+    --c4l-ui-scrollbar: rgba(255, 255, 255, .24);
+    --c4l-ui-tabs-shadow: none;
+
+    --c4l-ui-ai-border: #2f4738;
+    --c4l-ui-ai-selected: #1d2a22;
+    --c4l-ui-ai-hover: #1b241e;
+    --c4l-ui-ai-icon-border: #2f4738;
+    --c4l-ui-ai-alert-bg: #1d2a22;
+    --c4l-ui-ai-alert-border: #2f4738;
+    --c4l-ui-ai-alert-ink: #8bf0b4;
+    --c4l-ui-ai-alert-btn-border: #3f6b50;
+    --c4l-ui-skeleton-mid: #22282e;
+
+    --c4l-shadow-mid: transparent;
+}
+
+:root,
+[data-bs-theme=light],
+[data-bs-theme=dark] {
+    /* Contextual */
+    --c4l-keyconcept-bg: var(--c4l-tint-blue);
+    --c4l-keyconcept-accent: var(--c4l-accent-blue);
+    --c4l-tip-bg: var(--c4l-tint-magenta);
+    --c4l-tip-accent: var(--c4l-accent-magenta);
+    --c4l-tip-fold: var(--c4l-accent-magenta-shade);
+    --c4l-reminder-bg: var(--c4l-tint-cyan);
+    --c4l-reminder-accent: var(--c4l-accent-cyan);
+    --c4l-reminder-fold: var(--c4l-accent-cyan-shade);
+    --c4l-quote-line: var(--c4l-accent-blue);
+    --c4l-do-bg: var(--c4l-tint-green);
+    --c4l-do-icon: var(--c4l-accent-green);
+    --c4l-dont-bg: var(--c4l-tint-red);
+    --c4l-dont-icon: var(--c4l-accent-red);
+    --c4l-readingcontext-bg: var(--c4l-surface);
+    --c4l-example-bg: var(--c4l-surface);
+    --c4l-example-rule: var(--c4l-accent-blue-mid);
+    --c4l-figure-caption: var(--c4l-text-muted);
+    --c4l-tag-bg: var(--c4l-tint-blue);
+    --c4l-tag-ink: var(--c4l-ink-blue);
+    --c4l-inlinetag-bg: var(--c4l-solid-blue);
+    --c4l-inlinetag-ink: var(--c4l-on-accent);
+    --c4l-conceptreview-bg: var(--c4l-surface);
+    --c4l-conceptreview-title: var(--c4l-ink-magenta);
+    --c4l-conceptreview-icon: var(--c4l-accent-magenta);
+    --c4l-conceptreview-fold: var(--c4l-accent-magenta-shade);
+    --c4l-furtherreading-bg: var(--c4l-surface);
+    --c4l-furtherreading-title: var(--c4l-ink-cyan);
+    --c4l-furtherreading-icon: var(--c4l-accent-cyan);
+    --c4l-furtherreading-fold: var(--c4l-accent-cyan-shade);
+    --c4l-furtherreading-marker: var(--c4l-accent-cyan);
+
+    /* Procedural */
+    --c4l-attention-bg: var(--c4l-tint-orange);
+    --c4l-attention-accent: var(--c4l-accent-orange);
+    --c4l-attention-fold: var(--c4l-accent-orange-shade);
+    --c4l-estimatedtime-bg: var(--c4l-tint-blue);
+    --c4l-estimatedtime-ink: var(--c4l-ink-blue);
+    --c4l-duedate-bg: var(--c4l-tint-blue);
+    --c4l-duedate-ink: var(--c4l-ink-blue);
+    --c4l-proceduralcontext-ink: var(--c4l-ink-indigo);
+    --c4l-learningoutcomes-bg: var(--c4l-tint-blue-alt);
+    --c4l-learningoutcomes-title-bg: var(--c4l-solid-blue-deep);
+    --c4l-learningoutcomes-title-ink: var(--c4l-on-accent);
+    --c4l-learningoutcomes-title-shade: var(--c4l-accent-blue-shade);
+    --c4l-learningoutcomes-marker: var(--c4l-accent-blue-deep);
+
+    /* Evaluative */
+    --c4l-gradingvalue-bg: var(--c4l-tint-blue);
+    --c4l-gradingvalue-ink: var(--c4l-ink-blue);
+    --c4l-expectedfeedback-bg: var(--c4l-surface);
+    --c4l-expectedfeedback-icon: var(--c4l-accent-blue);
+    --c4l-expectedfeedback-fold: var(--c4l-accent-blue-mid-shade);
+    --c4l-aiuseallowed-bg: var(--c4l-tint-green-alt);
+    --c4l-aiuseallowed-ink: var(--c4l-ink-green);
+    --c4l-aiusenotallowed-bg: var(--c4l-tint-red-alt);
+    --c4l-aiusenotallowed-ink: var(--c4l-ink-red);
+    --c4l-aiusereported-bg: var(--c4l-tint-amber);
+    --c4l-aiusereported-ink: var(--c4l-ink-amber);
+
+    /* Helper */
+    --c4l-allpurposecard-bg: var(--c4l-tint-blue);
+
+    --c4l-statement-bg: var(--c4l-surface);
+    --c4l-assessment-bg: var(--c4l-surface);
+    --c4l-assessment-frame-bg: var(--c4l-tint-blue);
+}

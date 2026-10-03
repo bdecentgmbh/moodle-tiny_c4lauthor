@@ -1,0 +1,11 @@
+{
+    "name": "c4lauthor",
+    "private": true,
+    "description": "Authoring environment for the Components for Learning (C4L) set in the Moodle TinyMCE editor.",
+    "scripts": {
+        "sass": "sass --no-source-map --style=compressed scss/main.scss styles.css; sass --no-source-map --style=compressed scss/editor.scss editor_styles.css"
+    },
+    "devDependencies": {
+        "sass": "^1.64.1"
+    }
+}
