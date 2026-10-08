@@ -127,6 +127,24 @@ Changing a component's markup means updating its fixtures in the same commit.
 settings list every component; one an admin has not seen there yet counts with its
 default.
 
+## Tabs, carousel and collapsible
+
+These helpers are plain markup recognised by their classes, so they survive Moodle's
+HTML cleaning (which removes `<button>`, `role`, `aria-*` and `data-*` for untrusted
+content) and work with Bootstrap 4 and 5 alike. Without JavaScript, and in the Moodle
+app, every tab, slide and collapsible content is shown. On the page,
+`amd/src/runtime.js` adds the buttons, the ARIA attributes and the behaviour; a hook
+callback loads it on every page, and it does nothing where these helpers are absent.
+
+The runtime also reads the Bootstrap-based markup of the C4L Author bdecent build and
+turns it into this markup when the page loads, so content made with that build keeps
+working. A link block from that build keeps its address only in its text; the runtime
+copies it into the link only if it is an http, https or mailto address.
+
+In the C4L Author editor, `amd/src/editor_widgets.js` shows one tab or slide at a time,
+with controls to switch, add and delete them and to add an image to a slide. The
+controls are never saved.
+
 ## Adding components from another plugin
 
 Another plugin adds components through the `\tiny_c4lauthor\hook\extend_components`
@@ -158,6 +176,7 @@ public static function extend_c4lauthor(\tiny_c4lauthor\hook\extend_components $
         'students' => false,
     ]);
     $hook->add_editor_stylesheet(new \moodle_url('/local/example/editor.css'));
+    $hook->add_page_module('local_example/runtime');
 }
 ```
 
@@ -170,7 +189,9 @@ C4L Author. A declaration C4L Author cannot use is left out with a developer deb
 message.
 
 The plugin's `styles.css` styles the component on the page. The editor's content does
-not load it, so add the same rules as an editor stylesheet.
+not load it, so add the same rules as an editor stylesheet. A page module's `init()`
+runs on every page, for components that need behaviour, like tabs; it should return
+quickly where its components are absent.
 
 Instead of its template, a component can insert what an AMD module of the plugin
 returns, for example after the teacher has picked something:
@@ -215,7 +236,7 @@ Note that Moodle pins Node to `>=22.11.0 <23`; a newer Node will fail the instal
 
 ## Icons
 
-Icons authored by Roger Segú, except for the following, licensed under Creative Commons CCBY: [Glasses](https://thenounproject.com/icon/70907/) by Austin Condiff, [Estimate](https://thenounproject.com/icon/1061038/) by xwoodhillx, [Quote](https://thenounproject.com/icon/77920/) by Rohith M S, [Pin](https://thenounproject.com/icon/689105/) by Icons fest, [Bulb](https://thenounproject.com/icon/1175583/) by Adrien Coquet, [Date](https://thenounproject.com/icon/1272092/) by Karan, [Success](https://thenounproject.com/icon/3405499/) by Alice Design, [Clock](https://thenounproject.com/icon/2310543/) by Aybige, [Feedback](https://thenounproject.com/icon/651868/) by dilayorganci, [Star](https://thenounproject.com/icon/1368720/) by Zaff Studio, [Tag](https://thenounproject.com/icon/938953/) by Ananth, Redo and Book Open by [Unicons](https://github.com/Iconscout/unicons).
+Icons authored by Roger Segú, except for the following, licensed under Creative Commons CCBY: [Glasses](https://thenounproject.com/icon/70907/) by Austin Condiff, [Estimate](https://thenounproject.com/icon/1061038/) by xwoodhillx, [Quote](https://thenounproject.com/icon/77920/) by Rohith M S, [Pin](https://thenounproject.com/icon/689105/) by Icons fest, [Bulb](https://thenounproject.com/icon/1175583/) by Adrien Coquet, [Date](https://thenounproject.com/icon/1272092/) by Karan, [Success](https://thenounproject.com/icon/3405499/) by Alice Design, [Clock](https://thenounproject.com/icon/2310543/) by Aybige, [Feedback](https://thenounproject.com/icon/651868/) by dilayorganci, [Star](https://thenounproject.com/icon/1368720/) by Zaff Studio, [Tag](https://thenounproject.com/icon/938953/) by Ananth, Redo, Book Open and Check circle by [Unicons](https://github.com/Iconscout/unicons), Clipboard, External link, Arrow right, Combo (derived), Tabs (derived), Styled table (derived), Carousel (derived), and Dropdown (derived) by [Feather icons](https://feathericons.com/).
 
 ## Related projects
 
