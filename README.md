@@ -125,10 +125,7 @@ Note that Moodle pins Node to `>=22.11.0 <23`; a newer Node will fail the instal
 - `tiny/c4lauthor:viewplugin` — controls plugin visibility for any role.
 - `tiny/c4lauthor:use` — allows using the plugin.
 - `tiny/c4lauthor:aisuggest` — allows using the AI suggest feature.
-
-## Fonts
-
-This plugin includes the Figtree font family (SIL Open Font License 1.1), inherited from the Components for Learning project.
+- `tiny/c4lauthor:useallcomponents` — offers all components in the sidebar. Users without it see only the components listed for students in the settings. Teachers and managers have it by default. This steers authoring and is not access control.
 
 ## Icons
 

@@ -17,6 +17,16 @@
 - Brand colour tokens (`--c4l-brand` and its tints) that follow the site's primary
   colour, also inside the editor, with dark-mode values. The new helpers use them.
 - The mobile app styles cover the three helpers.
+## 1.2.2-beta
+
+### Changed
+
+- A new capability, `tiny/c4lauthor:useallcomponents`, decides who sees all
+  components in the sidebar. It replaces the check on `gradereport/grader:view`
+  and has the same default roles (teacher, editing teacher, manager), so standard
+  roles see no change. Users without it see only the components listed for
+  students. This guides authoring and is not access control.
+- The README no longer mentions the Figtree font, which the plugin does not ship.
 
 ## 1.2.1-beta
 

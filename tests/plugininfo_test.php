@@ -78,6 +78,34 @@ final class plugininfo_test extends \advanced_testcase {
         $this->assertFalse(plugininfo::is_enabled($this->context, [], []));
     }
 
+    public function test_teacher_sees_all_components(): void {
+        $config = $this->configuration();
+
+        $this->assertFalse($config['isstudent']);
+        $this->assertSame([], $config['allowedcomps']);
+    }
+
+    public function test_student_sees_components_listed_for_students(): void {
+        $student = $this->getDataGenerator()->create_and_enrol($this->course, 'student');
+        $this->setUser($student);
+
+        $config = $this->configuration();
+
+        $this->assertTrue($config['isstudent']);
+        $this->assertContains('keyconcept', $config['allowedcomps']);
+    }
+
+    public function test_useallcomponents_decides_not_the_grader_report(): void {
+        $student = $this->getDataGenerator()->create_and_enrol($this->course, 'student');
+        $role = $this->getDataGenerator()->create_role();
+        assign_capability('tiny/c4lauthor:useallcomponents', CAP_ALLOW, $role, $this->context->id);
+        role_assign($role, $student->id, $this->context->id);
+        $this->setUser($student);
+
+        $this->assertFalse(has_capability('gradereport/grader:view', $this->context));
+        $this->assertFalse($this->configuration()['isstudent']);
+    }
+
     public function test_ai_off_by_default(): void {
         $this->assertSame('0', get_config('tiny_c4lauthor', 'ai_enabled'));
         $this->assertFalse($this->configuration()['aienabled']);

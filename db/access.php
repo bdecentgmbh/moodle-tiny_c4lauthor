@@ -43,6 +43,17 @@ $capabilities = [
             'manager' => CAP_ALLOW,
         ],
     ],
+    // Decides only which components the sidebar offers; components are plain HTML,
+    // so this is authoring guidance, not access control.
+    'tiny/c4lauthor:useallcomponents' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ],
+    ],
     'tiny/c4lauthor:aisuggest' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
