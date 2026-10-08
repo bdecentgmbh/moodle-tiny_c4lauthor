@@ -51,54 +51,19 @@ if ($ADMIN->fulltree) {
         0
     ));
 
-    // Components aimed at students.
-    $components = [
-        'keyconcept' => get_string('keyconcept', 'tiny_c4lauthor'),
-        'tip' => get_string('tip', 'tiny_c4lauthor'),
-        'reminder' => get_string('reminder', 'tiny_c4lauthor'),
-        'quote' => get_string('quote', 'tiny_c4lauthor'),
-        'dodontcards' => get_string('dodontcards', 'tiny_c4lauthor'),
-        'readingcontext' => get_string('readingcontext', 'tiny_c4lauthor'),
-        'example' => get_string('example', 'tiny_c4lauthor'),
-        'figure' => get_string('figure', 'tiny_c4lauthor'),
-        'tag' => get_string('tag', 'tiny_c4lauthor'),
-        'inlinetag' => get_string('inlinetag', 'tiny_c4lauthor'),
-        'attention' => get_string('attention', 'tiny_c4lauthor'),
-        'allpurposecard' => get_string('allpurposecard', 'tiny_c4lauthor'),
-    ];
-    $name = get_string('aimedatstudents', 'tiny_c4lauthor');
-    $desc = get_string('aimedatstudents_desc', 'tiny_c4lauthor');
-    $setting = new admin_setting_configmulticheckbox(
+    // Components offered to students: those aimed at them, and those not intended for them.
+    $settings->add(new \tiny_c4lauthor\local\admin_setting_student_components(
         'tiny_c4lauthor/aimedatstudents',
-        $name,
-        $desc,
-        $components,
-        $components
-    );
-    $settings->add($setting);
-
-    // Components not intended for students.
-    $components = [
-        'estimatedtime' => get_string('estimatedtime', 'tiny_c4lauthor'),
-        'duedate' => get_string('duedate', 'tiny_c4lauthor'),
-        'proceduralcontext' => get_string('proceduralcontext', 'tiny_c4lauthor'),
-        'gradingvalue' => get_string('gradingvalue', 'tiny_c4lauthor'),
-        'aiuseallowed' => get_string('aiuseallowed', 'tiny_c4lauthor'),
-        'aiusenotallowed' => get_string('aiusenotallowed', 'tiny_c4lauthor'),
-        'aiusereported' => get_string('aiusereported', 'tiny_c4lauthor'),
-        'expectedfeedback' => get_string('expectedfeedback', 'tiny_c4lauthor'),
-        'learningoutcomes' => get_string('learningoutcomes', 'tiny_c4lauthor'),
-    ];
-    $name = get_string('notintendedforstudents', 'tiny_c4lauthor');
-    $desc = get_string('notintendedforstudents_desc', 'tiny_c4lauthor');
-    $setting = new admin_setting_configmulticheckbox(
+        get_string('aimedatstudents', 'tiny_c4lauthor'),
+        get_string('aimedatstudents_desc', 'tiny_c4lauthor'),
+        true
+    ));
+    $settings->add(new \tiny_c4lauthor\local\admin_setting_student_components(
         'tiny_c4lauthor/notintendedforstudents',
-        $name,
-        $desc,
-        [],
-        $components
-    );
-    $settings->add($setting);
+        get_string('notintendedforstudents', 'tiny_c4lauthor'),
+        get_string('notintendedforstudents_desc', 'tiny_c4lauthor'),
+        false
+    ));
 
     // AI Suggest settings heading.
     $settings->add(new admin_setting_heading(

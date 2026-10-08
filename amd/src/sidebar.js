@@ -33,7 +33,7 @@
  */
 export const buildSidebar = (catalogue, filterLabels, userIsStudent, allowedComps, enableTooltips) => {
     // Collect visible types.
-    const typeOrder = ['contextual', 'procedural', 'evaluative', 'helper', 'custom'];
+    const typeOrder = ['contextual', 'procedural', 'evaluative', 'helper', 'templates', 'custom'];
 
     // Filter components based on student/allowed.
     const visibleComponents = catalogue.components.filter((comp) => {
