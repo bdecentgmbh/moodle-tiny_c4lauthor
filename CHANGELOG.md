@@ -1,5 +1,25 @@
 # Changelog
 
+## 1.4.0-beta
+
+### Changed
+
+- Components are declared in `db/components.php` and their markup lives in Mustache
+  templates (`templates/components/`), instead of in JavaScript. The editor fetches
+  the declarations through a new web service, `tiny_c4lauthor_get_components`. The
+  inserted markup is unchanged; a test compares every component with the markup
+  1.3.0-beta inserted.
+- Precision mode reads its fields from the declarations. Fields that need custom
+  code name a handler in `precise_handlers.js`.
+- `commands.js` is split into modules: the convert menu, the sidebar, the variant
+  toolbar, the dropdown, the icons and the component markup each have their own.
+
+### Fixed
+
+- `variantslib.js` imported the variant list under a name `variants.js` did not
+  export, so restoring a variant preference that named a variant failed with an
+  error. It now gets the variants from the declarations.
+
 ## 1.3.0-beta
 
 ### Added
