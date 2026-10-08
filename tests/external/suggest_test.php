@@ -193,12 +193,13 @@ final class suggest_test extends \advanced_testcase {
     public function test_hides_provider_errors(): void {
         $this->require_mockable_ai();
         $this->accept_policy();
-        $this->mock_ai(new response_generate_text(
-            success: false,
-            errorcode: 500,
-            error: 'Internal server error',
-            errormessage: 'Secret provider detail',
-        ));
+        $args = ['success' => false, 'errorcode' => 500, 'errormessage' => 'Secret provider detail'];
+        $constructor = new \ReflectionMethod(response_generate_text::class, '__construct');
+        if (in_array('error', array_map(fn($param) => $param->getName(), $constructor->getParameters()))) {
+            // Moodle 5.1 and later require an error name as well.
+            $args['error'] = 'Internal server error';
+        }
+        $this->mock_ai(new response_generate_text(...$args));
 
         $result = $this->call($this->paragraphs(3));
 
