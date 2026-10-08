@@ -23,6 +23,7 @@
 
 import {get_string as getString} from 'core/str';
 import {component} from './common';
+import {brandColourRule} from './brand';
 import Pending from 'core/pending';
 import Templates from 'core/templates';
 
@@ -61,6 +62,11 @@ const FIELD_REGISTRY = {
     ],
     expectedfeedback: [
         {selector: 'span[data-id]', label: 'precision_field_text', type: 'textarea', innerHTML: true, fallback: true},
+    ],
+    combo: [
+        {selector: '.text p', label: 'precision_field_text', type: 'textarea'},
+        {selector: '.text li', label: 'precision_field_item', type: 'list'},
+        {selector: 'img', label: 'precision_field_image_alt', type: 'image-alt'},
     ],
     allpurposecard: [
         {selector: 'span[data-id]', label: 'precision_field_text', type: 'textarea', innerHTML: true, fallback: true},
@@ -180,6 +186,59 @@ const FIELD_REGISTRY = {
         {selector: 'img', label: 'precision_field_image_alt', type: 'image-alt'},
         {selector: '.c4l-figure-footer', label: 'precision_field_caption', type: 'input', optional: true},
         {selector: '.c4l-figure-caption', label: 'precision_field_source', type: 'input', optional: true},
+    ],
+    panellist: [
+        {selector: 'li', label: 'precision_field_item', type: 'list'},
+    ],
+    timeline: [
+        {selector: '.c4l-timeline-event',
+            label: 'precision_field_event', type: 'list',
+            subfields: [
+                {key: 'year', selector: '.c4l-timeline-year', type: 'input',
+                    label: 'precision_field_year'},
+                {key: 'text', selector: '.c4l-timeline-text', type: 'textarea',
+                    label: 'precision_field_text'},
+            ],
+            apply: (compEl, values) => {
+                const doc = compEl.ownerDocument;
+                const eventsContainer = compEl.querySelector('.c4l-timeline-events');
+                if (!eventsContainer) {
+                    return;
+                }
+                const existing = [...compEl.querySelectorAll('.c4l-timeline-event')];
+                values.forEach((row, i) => {
+                    let ev = existing[i];
+                    if (!ev) {
+                        ev = doc.createElement('div');
+                        ev.className = 'c4l-timeline-event';
+                        const pill = doc.createElement('div');
+                        pill.className = 'c4l-timeline-pill';
+                        const marker = doc.createElement('div');
+                        marker.className = 'c4l-timeline-marker';
+                        marker.setAttribute('contenteditable', 'false');
+                        const yearSpan = doc.createElement('span');
+                        yearSpan.className = 'c4l-timeline-year';
+                        pill.appendChild(marker);
+                        pill.appendChild(yearSpan);
+                        ev.appendChild(pill);
+                        const textP = doc.createElement('p');
+                        textP.className = 'c4l-timeline-text';
+                        ev.appendChild(textP);
+                        eventsContainer.appendChild(ev);
+                    }
+                    const yearEl = ev.querySelector('.c4l-timeline-year');
+                    if (yearEl) {
+                        yearEl.textContent = row.year || '';
+                    }
+                    const textEl = ev.querySelector('.c4l-timeline-text');
+                    if (textEl) {
+                        textEl.textContent = row.text || '';
+                    }
+                });
+                for (let i = values.length; i < existing.length; i++) {
+                    existing[i].remove();
+                }
+            }},
     ],
 };
 
@@ -365,7 +424,18 @@ const extractListField = (compEl, desc) => {
         return null;
     }
     const values = [];
-    items.forEach((li) => values.push(li.textContent.trim()));
+    if (desc.subfields) {
+        items.forEach((item) => {
+            const row = {};
+            desc.subfields.forEach((sf) => {
+                const el = item.querySelector(sf.selector);
+                row[sf.key] = el ? el.textContent.trim() : '';
+            });
+            values.push(row);
+        });
+    } else {
+        items.forEach((li) => values.push(li.textContent.trim()));
+    }
     return {descriptor: desc, values, elements: items, listParent: items[0].parentNode};
 };
 
@@ -380,15 +450,30 @@ const extractListField = (compEl, desc) => {
  */
 const populateFormValues = (panel, fields) => {
     fields.forEach((field, fIdx) => {
-        if (field.descriptor.type === 'list') {
-            const textareas = panel.querySelectorAll(
-                'textarea[data-field="' + fIdx + '"]'
-            );
-            field.values.forEach((val, i) => {
-                if (textareas[i]) {
-                    textareas[i].value = val;
-                }
-            });
+        const desc = field.descriptor;
+        if (desc.type === 'list') {
+            if (desc.subfields) {
+                field.values.forEach((row, i) => {
+                    desc.subfields.forEach((sf, sIdx) => {
+                        const input = panel.querySelector(
+                            '[data-field="' + fIdx + '"][data-item="' + i +
+                            '"][data-sub="' + sIdx + '"]'
+                        );
+                        if (input) {
+                            input.value = row[sf.key] || '';
+                        }
+                    });
+                });
+            } else {
+                const textareas = panel.querySelectorAll(
+                    'textarea[data-field="' + fIdx + '"]'
+                );
+                field.values.forEach((val, i) => {
+                    if (textareas[i]) {
+                        textareas[i].value = val;
+                    }
+                });
+            }
         } else {
             const input = panel.querySelector('[data-field="' + fIdx + '"]');
             if (input) {
@@ -488,7 +573,7 @@ const buildFieldHtml = (field, fIdx, strings) => {
 const buildListFieldHtml = (field, fIdx, strings) => {
     let html = '';
     field.values.forEach((_val, i) => {
-        html += buildListItemHtml(fIdx, i, strings);
+        html += buildListItemHtml(fIdx, i, strings, field.descriptor);
     });
     html += '<button type="button" class="tiny_c4lauthor__precision-add-btn"' +
         ' data-field="' + fIdx + '">' +
@@ -502,15 +587,41 @@ const buildListFieldHtml = (field, fIdx, strings) => {
  * @param {number} fIdx
  * @param {number} itemIdx
  * @param {Map} strings
+ * @param {Object} [desc] field descriptor, used when subfields are configured
  * @returns {string}
  */
-const buildListItemHtml = (fIdx, itemIdx, strings) => {
-    return '<div class="tiny_c4lauthor__precision-list-item" data-item-idx="' + itemIdx + '">' +
-        '<textarea class="tiny_c4lauthor__precision-input tiny_c4lauthor__precision-textarea"' +
-        ' data-field="' + fIdx + '" data-item="' + itemIdx + '"></textarea>' +
-        '<button type="button" class="tiny_c4lauthor__precision-remove-btn"' +
+const buildListItemHtml = (fIdx, itemIdx, strings, desc) => {
+    let html = '<div class="tiny_c4lauthor__precision-list-item" data-item-idx="' + itemIdx + '">';
+    if (desc && desc.subfields) {
+        html += '<div class="tiny_c4lauthor__precision-subfields">';
+        desc.subfields.forEach((sf, sIdx) => {
+            const labelText = sf.label ? strings.get(sf.label) : '';
+            html += '<div class="tiny_c4lauthor__precision-subfield">';
+            if (labelText) {
+                html += '<label class="tiny_c4lauthor__precision-sublabel">' + labelText + '</label>';
+            }
+            if (sf.type === 'textarea') {
+                html += '<textarea class="tiny_c4lauthor__precision-input' +
+                    ' tiny_c4lauthor__precision-textarea"' +
+                    ' data-field="' + fIdx + '" data-item="' + itemIdx +
+                    '" data-sub="' + sIdx + '"></textarea>';
+            } else {
+                html += '<input type="text" class="tiny_c4lauthor__precision-input"' +
+                    ' data-field="' + fIdx + '" data-item="' + itemIdx +
+                    '" data-sub="' + sIdx + '" value="">';
+            }
+            html += '</div>';
+        });
+        html += '</div>';
+    } else {
+        html += '<textarea class="tiny_c4lauthor__precision-input' +
+            ' tiny_c4lauthor__precision-textarea"' +
+            ' data-field="' + fIdx + '" data-item="' + itemIdx + '"></textarea>';
+    }
+    html += '<button type="button" class="tiny_c4lauthor__precision-remove-btn"' +
         ' data-field="' + fIdx + '" data-item="' + itemIdx + '" title="' +
         escapeAttr(strings.get('precision_remove_item')) + '">&times;</button></div>';
+    return html;
 };
 
 // ── Applying form values ──
@@ -548,6 +659,29 @@ const applyStandardField = (compEl, desc, val) => {
  * @param {number} fIdx
  */
 const applyListField = (compEl, desc, field, formPanel, fIdx) => {
+    if (desc.apply) {
+        const values = [];
+        if (desc.subfields) {
+            const items = formPanel.querySelectorAll(
+                '.tiny_c4lauthor__precision-field-group[data-field-idx="' + fIdx + '"]' +
+                ' .tiny_c4lauthor__precision-list-item'
+            );
+            items.forEach((item) => {
+                const row = {};
+                desc.subfields.forEach((sf, sIdx) => {
+                    const input = item.querySelector('[data-sub="' + sIdx + '"]');
+                    row[sf.key] = input ? input.value : '';
+                });
+                values.push(row);
+            });
+        } else {
+            formPanel.querySelectorAll('textarea[data-field="' + fIdx + '"]').forEach((ta) => {
+                values.push(ta.value);
+            });
+        }
+        desc.apply(compEl, values, field);
+        return;
+    }
     const textareas = formPanel.querySelectorAll('textarea[data-field="' + fIdx + '"]');
     const listParent = field.listParent || (field.elements[0] ? field.elements[0].parentNode : null);
     if (!listParent) {
@@ -605,8 +739,9 @@ const applyFormToComponent = (compEl, fields, formPanel) => {
  * @param {HTMLElement} formPanel
  * @param {Map} strings
  * @param {Function} onFieldInput — callback to trigger reactive apply
+ * @param {Array} [fields] — extracted fields, used to look up descriptors for new items
  */
-const wireListButtons = (formPanel, strings, onFieldInput) => {
+const wireListButtons = (formPanel, strings, onFieldInput, fields) => {
     formPanel.querySelectorAll('.tiny_c4lauthor__precision-remove-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
             const listItem = btn.closest('.tiny_c4lauthor__precision-list-item');
@@ -628,7 +763,8 @@ const wireListButtons = (formPanel, strings, onFieldInput) => {
             }
             const items = group.querySelectorAll('.tiny_c4lauthor__precision-list-item');
             const newIdx = items.length;
-            const itemHtml = buildListItemHtml(fIdx, newIdx, strings);
+            const desc = fields && fields[fIdx] ? fields[fIdx].descriptor : null;
+            const itemHtml = buildListItemHtml(fIdx, newIdx, strings, desc);
             btn.insertAdjacentHTML('beforebegin', itemHtml);
             // Wire the new item.
             const newItem = group.querySelectorAll('.tiny_c4lauthor__precision-list-item');
@@ -642,10 +778,11 @@ const wireListButtons = (formPanel, strings, onFieldInput) => {
                     }
                 });
             }
-            const newTextarea = last.querySelector('.tiny_c4lauthor__precision-input');
-            if (newTextarea && onFieldInput) {
-                newTextarea.addEventListener('input', onFieldInput);
-            }
+            last.querySelectorAll('.tiny_c4lauthor__precision-input').forEach((inp) => {
+                if (onFieldInput) {
+                    inp.addEventListener('input', onFieldInput);
+                }
+            });
             if (onFieldInput) {
                 onFieldInput();
             }
@@ -681,6 +818,13 @@ export const mountPreciseView = async(container, handlers) => {
             if (field.label) {
                 stringKeySet.add(field.label);
             }
+            if (field.subfields) {
+                field.subfields.forEach((sf) => {
+                    if (sf.label) {
+                        stringKeySet.add(sf.label);
+                    }
+                });
+            }
         });
     });
     const stringKeys = Array.from(stringKeySet);
@@ -710,6 +854,7 @@ export const mountPreciseView = async(container, handlers) => {
         '<style>body{margin:1rem;font-family:-apple-system,BlinkMacSystemFont,' +
         '"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}' +
         '.c4l-spacer{margin:.25rem 0}' +
+        brandColourRule() +
         '[data-c4l-selected]{outline:2px solid #b8d7ff;outline-offset:2px;border-radius:0}' +
         'html[data-bs-theme=dark] [data-c4l-selected]{outline-color:var(--c4l-ui-accent)}</style>' +
         '</head><body class="tiny_c4lauthor__precision-body">' + editorHtml + '</body></html>';
@@ -858,7 +1003,7 @@ export const mountPreciseView = async(container, handlers) => {
             input.addEventListener('input', onFieldInput);
         });
 
-        wireListButtons(formPanel, strings, onFieldInput);
+        wireListButtons(formPanel, strings, onFieldInput, currentFields);
     };
 
     const destroy = () => {

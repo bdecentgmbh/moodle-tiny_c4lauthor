@@ -68,6 +68,7 @@ import {
     basicSetup as cmBasicSetup,
     lang as cmLang,
 } from 'tiny_html/codemirror-lazy';
+import {brandColourRule} from './brand';
 import {callSuggest} from './ai_api';
 import {mountAiView} from './ai_ui';
 import {mountPreciseView} from './precise_ui';
@@ -492,16 +493,25 @@ const buildSidebar = (filterLabels, userIsStudent, allowedComps, enableTooltips)
 
 
 /**
- * Get the C4L component name from a DOM element by
- * finding its c4lv-* class.
+ * Get the C4L component name from a DOM element by finding its c4lv-* class,
+ * or the wrapper class of a component that declares one.
  *
  * @param {HTMLElement} el
  * @returns {string|null}
  */
 const getC4lComponentName = (el) => {
+    if (!el || !el.classList) {
+        return null;
+    }
     for (const cls of el.classList) {
         if (cls.startsWith('c4lv-')) {
             return cls.substring(5);
+        }
+    }
+    for (const cls of el.classList) {
+        const comp = c4lComponents.find((c) => c.wrapperClass === cls);
+        if (comp) {
+            return comp.name;
         }
     }
     return null;
@@ -536,6 +546,16 @@ const setupVariantToolbar = (ed, deleteStr, moveUpStr, moveDownStr) => {
     const iframeDoc = ed.getDoc();
     const iframeBody = ed.getBody();
     const allVariants = variantsModule.variants;
+
+    // Components whose wrapper is not a c4lv- class have to be named explicitly
+    // or the hover test below never reaches them.
+    const nonVariantWrappers = Array.from(new Set(
+        c4lComponents.filter((c) => c.wrapperClass).map((c) => c.wrapperClass)
+    ));
+    const hoverSelector = '[class*="c4lv-"]'
+        + (nonVariantWrappers.length
+            ? ', ' + nonVariantWrappers.map((cls) => '.' + cls).join(', ')
+            : '');
 
     // Create toolbar (excluded from editor content).
     const toolbar = iframeDoc.createElement('div');
@@ -621,41 +641,90 @@ const setupVariantToolbar = (ed, deleteStr, moveUpStr, moveDownStr) => {
         ed.undoManager.add();
     };
 
+    const deactivateVariant = (compEl, varName, btn) => {
+        const varClass = 'c4l-' + varName + '-variant';
+        compEl.classList.remove(varClass);
+        if (btn) {
+            btn.classList.remove('c4lauthor-vt__btn--active');
+        }
+        if (varName === 'caption') {
+            const fc = compEl.querySelector('figcaption');
+            if (fc) {
+                fc.remove();
+            }
+        } else if (varName === 'quote') {
+            const ec = compEl.querySelector('.c4l-embedded-caption');
+            if (ec) {
+                ec.remove();
+            }
+        }
+    };
+
+    const activateVariant = (compEl, varName, btn, vDef) => {
+        const varClass = 'c4l-' + varName + '-variant';
+        compEl.classList.add(varClass);
+        if (btn) {
+            btn.classList.add('c4lauthor-vt__btn--active');
+        }
+        if (vDef && vDef.html) {
+            const tmp = iframeDoc.createElement('div');
+            tmp.innerHTML = vDef.html;
+            while (tmp.firstChild) {
+                compEl.appendChild(tmp.firstChild);
+            }
+        }
+    };
+
     const toggleVariant = (compEl, varName, btn) => {
         const varClass = 'c4l-' + varName + '-variant';
         const isActive = compEl.classList.contains(varClass);
+        const vDef = allVariants.find((v) => v.name === varName);
 
-        if (isActive) {
-            compEl.classList.remove(varClass);
-            btn.classList.remove('c4lauthor-vt__btn--active');
-            if (varName === 'caption') {
-                const fc = compEl.querySelector('figcaption');
-                if (fc) {
-                    fc.remove();
-                }
-            } else if (varName === 'quote') {
-                const ec = compEl.querySelector(
-                    '.c4l-embedded-caption'
-                );
-                if (ec) {
-                    ec.remove();
-                }
-            }
-        } else {
-            compEl.classList.add(varClass);
-            btn.classList.add('c4lauthor-vt__btn--active');
-            const vDef = allVariants.find(
-                (v) => v.name === varName
-            );
-            if (vDef && vDef.html) {
-                const tmp = iframeDoc.createElement('div');
-                tmp.innerHTML = vDef.html;
-                while (tmp.firstChild) {
-                    compEl.appendChild(tmp.firstChild);
-                }
-            }
+        // Mutually exclusive group: clicking the active one is a no-op
+        // (the group must always have exactly one active variant).
+        if (vDef && vDef.group && isActive) {
+            return;
         }
 
+        if (isActive) {
+            deactivateVariant(compEl, varName, btn);
+            return;
+        }
+
+        // Activating a grouped variant: deactivate any other active
+        // variant in the same group on this component.
+        if (vDef && vDef.group) {
+            const toolbar = btn && btn.parentNode;
+            allVariants
+                .filter((v) => v.group === vDef.group && v.name !== varName)
+                .forEach((other) => {
+                    const otherClass = 'c4l-' + other.name + '-variant';
+                    if (compEl.classList.contains(otherClass)) {
+                        const otherBtn = toolbar
+                            ? toolbar.querySelector('[data-variant="' + other.name + '"]')
+                            : null;
+                        deactivateVariant(compEl, other.name, otherBtn);
+                    }
+                });
+        }
+
+        // Activating a variant that excludes others: deactivate them
+        // on this component. Unlike `group`, excludes does not change
+        // the ability to toggle the variant off later.
+        if (vDef && Array.isArray(vDef.excludes)) {
+            const toolbar = btn && btn.parentNode;
+            vDef.excludes.forEach((excludedName) => {
+                const excludedClass = 'c4l-' + excludedName + '-variant';
+                if (compEl.classList.contains(excludedClass)) {
+                    const excludedBtn = toolbar
+                        ? toolbar.querySelector('[data-variant="' + excludedName + '"]')
+                        : null;
+                    deactivateVariant(compEl, excludedName, excludedBtn);
+                }
+            });
+        }
+
+        activateVariant(compEl, varName, btn, vDef);
     };
 
     const showToolbar = (compEl, comp) => {
@@ -775,9 +844,7 @@ const setupVariantToolbar = (ed, deleteStr, moveUpStr, moveDownStr) => {
             return;
         }
 
-        const compEl = e.target.closest(
-            '[class*="c4lv-"]'
-        );
+        const compEl = e.target.closest(hoverSelector);
         if (compEl) {
             cancelHide();
             const compName = getC4lComponentName(compEl);
@@ -843,6 +910,9 @@ const componentIconMap = {
     furtherreading: 'c4l_furtherreading_icon',
     statement: 'c4l-statement-icon',
     assessment: 'c4l-assessment-icon',
+    panellist: 'c4l_panellist_icon',
+    timeline: 'c4l_timeline_icon',
+    combo: 'c4l-combo-icon',
 };
 
 /**
@@ -1406,6 +1476,7 @@ export const getSetup = async() => {
             body_class: 'tiny_c4lauthor-inner-body',
             height: '100%',
             content_css: contentCss,
+            content_style: brandColourRule(),
             setup: (ed) => {
                 // Register Moodle core options so plugins can access contextid, filepickers, etc.
                 registerMoodleOptions(ed, moodleOptions);
@@ -2251,10 +2322,10 @@ export const getSetup = async() => {
             onAction: () => openModal(editor),
         });
 
-        // Inject custom preview CSS into the outer editor.
-        const previewCss = getpreviewCSS(editor);
-        if (previewCss) {
-            editor.options.set('content_style', previewCss);
+        // Inject the site's brand colour and the custom preview CSS into the outer editor.
+        const contentStyle = [brandColourRule(), getpreviewCSS(editor)].filter(Boolean).join('\n');
+        if (contentStyle) {
+            editor.options.set('content_style', contentStyle);
         }
 
         // Click-to-open: replace the editor UI with a clickable mask that opens the modal.

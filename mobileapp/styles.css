@@ -1318,3 +1318,411 @@ p.c4l-spacer + p.c4l-spacer {
     }
 }
 
+/* ── Panel list, timeline and combo ──
+   The app does not load the token layer, so these components bring the light-mode
+   values they use. --c4l-brand follows the app's primary colour where it sets one. */
+
+:root {
+    --c4l-brand: var(--ion-color-primary, #0f6cbf);
+    --c4l-text: inherit;
+    --c4l-text-muted: #686d79;
+    --c4l-on-accent: #fff;
+    --c4l-panellist-bg: color-mix(in srgb, var(--c4l-brand) 7%, #fff);
+    --c4l-panellist-marker: var(--c4l-brand);
+    --c4l-panellist-marker-ink: var(--c4l-on-accent);
+    --c4l-timeline-rule: color-mix(in srgb, var(--c4l-brand) 50%, #fff);
+    --c4l-timeline-pill-bg: color-mix(in srgb, var(--c4l-brand) 7%, #fff);
+    --c4l-timeline-marker: var(--c4l-brand);
+    --c4l-timeline-marker-dot: var(--c4l-on-accent);
+    --c4l-timeline-year: var(--c4l-brand);
+    --c4l-combo-bg: color-mix(in srgb, var(--c4l-brand) 7%, #fff);
+    --c4l-combo-title: var(--c4l-brand);
+    --c4l-combo-bullet: var(--c4l-brand);
+    --c4l-combo-lead: var(--c4l-text-muted);
+}
+
+/* Panel list (helper) */
+.c4lv-panellist {
+    list-style: none;
+    padding-left: 0;
+    margin: 24px auto;
+    max-width: 75%;
+}
+
+/* Numbered variant — panel rows with a circular counter badge. */
+.c4lv-panellist.c4l-numbered-variant {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    counter-reset: c4l-panellist-counter;
+}
+
+.c4lv-panellist.c4l-numbered-variant > li {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    margin: 0;
+    padding: 8px 6px 8px 8px;
+    background-color: var(--c4l-panellist-bg);
+    border-radius: 23px;
+    counter-increment: c4l-panellist-counter;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--c4l-text);
+}
+
+.c4lv-panellist.c4l-numbered-variant > li::before {
+    content: counter(c4l-panellist-counter);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    margin-right: 12px;
+    background-color: var(--c4l-panellist-marker);
+    border-radius: 50%;
+    color: var(--c4l-panellist-marker-ink);
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+}
+
+/* Checkmarks variant — panel rows with a circular check icon. The SVG
+      is embedded inline as a data URI so the rendered colour comes from
+      the element's background-color, which follows the site's brand colour
+      through --c4l-panellist-marker (mask-image uses the SVG only for shape). */
+.c4lv-panellist.c4l-checkmarks-variant {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.c4lv-panellist.c4l-checkmarks-variant > li {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    margin: 0;
+    padding: 8px 13px;
+    background-color: var(--c4l-panellist-bg);
+    border-radius: 23px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--c4l-text);
+}
+
+.c4lv-panellist.c4l-checkmarks-variant.c4l-compact-variant > li {
+    min-height: 40px;
+    padding: 8px 4px;
+}
+
+.c4lv-panellist.c4l-checkmarks-variant > li::before {
+    content: "";
+    display: inline-block;
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    margin-right: 14px;
+    background-color: var(--c4l-panellist-marker);
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 0C8.81703 0 5.76583 1.2641 3.51409 3.51409C1.2641 5.7656 0 8.81692 0 12C0 15.1831 1.2641 18.2341 3.51409 20.4859C5.7656 22.7359 8.81692 24 12 24C15.1831 24 18.2341 22.7359 20.4859 20.4859C22.7359 18.2344 24 15.1831 24 12C24 8.81692 22.7359 5.76583 20.4859 3.51409C18.2344 1.2641 15.1831 0 12 0ZM12 21.6773C9.43399 21.6773 6.9724 20.6583 5.15771 18.8421C3.34168 17.0277 2.32253 14.566 2.32253 11.9999C2.32253 9.43383 3.34168 6.97229 5.15771 5.15759C6.97221 3.34156 9.43395 2.32241 12 2.32241C14.566 2.32241 17.0276 3.34156 18.8423 5.15759C20.6583 6.97209 21.6775 9.43383 21.6775 11.9999C21.6775 14.566 20.6583 17.0275 18.8423 18.8421C17.0277 20.6583 14.566 21.6773 12 21.6773Z'/><path d='M18.1869 8.26563C18.388 8.45477 18.3978 8.77116 18.2087 8.97235L11.3714 16.2467C11.1243 16.5095 10.7809 16.6611 10.4202 16.6667C10.0597 16.6721 9.71237 16.531 9.45736 16.276L5.80124 12.6199C5.60594 12.4246 5.60598 12.108 5.80133 11.9127L6.97984 10.7348C7.17509 10.5397 7.49156 10.5397 7.6868 10.7349L10.3704 13.4176L16.2662 7.14621C16.4554 6.94501 16.7718 6.93525 16.973 7.1244L18.1869 8.26563Z'/></svg>") no-repeat center/24px 24px;
+    mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 0C8.81703 0 5.76583 1.2641 3.51409 3.51409C1.2641 5.7656 0 8.81692 0 12C0 15.1831 1.2641 18.2341 3.51409 20.4859C5.7656 22.7359 8.81692 24 12 24C15.1831 24 18.2341 22.7359 20.4859 20.4859C22.7359 18.2344 24 15.1831 24 12C24 8.81692 22.7359 5.76583 20.4859 3.51409C18.2344 1.2641 15.1831 0 12 0ZM12 21.6773C9.43399 21.6773 6.9724 20.6583 5.15771 18.8421C3.34168 17.0277 2.32253 14.566 2.32253 11.9999C2.32253 9.43383 3.34168 6.97229 5.15771 5.15759C6.97221 3.34156 9.43395 2.32241 12 2.32241C14.566 2.32241 17.0276 3.34156 18.8423 5.15759C20.6583 6.97209 21.6775 9.43383 21.6775 11.9999C21.6775 14.566 20.6583 17.0275 18.8423 18.8421C17.0277 20.6583 14.566 21.6773 12 21.6773Z'/><path d='M18.1869 8.26563C18.388 8.45477 18.3978 8.77116 18.2087 8.97235L11.3714 16.2467C11.1243 16.5095 10.7809 16.6611 10.4202 16.6667C10.0597 16.6721 9.71237 16.531 9.45736 16.276L5.80124 12.6199C5.60594 12.4246 5.60598 12.108 5.80133 11.9127L6.97984 10.7348C7.17509 10.5397 7.49156 10.5397 7.6868 10.7349L10.3704 13.4176L16.2662 7.14621C16.4554 6.94501 16.7718 6.93525 16.973 7.1244L18.1869 8.26563Z'/></svg>") no-repeat center/24px 24px;
+}
+
+/* Compact variant — wraps all items in a single rounded panel. When
+      combined with the numbered variant the per-item pill is dropped
+      and the rows share the outer panel background. */
+.c4lv-panellist.c4l-compact-variant {
+    background-color: var(--c4l-panellist-bg);
+    border-radius: 16px;
+    padding: 26px 32px;
+}
+
+.c4lv-panellist.c4l-compact-variant.c4l-numbered-variant {
+    gap: 11px;
+}
+
+.c4lv-panellist.c4l-compact-variant.c4l-numbered-variant > li {
+    background-color: transparent;
+    border-radius: 0;
+    min-height: 32px;
+    padding: 0;
+}
+
+/* Timeline (helper) */
+.c4lv-timeline {
+    margin: 24px auto;
+    max-width: 75%;
+    display: flex;
+    flex-direction: column;
+}
+
+.c4l-timeline-events {
+    position: relative;
+    padding: 4px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.c4l-timeline-events::before {
+    content: "";
+    position: absolute;
+    top: 25px;
+    bottom: 25px;
+    left: 21px;
+    width: 2px;
+    background-color: var(--c4l-timeline-rule);
+    z-index: 0;
+}
+
+.c4l-timeline-event {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    position: relative;
+    z-index: 1;
+}
+
+.c4l-timeline-pill {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 42px;
+    padding: 7px 24px 7px 8px;
+    background-color: var(--c4l-timeline-pill-bg);
+    border-radius: 100px;
+}
+
+.c4l-timeline-marker {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: var(--c4l-timeline-marker);
+    background-image: radial-gradient(circle at center, var(--c4l-timeline-marker-dot) 6px, transparent 6.5px);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.c4l-timeline-year {
+    color: var(--c4l-timeline-year);
+    font-weight: 700;
+    font-size: 21px;
+    line-height: 23px;
+    min-width: 1em;
+    outline: none;
+    padding-left: 12px;
+}
+
+.c4l-timeline-text {
+    margin: 6px 0 28px 52px;
+    padding: 0 8px;
+    font-size: 17px;
+    line-height: 26px;
+    color: var(--c4l-text);
+}
+
+/* Continuity variants — independent (non-grouped) block pseudo-elements
+      rendered as direct children of .c4lv-timeline, before and after the
+      .c4l-timeline-events container, so they don't interfere with the
+      main guide line geometry. */
+.c4lv-timeline.c4l-continuitybefore-variant::before {
+    content: "";
+    display: block;
+    align-self: flex-start;
+    margin-left: 21px;
+    width: 2px;
+    height: 24px;
+    background-image: repeating-linear-gradient(to bottom, var(--c4l-timeline-rule) 0, var(--c4l-timeline-rule) 4px, transparent 4px, transparent 10px);
+}
+
+.c4lv-timeline.c4l-continuityafter-variant::after {
+    content: "";
+    display: block;
+    align-self: flex-start;
+    margin-left: 21px;
+    margin-top: -20px;
+    width: 2px;
+    height: 24px;
+    background-image: repeating-linear-gradient(to bottom, var(--c4l-timeline-rule) 0, var(--c4l-timeline-rule) 4px, transparent 4px, transparent 10px);
+}
+
+/* Split variant — alternating events on either side of a centred guide
+      line. Mutually exclusive with full-width via the variants registry
+      excludes mechanism. */
+.c4lv-timeline.c4l-split-variant {
+    max-width: 100%;
+}
+
+.c4lv-timeline.c4l-split-variant .c4l-timeline-events {
+    width: 100%;
+}
+
+.c4lv-timeline.c4l-split-variant .c4l-timeline-events::before {
+    left: calc(50% - 1px);
+}
+
+.c4lv-timeline.c4l-split-variant .c4l-timeline-event {
+    width: 50%;
+    box-sizing: border-box;
+}
+
+.c4lv-timeline.c4l-split-variant .c4l-timeline-event:nth-child(odd) {
+    align-self: flex-end;
+    transform: translateX(-22px);
+}
+
+.c4lv-timeline.c4l-split-variant .c4l-timeline-event:nth-child(even) {
+    align-self: flex-start;
+    transform: translateX(22px);
+}
+
+.c4lv-timeline.c4l-split-variant .c4l-timeline-event:nth-child(even) .c4l-timeline-pill {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+    padding: 7px 8px 7px 24px;
+}
+
+.c4lv-timeline.c4l-split-variant .c4l-timeline-event:nth-child(even) .c4l-timeline-text {
+    text-align: right;
+    margin: 6px 52px 28px 0;
+}
+
+.c4lv-timeline.c4l-split-variant.c4l-continuitybefore-variant::before,
+.c4lv-timeline.c4l-split-variant.c4l-continuityafter-variant::after {
+    align-self: center;
+    margin-left: 0;
+}
+
+/* Combo */
+.c4l-spacer + .c4l-combo {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.c4l-combo {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    grid-gap: 20px;
+    align-items: stretch;
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+.c4l-combo .text {
+    background: var(--c4l-combo-bg);
+    border-radius: 16px;
+    padding: 48px;
+}
+.c4l-combo .text h2,
+.c4l-combo .text h3,
+.c4l-combo .text h4 {
+    margin-bottom: 22px;
+    color: var(--c4l-combo-title);
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+}
+.c4l-combo .text p {
+    color: var(--c4l-text);
+    font-size: 17px;
+    line-height: 1.5;
+}
+.c4l-combo .text ul {
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
+}
+.c4l-combo .text ul li {
+    position: relative;
+    margin-bottom: 12px;
+    padding-left: 27px;
+    font-size: 17px;
+    line-height: 1.5;
+}
+.c4l-combo .text ul li:last-child {
+    margin-bottom: 0;
+}
+.c4l-combo .text ul li::before {
+    content: "";
+    background-color: var(--c4l-combo-bullet);
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg width=%229%22 height=%2211%22 viewBox=%220 0 9 11%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%0A%3Cpath d=%22M0 11V0L9 6L0 11Z%22 fill=%22%23FF7957%22/%3E%0A%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg width=%229%22 height=%2211%22 viewBox=%220 0 9 11%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%0A%3Cpath d=%22M0 11V0L9 6L0 11Z%22 fill=%22%23FF7957%22/%3E%0A%3C/svg%3E");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: 9px 11px;
+    mask-size: 9px 11px;
+    display: inline-block;
+    width: 9px;
+    height: 11px;
+    position: absolute;
+    top: 7px;
+    left: 0;
+}
+.c4l-combo .image {
+    position: relative;
+    min-height: 200px;
+}
+.c4l-combo img {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+    object-position: 50% 50%;
+    border-radius: 16px;
+}
+.c4l-combo img:not([src]), .c4l-combo img[src=""] {
+    position: static;
+    content: var(--c4l-figure-placeholder);
+}
+
+.c4l-combo .c4l-leading-text {
+    font-weight: 400;
+    font-size: 18px;
+    color: var(--c4l-combo-lead);
+    margin-bottom: 24px;
+    line-height: 1.4;
+}
+
+.c4l-combo.c4l-text-image-variant .text {
+    order: 1;
+}
+
+.c4l-combo.c4l-text-image-variant .image {
+    order: 2;
+}
+
+.c4l-combo.c4l-image-text-variant .text {
+    order: 2;
+}
+
+.c4l-combo.c4l-image-text-variant .image {
+    order: 1;
+}
+
+@media (max-width: 399.98px) {
+    .c4l-combo .text {
+        padding: 24px;
+    }
+}
+@media (min-width: 630px) {
+    .c4l-combo,
+    .c4l-combo.c4l-text-image-variant,
+    .c4l-combo.c4l-image-text-variant {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.c4lv-timeline.c4l-full-width-variant {
+    max-width: 100%;
+}
+
+.c4lv-panellist.c4l-full-width-variant {
+    max-width: 100%;
+}

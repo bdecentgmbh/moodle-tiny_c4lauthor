@@ -49,6 +49,15 @@
     --c4l-solid-blue: #3171e3;
     --c4l-solid-blue-deep: #497ae9;
 
+    /* Brand: the site's primary colour, as set by the theme. Bootstrap 5 names it
+       --bs-primary, Bootstrap 4 (Moodle 4.5) --primary. The editor iframes get the
+       page's resolved value from tiny_c4lauthor/brand. */
+    --c4l-brand: var(--bs-primary, var(--primary, #0f6cbf));
+    --c4l-tint-brand: color-mix(in srgb, var(--c4l-brand) 7%, #fff);
+    --c4l-accent-brand: color-mix(in srgb, var(--c4l-brand) 50%, #fff);
+    --c4l-solid-brand: var(--c4l-brand);
+    --c4l-ink-brand: var(--c4l-brand);
+
     /* Picker toolbar icons */
     --c4l-ui-icon-contextual: #1679f9;
     --c4l-ui-icon-procedural: #d93562;
@@ -164,6 +173,12 @@
     /* Solid fills */
     --c4l-solid-blue: #81abf5;
     --c4l-solid-blue-deep: #81abf5;
+
+    /* Brand: lightened like the other solids, pale fills become the surface. */
+    --c4l-tint-brand: var(--c4l-surface);
+    --c4l-accent-brand: color-mix(in srgb, var(--c4l-brand) 45%, var(--c4l-text-muted));
+    --c4l-solid-brand: color-mix(in srgb, var(--c4l-brand) 40%, #fff);
+    --c4l-ink-brand: color-mix(in srgb, var(--c4l-brand) 40%, #fff);
 
     /* ACTIVE 2 — PICKER TOOLBAR ICONS */
 
@@ -298,6 +313,18 @@
 
     /* Helper */
     --c4l-allpurposecard-bg: var(--c4l-tint-blue);
+    --c4l-panellist-bg: var(--c4l-tint-brand);
+    --c4l-panellist-marker: var(--c4l-solid-brand);
+    --c4l-panellist-marker-ink: var(--c4l-on-accent);
+    --c4l-timeline-rule: var(--c4l-accent-brand);
+    --c4l-timeline-pill-bg: var(--c4l-tint-brand);
+    --c4l-timeline-marker: var(--c4l-solid-brand);
+    --c4l-timeline-marker-dot: var(--c4l-on-accent);
+    --c4l-timeline-year: var(--c4l-ink-brand);
+    --c4l-combo-bg: var(--c4l-tint-brand);
+    --c4l-combo-title: var(--c4l-ink-brand);
+    --c4l-combo-bullet: var(--c4l-solid-brand);
+    --c4l-combo-lead: var(--c4l-text-muted);
 
     --c4l-statement-bg: var(--c4l-surface);
     --c4l-assessment-bg: var(--c4l-surface);

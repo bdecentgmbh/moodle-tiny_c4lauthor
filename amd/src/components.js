@@ -554,6 +554,90 @@ esse cillum dolore eu fugiat nulla pariatur.</p>
         },
         variants: ["full-width"],
     },
+    {
+        id: "55",
+        name: "panellist",
+        type: "helper",
+        imageClass: "c4l-panellist-icon",
+        code:
+            `<p class="c4l-spacer">&nbsp;</p>` +
+            `<ul class="c4lv-panellist c4l-numbered-variant {{VARIANTS}}">` +
+            `<li>{{PLACEHOLDER}}</li>` +
+            `<li>Lorem ipsum dolor sit amet consectetur.</li>` +
+            `<li>Pellentesque eget sodales mi imperdiet.</li>` +
+            `</ul>` +
+            `<p class="c4l-spacer">&nbsp;</p>`,
+        text: "Curabitur gravida est ultrices quam.",
+        docs: {
+            description: "{{#docs_panellist_desc}}",
+            useCases: [],
+        },
+        variants: ["numbered", "checkmarks", "compact", "full-width"],
+    },
+    {
+        id: "56",
+        name: "timeline",
+        type: "helper",
+        imageClass: "c4l-timeline-icon",
+        code:
+            `<div class="c4lv-timeline {{VARIANTS}}">` +
+            `<div class="c4l-timeline-events">` +
+            `<div class="c4l-timeline-event">` +
+            `<div class="c4l-timeline-pill">` +
+            `<div class="c4l-timeline-marker" contenteditable="false"></div>` +
+            `<span class="c4l-timeline-year">2008</span>` +
+            `</div>` +
+            `<p class="c4l-timeline-text">{{PLACEHOLDER}}</p>` +
+            `</div>` +
+            `<div class="c4l-timeline-event">` +
+            `<div class="c4l-timeline-pill">` +
+            `<div class="c4l-timeline-marker" contenteditable="false"></div>` +
+            `<span class="c4l-timeline-year">2012</span>` +
+            `</div>` +
+            `<p class="c4l-timeline-text">Lorem ipsum dolor sit amet consectetur.</p>` +
+            `</div>` +
+            `<div class="c4l-timeline-event">` +
+            `<div class="c4l-timeline-pill">` +
+            `<div class="c4l-timeline-marker" contenteditable="false"></div>` +
+            `<span class="c4l-timeline-year">2016</span>` +
+            `</div>` +
+            `<p class="c4l-timeline-text">Pellentesque eget sodales mi imperdiet.</p>` +
+            `</div>` +
+            `</div>` +
+            `</div>`,
+        text: "Description of the event.",
+        docs: {
+            description: "{{#docs_timeline_desc}}",
+            useCases: [],
+        },
+        variants: ["full-width", "split", "continuitybefore", "continuityafter"],
+    },
+    {
+        id: "48",
+        name: "combo",
+        type: "helper",
+        imageClass: "c4l-combo-icon",
+        wrapperClass: "c4l-combo",
+        code: `<p class="c4l-spacer">&nbsp;</p>
+<div class="c4l-combo c4l-text-image-variant {{VARIANTS}}">
+<div class="text">
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+Sed do eiusmod tempor incididunt ut labore et dolore magna
+aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Duis aute irure dolor in reprehenderit in voluptate.</p>
+</div>
+<div class="image">
+<img src="" alt=""></div>
+</div><p><br></p><p class="c4l-spacer">&nbsp;</p>`,
+        text: "Lorem ipsum dolor sit amet.",
+        docs: {
+            description:
+                "{{#docs_combo_desc}}",
+            useCases: [],
+        },
+        variants: ["text-image", "image-text"],
+    },
 ];
 
 export {components};
