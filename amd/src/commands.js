@@ -25,6 +25,7 @@ import {getButtonImage} from 'editor_tiny/utils';
 import {get_string as getString, get_strings as getStrings} from 'core/str';
 import {getTinyMCE} from 'editor_tiny/loader';
 import Modal from 'core/modal';
+import Pending from 'core/pending';
 import Templates from 'core/templates';
 import {
     register as registerMoodleOptions,
@@ -1162,7 +1163,7 @@ export const getSetup = async() => {
     };
 
     // eslint-disable-next-line complexity
-    const openModal = async(editor) => {
+    const buildModal = async(editor) => {
         // Add custom components from admin settings.
         const customComps = getcustomComponents(editor);
         addCustomComponents(customComps);
@@ -2026,10 +2027,12 @@ export const getSetup = async() => {
                 return;
             }
 
+            const pending = new Pending('tiny_c4lauthor/insertComponent');
             const selectedText = innerEditor.selection.getContent({format: 'text'});
             const compHtml = await processComponentCode(comp, selectedText);
             innerEditor.insertContent(compHtml);
             innerEditor.focus();
+            pending.resolve();
         });
 
         // Destroy inner editor on modal close.
@@ -2165,6 +2168,16 @@ export const getSetup = async() => {
 
         // Clean up if modal is closed via other means.
         root.on('modal:hidden', destroyInner);
+    };
+
+    // Track the modal set-up as pending JS, so Behat waits until it is ready.
+    const openModal = async(editor) => {
+        const pending = new Pending('tiny_c4lauthor/openModal');
+        try {
+            await buildModal(editor);
+        } finally {
+            pending.resolve();
+        }
     };
 
     return (editor) => {
