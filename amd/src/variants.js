@@ -58,6 +58,7 @@ const variants = [
     {
         id: 6,
         name: "full-width",
+        excludes: ["split"],
         html: "",
     },
     {
@@ -72,6 +73,51 @@ const variants = [
             `<div class="c4l-embedded-caption" aria-label="{{#caption}}">` +
             `<span>Marcus Tullius Cicero</span>, ` +
             `De Finibus Bonorum et Malorum</div>`,
+    },
+    {
+        id: 9,
+        name: "checkmarks",
+        group: "list-bullet",
+        html: "",
+    },
+    {
+        id: 18,
+        name: "numbered",
+        group: "list-bullet",
+        html: "",
+    },
+    {
+        id: 19,
+        name: "continuitybefore",
+        html: "",
+    },
+    {
+        id: 20,
+        name: "continuityafter",
+        html: "",
+    },
+    {
+        id: 21,
+        name: "split",
+        excludes: ["full-width"],
+        html: "",
+    },
+    {
+        id: 22,
+        name: "compact",
+        html: "",
+    },
+    {
+        id: 15,
+        name: "text-image",
+        group: "combo-layout",
+        html: "",
+    },
+    {
+        id: 16,
+        name: "image-text",
+        group: "combo-layout",
+        html: "",
     },
 ];
 
