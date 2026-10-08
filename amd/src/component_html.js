@@ -123,3 +123,25 @@ export const renderComponent = async(comp, selectedText, catalogue) => {
     html = html.replace(/\{\{@ID\}\}/g, generateRandomID());
     return resolveLangStrings(html, catalogue.strings);
 };
+
+/**
+ * Get the HTML to insert for a component: from its inserter if it declares one, else its template.
+ *
+ * An inserter is an AMD module of the plugin that added the component. Its insert() gets the
+ * editor, the component, the selected text and render(), which resolves with the component's
+ * own markup. It resolves with the HTML to insert, or null to insert nothing.
+ *
+ * @param {object} comp - The component.
+ * @param {string} selectedText - Text currently selected in the editor (may be empty).
+ * @param {object} catalogue - The components the editor offers.
+ * @param {object} editor - The editor to insert into.
+ * @returns {Promise<string|null>} HTML to insert, or null for nothing.
+ */
+export const buildComponentHtml = async(comp, selectedText, catalogue, editor) => {
+    const render = () => renderComponent(comp, selectedText, catalogue);
+    if (!comp.inserter) {
+        return render();
+    }
+    const inserter = await import(comp.inserter);
+    return inserter.insert({editor, component: comp, selectedText, render});
+};

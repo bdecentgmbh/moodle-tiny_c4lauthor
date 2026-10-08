@@ -17,6 +17,7 @@
 namespace tiny_c4lauthor\external;
 
 use core_external\external_api;
+use tiny_c4lauthor\local\components;
 
 /**
  * Tests for the get_components web service.
@@ -28,6 +29,14 @@ use core_external\external_api;
  * @covers     \tiny_c4lauthor\external\get_components
  */
 final class get_components_test extends \advanced_testcase {
+    /**
+     * Forget components other tests added through the hook.
+     */
+    protected function setUp(): void {
+        parent::setUp();
+        components::reset_caches();
+    }
+
     /**
      * A teacher gets the components, shaped as the return description says.
      */

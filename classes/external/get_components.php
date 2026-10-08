@@ -50,24 +50,26 @@ class get_components extends external_api {
     public static function execute_returns(): external_single_structure {
         $field = [
             'selector' => new external_value(PARAM_RAW, 'CSS selector of the element, empty for the component itself'),
-            'label' => new external_value(PARAM_ALPHANUMEXT, 'Lang string key of the label'),
+            'label' => new external_value(PARAM_RAW, 'Lang string key of the label'),
             'type' => new external_value(PARAM_ALPHANUMEXT, 'textarea, input, list, image-src or image-alt'),
         ];
         return new external_single_structure([
             'components' => new external_multiple_structure(
                 new external_single_structure([
                     'name' => new external_value(PARAM_ALPHANUMEXT, 'Component name'),
-                    'id' => new external_value(PARAM_INT, 'Component id'),
+                    'id' => new external_value(PARAM_INT, 'Component id, for components of C4L Author', VALUE_OPTIONAL),
+                    'component' => new external_value(PARAM_COMPONENT, 'Plugin the component comes from'),
                     'category' => new external_value(PARAM_ALPHA, 'Category'),
                     'template' => new external_value(PARAM_SAFEPATH, 'Template with the markup'),
                     'iconclass' => new external_value(PARAM_ALPHANUMEXT, 'Class of the sidebar button'),
                     'menuicon' => new external_value(PARAM_SAFEPATH, 'Pix path of the menu icon'),
+                    'icon' => new external_value(PARAM_URL, 'URL of the icon, for components from other plugins'),
                     'wrapperclass' => new external_value(PARAM_ALPHANUMEXT, 'Class identifying the component'),
                     'text' => new external_value(PARAM_RAW, 'Default text of the placeholder'),
                     'docs' => new external_single_structure([
-                        'description' => new external_value(PARAM_ALPHANUMEXT, 'Lang string key of the description'),
+                        'description' => new external_value(PARAM_RAW, 'Lang string key of the description'),
                         'usecases' => new external_multiple_structure(
-                            new external_value(PARAM_ALPHANUMEXT, 'Lang string key of a use case')
+                            new external_value(PARAM_RAW, 'Lang string key of a use case')
                         ),
                     ]),
                     'variants' => new external_multiple_structure(
@@ -87,6 +89,7 @@ class get_components extends external_api {
                             ),
                         ])
                     ),
+                    'inserter' => new external_value(PARAM_PATH, 'AMD module that returns the markup to insert'),
                 ])
             ),
             'variants' => new external_multiple_structure(
@@ -102,7 +105,7 @@ class get_components extends external_api {
             ),
             'strings' => new external_multiple_structure(
                 new external_single_structure([
-                    'key' => new external_value(PARAM_ALPHANUMEXT, 'Lang string key'),
+                    'key' => new external_value(PARAM_RAW, 'Lang string key, prefixed with the plugin for other plugins'),
                     'value' => new external_value(PARAM_RAW, 'Lang string'),
                 ])
             ),
@@ -123,6 +126,6 @@ class get_components extends external_api {
         require_capability('tiny/c4lauthor:use', $context);
         require_capability('tiny/c4lauthor:viewplugin', $context);
 
-        return components::export_for_editor();
+        return components::export_for_editor($context);
     }
 }

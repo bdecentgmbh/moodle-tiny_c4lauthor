@@ -33,13 +33,13 @@ import {component} from './common';
  */
 export const registerComponentIcons = async(ed, catalogue) => {
     const promises = [];
-    catalogue.components.filter((comp) => comp.menuicon).forEach(({name, menuicon}) => {
+    catalogue.components.filter((comp) => comp.menuicon).forEach(({name, menuicon, component: iconComponent}) => {
         const iconName = 'c4l-' + name;
         // Skip if already registered.
         if (ed.ui.registry.getAll().icons[iconName]) {
             return;
         }
-        const promise = getButtonImage(menuicon, component).then((result) => {
+        const promise = getButtonImage(menuicon, iconComponent || component).then((result) => {
             if (result && result.html) {
                 ed.ui.registry.addIcon(iconName, result.html);
             }

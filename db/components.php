@@ -50,6 +50,7 @@ $components = [
                 'fallback' => true,
             ],
         ],
+        'students' => true,
     ],
     'tip' => [
         'id' => 1,
@@ -73,6 +74,7 @@ $components = [
                 'fallback' => true,
             ],
         ],
+        'students' => true,
     ],
     'reminder' => [
         'id' => 2,
@@ -96,6 +98,7 @@ $components = [
                 'fallback' => true,
             ],
         ],
+        'students' => true,
     ],
     'quote' => [
         'id' => 3,
@@ -131,6 +134,7 @@ $components = [
                 'handler' => 'captiontext',
             ],
         ],
+        'students' => true,
     ],
     'dodontcards' => [
         'id' => 4,
@@ -158,6 +162,7 @@ $components = [
                 'type' => 'textarea',
             ],
         ],
+        'students' => true,
     ],
     'readingcontext' => [
         'id' => 5,
@@ -194,6 +199,7 @@ $components = [
                 'handler' => 'captiontext',
             ],
         ],
+        'students' => true,
     ],
     'example' => [
         'id' => 6,
@@ -222,6 +228,7 @@ $components = [
                 'type' => 'textarea',
             ],
         ],
+        'students' => true,
     ],
     'figure' => [
         'id' => 7,
@@ -254,6 +261,7 @@ $components = [
                 'optional' => true,
             ],
         ],
+        'students' => true,
     ],
     'tag' => [
         'id' => 8,
@@ -275,6 +283,7 @@ $components = [
                 'handler' => 'trimmedtext',
             ],
         ],
+        'students' => true,
     ],
     'inlinetag' => [
         'id' => 9,
@@ -296,6 +305,7 @@ $components = [
                 'handler' => 'textcontent',
             ],
         ],
+        'students' => true,
     ],
     'attention' => [
         'id' => 10,
@@ -319,6 +329,7 @@ $components = [
                 'fallback' => true,
             ],
         ],
+        'students' => true,
     ],
     'estimatedtime' => [
         'id' => 11,
@@ -482,6 +493,7 @@ $components = [
                 'fallback' => true,
             ],
         ],
+        'students' => true,
     ],
     'conceptreview' => [
         'id' => 18,
