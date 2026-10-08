@@ -31,7 +31,7 @@ $addons = [
                 'delegate' => '',
                 'styles' => [
                     'url' => $CFG->wwwroot . '/lib/editor/tiny/plugins/c4lauthor/mobileapp/styles.css',
-                    'version' => '2026060400',
+                    'version' => get_config('tiny_c4lauthor', 'version'),
                 ],
             ],
         ],

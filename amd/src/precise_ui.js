@@ -23,6 +23,7 @@
 
 import {get_string as getString} from 'core/str';
 import {component} from './common';
+import Pending from 'core/pending';
 import Templates from 'core/templates';
 
 // ── Shared apply/extract helpers for the registry ──
@@ -491,7 +492,7 @@ const buildListFieldHtml = (field, fIdx, strings) => {
     });
     html += '<button type="button" class="tiny_c4lauthor__precision-add-btn"' +
         ' data-field="' + fIdx + '">' +
-        (strings.get('precision_add_item') || 'Add item') + '</button>';
+        strings.get('precision_add_item') + '</button>';
     return html;
 };
 
@@ -509,7 +510,7 @@ const buildListItemHtml = (fIdx, itemIdx, strings) => {
         ' data-field="' + fIdx + '" data-item="' + itemIdx + '"></textarea>' +
         '<button type="button" class="tiny_c4lauthor__precision-remove-btn"' +
         ' data-field="' + fIdx + '" data-item="' + itemIdx + '" title="' +
-        (strings.get('precision_remove_item') || 'Remove') + '">&times;</button></div>';
+        escapeAttr(strings.get('precision_remove_item')) + '">&times;</button></div>';
 };
 
 // ── Applying form values ──
@@ -691,6 +692,9 @@ export const mountPreciseView = async(container, handlers) => {
     const cssUrls = handlers.getContentCss();
     const iframe = document.createElement('iframe');
     iframe.className = 'tiny_c4lauthor__precision-iframe';
+    // The preview shows stored content, which can contain scripts. Keep them inert:
+    // same origin so this module can read the document, but no scripts in the frame.
+    iframe.setAttribute('sandbox', 'allow-same-origin');
 
     let linkTags = '';
     cssUrls.forEach((url) => {
@@ -709,15 +713,32 @@ export const mountPreciseView = async(container, handlers) => {
         '[data-c4l-selected]{outline:2px solid #b8d7ff;outline-offset:2px;border-radius:0}' +
         'html[data-bs-theme=dark] [data-c4l-selected]{outline-color:var(--c4l-ui-accent)}</style>' +
         '</head><body class="tiny_c4lauthor__precision-body">' + editorHtml + '</body></html>';
+    // Track the preview until it has loaded and is clickable, so Behat waits for it.
+    const pending = new Pending('tiny_c4lauthor/precisionPreview');
     iframe.setAttribute('srcdoc', srcdoc);
     previewContainer.appendChild(iframe);
 
     let currentCompEl = null;
     let currentFields = null;
 
+    /**
+     * Get the preview's HTML without the attributes this view adds for its own use.
+     *
+     * @returns {string}
+     */
+    const getCleanHtml = () => {
+        const body = iframe.contentDocument.body.cloneNode(true);
+        body.querySelectorAll('[data-c4l-idx], [data-c4l-selected]').forEach((el) => {
+            el.removeAttribute('data-c4l-idx');
+            el.removeAttribute('data-c4l-selected');
+        });
+        return body.innerHTML;
+    };
+
     iframe.addEventListener('load', () => {
         const iDoc = iframe.contentDocument;
         if (!iDoc) {
+            pending.resolve();
             return;
         }
 
@@ -730,6 +751,7 @@ export const mountPreciseView = async(container, handlers) => {
             e.preventDefault();
             handlePreviewClick(e.target, iDoc);
         });
+        pending.resolve();
     });
 
     /**
@@ -763,7 +785,7 @@ export const mountPreciseView = async(container, handlers) => {
             return;
         }
 
-        showForm(iDoc);
+        showForm();
     };
 
     let syncTimer = null;
@@ -775,7 +797,7 @@ export const mountPreciseView = async(container, handlers) => {
         if (syncTimer) {
             clearTimeout(syncTimer);
             syncTimer = null;
-            handlers.setEditorContent(iframe.contentDocument.body.innerHTML);
+            handlers.setEditorContent(getCleanHtml());
         }
     };
 
@@ -797,10 +819,8 @@ export const mountPreciseView = async(container, handlers) => {
 
     /**
      * Show the form for the currently selected component.
-     *
-     * @param {Document} iDoc
      */
-    const showForm = (iDoc) => {
+    const showForm = () => {
         if (placeholder) {
             placeholder.style.display = 'none';
         }
@@ -825,7 +845,7 @@ export const mountPreciseView = async(container, handlers) => {
             clearTimeout(syncTimer);
             syncTimer = setTimeout(() => {
                 syncTimer = null;
-                handlers.setEditorContent(iDoc.body.innerHTML);
+                handlers.setEditorContent(getCleanHtml());
             }, 300);
         };
 
@@ -851,7 +871,7 @@ export const mountPreciseView = async(container, handlers) => {
             syncTimer = null;
         }
         if (iframe && iframe.contentDocument) {
-            handlers.setEditorContent(iframe.contentDocument.body.innerHTML);
+            handlers.setEditorContent(getCleanHtml());
         }
         container.innerHTML = '';
         currentCompEl = null;

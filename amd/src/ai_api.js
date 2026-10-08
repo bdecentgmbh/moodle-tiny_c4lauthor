@@ -26,7 +26,7 @@ import Ajax from 'core/ajax';
 export const callSuggest = async({contextid, paragraphs, lang}) => {
     const [result] = await Ajax.call([{
         methodname: 'tiny_c4lauthor_suggest',
-        args: {contextid, paragraphs: JSON.stringify(paragraphs), lang},
+        args: {contextid, paragraphs, lang},
     }]);
     return result;
 };

@@ -15,22 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Web services for the tiny_c4lauthor plugin.
+ * Uninstall clean-up for tiny_c4lauthor.
  *
  * @package    tiny_c4lauthor
- * @copyright  2026 Roger Segú <rogersegu@gmail.com>
+ * @copyright  2026 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * Remove the user preferences the plugin stores; Moodle does not delete them by itself.
+ *
+ * @return bool
+ */
+function xmldb_tiny_c4lauthor_uninstall() {
+    global $DB;
 
-$functions = [
-    'tiny_c4lauthor_suggest' => [
-        'classname'    => 'tiny_c4lauthor\external\suggest',
-        'methodname'   => 'execute',
-        'description'  => 'Return C4L component suggestions for a fragment of editor content.',
-        'type'         => 'write',
-        'ajax'         => true,
-        'capabilities' => 'tiny/c4lauthor:aisuggest',
-    ],
-];
+    $DB->delete_records('user_preferences', ['name' => 'c4lauthor_components_variants']);
+
+    return true;
+}

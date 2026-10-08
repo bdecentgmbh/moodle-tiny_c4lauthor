@@ -112,7 +112,7 @@ if ($ADMIN->fulltree) {
         'tiny_c4lauthor/ai_enabled',
         get_string('ai_enabled', 'tiny_c4lauthor'),
         get_string('ai_enabled_desc', 'tiny_c4lauthor'),
-        1
+        0
     ));
 
     // Per-component: enable checkbox + max rate per 10 paragraphs.
