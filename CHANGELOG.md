@@ -1,5 +1,36 @@
 # Changelog
 
+## 1.6.0-beta
+
+### Added
+
+- Six helpers from the C4L Author bdecent build join the free set: styled list, link
+  block, tabs, carousel, collapsible and styled table, with their variants (checkmarks
+  or chevrons, button or link, solid or coloured, white controls).
+- Tabs, carousel and collapsible use new markup made of classes only, so it survives
+  Moodle's HTML cleaning and works with Bootstrap 4 and 5. Without JavaScript, and in
+  the Moodle app, all their content shows. A page script adds the buttons, ARIA
+  attributes and keyboard support.
+- In the editor, tabs and slides can be switched, added and deleted, and a slide gets
+  its image through the editor's image dialog, as in the bdecent build.
+- The extension hook can add page modules, scripts for the behaviour of interactive
+  components that other plugins add.
+
+### Security
+
+- The bdecent build copied a link block's visible address into the link on every page,
+  so an address such as `javascript:` ran when clicked. Link blocks now store their
+  address in the link; for content from that build, the page script copies only http,
+  https and mailto addresses.
+
+### Changed
+
+- Content made with the bdecent build's tabs, carousel and collapsible is turned into
+  the new markup when the page loads, so it keeps working, also where Moodle cleaned
+  away its buttons.
+- The helpers' styles follow the site's brand colour and dark mode. Unlike in the
+  bdecent build, they do not restyle Moodle's own navigation tabs.
+
 ## 1.5.0-beta
 
 ### Added
