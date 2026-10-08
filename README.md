@@ -123,6 +123,72 @@ CSS selector alone cannot read or write name a handler from `amd/src/precise_han
 that each component renders exactly the markup in `tests/fixtures/components/`.
 Changing a component's markup means updating its fixtures in the same commit.
 
+`students => true` offers a component to students by default. The two student
+settings list every component; one an admin has not seen there yet counts with its
+default.
+
+## Adding components from another plugin
+
+Another plugin adds components through the `\tiny_c4lauthor\hook\extend_components`
+hook, without changing C4L Author. Register a callback in its `db/hooks.php`:
+
+```php
+$callbacks = [
+    [
+        'hook' => \tiny_c4lauthor\hook\extend_components::class,
+        'callback' => [\local_example\hook_callbacks::class, 'extend_c4lauthor'],
+    ],
+];
+```
+
+and add components and editor stylesheets in the callback:
+
+```php
+public static function extend_c4lauthor(\tiny_c4lauthor\hook\extend_components $hook): void {
+    $hook->add_component('local_example', 'banner', [
+        'category' => 'templates',
+        'template' => 'local_example/banner',
+        'menuicon' => 'banner',
+        'text' => 'Welcome to the course',
+        'docs' => ['description' => 'banner_desc'],
+        'variants' => ['full-width'],
+        'precision' => [
+            ['selector' => 'span[data-id]', 'label' => 'banner_text', 'type' => 'textarea', 'fallback' => true],
+        ],
+        'students' => false,
+    ]);
+    $hook->add_editor_stylesheet(new \moodle_url('/local/example/editor.css'));
+}
+```
+
+A declaration takes the keys of `db/components.php`, except `id` and `convertible`.
+Its template, icon (in the plugin's `pix/`) and strings belong to the plugin that adds
+it; a string key may name another plugin as `component/key`. The label is the string
+named like the component, or the one in `label`. The category may also be `templates`.
+The name must be unique: lower case letters, digits and underscores, not used by
+C4L Author. A declaration C4L Author cannot use is left out with a developer debugging
+message.
+
+The plugin's `styles.css` styles the component on the page. The editor's content does
+not load it, so add the same rules as an editor stylesheet.
+
+Instead of its template, a component can insert what an AMD module of the plugin
+returns, for example after the teacher has picked something:
+
+```php
+'inserter' => 'local_example/banner_picker',
+```
+
+```js
+export const insert = async({editor, component, selectedText, render}) => {
+    // render() resolves with the component's own markup.
+    return '<div class="c4lv-banner">...</div>'; // Or null to insert nothing.
+};
+```
+
+The components can be filtered by the hook's `context`, the context of the editor.
+The hook is called on every page with an editor, so keep the callback cheap.
+
 ## Building from source
 
 The compiled `styles.css` and `editor_styles.css` are generated from `scss/`:
