@@ -1,0 +1,18 @@
+/**
+ * Standalone fallback stylesheet: the content styles only, for Additional HTML.
+ *
+ * Built by tools/build-standalone.mjs into dist/standalone.css. It keeps C4L content
+ * styled after the plugin is uninstalled. Editor, sidebar and modal styles are left out.
+ *
+ * @package     tiny_c4lauthor
+ * @copyright   2026 bdecent gmbh <https://bdecent.de>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+@import "tokens";
+@import "mixins";
+@import "variables";
+@import "components";
+@import "helpers";
+@import "responsive";
+@import "variants";

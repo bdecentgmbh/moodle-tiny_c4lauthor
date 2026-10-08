@@ -229,3 +229,12 @@ if ($ADMIN->fulltree) {
         $settings->add($setting);
     }
 }
+
+// The settings and the standalone fallback page share the plugin's category.
+$ADMIN->add('tiny_c4lauthor', $settings);
+$ADMIN->add('tiny_c4lauthor', new admin_externalpage(
+    'tiny_c4lauthor_standalone',
+    new lang_string('standalone_heading', 'tiny_c4lauthor'),
+    new moodle_url('/lib/editor/tiny/plugins/c4lauthor/admin/standalone.php')
+));
+$settings = null;
