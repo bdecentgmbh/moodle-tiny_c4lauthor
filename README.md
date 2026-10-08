@@ -145,6 +145,20 @@ In the C4L Author editor, `amd/src/editor_widgets.js` shows one tab or slide at 
 with controls to switch, add and delete them and to add an image to a slide. The
 controls are never saved.
 
+## Standalone fallback
+
+Uninstalling the plugin takes its styles and page script with it, so content made with
+it loses its look, and tabs, carousels and collapsibles stop switching. *Site
+administration > Plugins > Text editors > TinyMCE editor > C4L Author > Standalone
+fallback* offers the content styles and the page script to copy into the site first:
+the styles into the theme's Raw SCSS (served as a cached stylesheet), the script into
+Additional HTML. They do not depend on Moodle's JavaScript.
+
+Both are built into `dist/` by `node tools/build-standalone.mjs`: the styles from
+`scss/standalone.scss` (content only, icons inlined once each), the script from
+`amd/src/runtime.js`. CI fails when `dist/` does not match the sources, so run the
+script after changing either.
+
 ## Adding components from another plugin
 
 Another plugin adds components through the `\tiny_c4lauthor\hook\extend_components`
@@ -218,6 +232,9 @@ The compiled `styles.css` and `editor_styles.css` are generated from `scss/`:
 npm install
 npm run sass
 ```
+
+The standalone fallback in `dist/` is built from the plugin directory with
+`node tools/build-standalone.mjs`.
 
 JavaScript is built with Moodle's own Grunt setup, from the Moodle root:
 

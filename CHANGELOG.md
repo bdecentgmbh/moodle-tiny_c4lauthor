@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.7.0-beta
+
+### Added
+
+- A standalone fallback, as in the bdecent build but lighter: an admin page offers the
+  content styles and the page script to copy into the site before uninstalling the
+  plugin, so content keeps its look and its tabs, carousels and collapsibles keep
+  working. The styles are 102 KB (22 KB compressed) instead of 324 KB: content only,
+  with each icon inlined once. The script needs no Moodle JavaScript and has none of
+  the build's link block issue.
+
 ## 1.6.0-beta
 
 ### Added
