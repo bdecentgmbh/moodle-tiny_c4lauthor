@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.4.1-beta
+
+### Fixed
+
+- Precision mode on *Estimated time* and *Grading value* replaced the whole
+  component with the new value, losing "min" and "Grading value:". It looked for
+  the span around that fixed text, which the editor removes. The field now edits
+  the span around the value, which the editor keeps, so it also works on content
+  inserted earlier.
+
 ## 1.4.0-beta
 
 ### Changed
