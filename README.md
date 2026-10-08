@@ -103,6 +103,26 @@ exactly what should not be there.
   `data-bs-theme`; it has its own dark mode via Ionic, which needs a separate
   approach.
 
+## Adding a component
+
+Each component is two files:
+
+- its declaration in `db/components.php`: id, category, sidebar icon, default text,
+  docs strings, variants, its position in the "Convert to" menu and the fields
+  precision mode offers. `\tiny_c4lauthor\local\components` documents every key.
+- its markup in `templates/components/<name>.mustache`. The template gets
+  `placeholder` (the text span, already HTML), `variantclasses`, `variantshtml`
+  (HTML the active variants add, such as a caption) and `uniqid`. Strings use
+  `{{#str}}key, tiny_c4lauthor{{/str}}`.
+
+Add the strings to `lang/en/tiny_c4lauthor.php` and the styles to `scss/`. A variant
+that adds HTML has its own template in `templates/variants/`. Precision fields that a
+CSS selector alone cannot read or write name a handler from `amd/src/precise_handlers.js`.
+
+`tests/local/components_test.php` checks that the declarations are consistent and
+that each component renders exactly the markup in `tests/fixtures/components/`.
+Changing a component's markup means updating its fixtures in the same commit.
+
 ## Building from source
 
 The compiled `styles.css` and `editor_styles.css` are generated from `scss/`:
