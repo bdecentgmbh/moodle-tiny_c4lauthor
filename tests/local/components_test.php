@@ -31,6 +31,8 @@ final class components_test extends \advanced_testcase {
      */
     protected function setUp(): void {
         parent::setUp();
+        // Only C4L Author's own declarations: other plugins installed on the site may add theirs.
+        $this->redirectHook(\tiny_c4lauthor\hook\extend_components::class, fn() => null);
         components::reset_caches();
     }
 
