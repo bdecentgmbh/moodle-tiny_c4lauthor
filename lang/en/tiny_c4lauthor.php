@@ -76,6 +76,7 @@ $string['attention'] = 'Attention';
 $string['buttontitle'] = 'C4L Author';
 $string['c4lauthor:aisuggest'] = 'Use AI suggestions in C4L Author';
 $string['c4lauthor:use'] = 'Use TinyMCE C4L Author';
+$string['c4lauthor:useallcomponents'] = 'Use all C4L components, including those not listed for students';
 $string['c4lauthor:viewplugin'] = 'View C4L Author plugin';
 $string['cancel'] = 'Cancel';
 $string['caption'] = 'Caption';
