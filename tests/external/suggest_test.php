@@ -104,7 +104,10 @@ final class suggest_test extends \advanced_testcase {
     private function mock_ai(response_generate_text $response): void {
         $manager = $this->createMock(manager::class);
         $manager->method('is_action_available')->willReturn(true);
-        $manager->method('is_action_enabled_in_context')->willReturn(true);
+        if (method_exists(manager::class, 'is_action_enabled_in_context')) {
+            // Added after Moodle 5.0.
+            $manager->method('is_action_enabled_in_context')->willReturn(true);
+        }
         $manager->method('process_action')->willReturn($response);
         \core\di::set(manager::class, $manager);
     }
