@@ -47,6 +47,7 @@ import {
     getcustomComponents,
     getpreviewCSS,
     isAiEnabled,
+    isAiPolicyAgreed,
     getAiRates,
 } from './options';
 import {
@@ -56,6 +57,10 @@ import {
     getVariantsHtml,
 } from './variantslib';
 import Notification from 'core/notification';
+import CustomEvents from 'core/custom_interaction_events';
+import AiPolicy from 'core_ai/policy';
+import AiPolicyModal from 'core_ai/policymodal';
+import {getPolicyStatus as fetchAiPolicyStatus} from 'core_ai/repository';
 import $ from 'jquery';
 import {
     EditorState as CMState,
@@ -230,6 +235,18 @@ const generateRandomID = () => {
 };
 
 /**
+ * Escape a string for use inside a double-quoted HTML attribute.
+ *
+ * @param {string} value
+ * @returns {string}
+ */
+const escapeAttr = (value) => String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+/**
  * Get all language strings referenced in component definitions.
  *
  * @returns {Promise<Map>}
@@ -351,13 +368,15 @@ const addCustomComponents = (customComponents) => {
  * @returns {string} Ready-to-insert HTML.
  */
 const processComponentCode = async(comp, selectedText) => {
-    let placeholder = selectedText || comp.text || '';
-    placeholder = applyLangStrings(placeholder);
-    const randomId = generateRandomID();
-    const {html: spanHtml} = await Templates.renderForPromise('tiny_c4lauthor/placeholder_span', {
-        id: randomId,
-        placeholder,
-    });
+    const context = {id: generateRandomID()};
+    if (selectedText) {
+        // Text the author selected is always inserted as text.
+        context.placeholdertext = selectedText;
+    } else {
+        // The component's default text comes from its definition and may contain markup.
+        context.placeholderhtml = applyLangStrings(comp.text || '');
+    }
+    const {html: spanHtml} = await Templates.renderForPromise('tiny_c4lauthor/placeholder_span', context);
 
     let html = comp.code;
     html = html.replace('{{PLACEHOLDER}}', spanHtml.trim());
@@ -1122,6 +1141,7 @@ export const getSetup = async() => {
            codeButtonStr,
            precisionButtonStr, regularViewStr,
            deleteComponentStr, moveUpStr, moveDownStr,
+           sidebarToggleStr, aiErrorStr,
     ] = await Promise.all([
         getString('buttontitle', component),
         getButtonImage('icon-toolbar', component),
@@ -1150,6 +1170,8 @@ export const getSetup = async() => {
         getString('delete_component', component),
         getString('move_up', component),
         getString('move_down', component),
+        getString('sidebar_toggle', component),
+        getString('ai_error', component),
     ]);
 
     const filterLabels = {
@@ -1197,14 +1219,14 @@ export const getSetup = async() => {
                 <div class="tiny_c4lauthor__main-view">
                     <div class="tiny_c4lauthor__body">
                         ${sidebarHtml}
-                        <button class="tiny_c4lauthor__sidebar-toggle" title="Toggle sidebar" ` +
-                            `aria-label="Toggle sidebar">` +
+                        <button class="tiny_c4lauthor__sidebar-toggle" title="${escapeAttr(sidebarToggleStr)}" ` +
+                            `aria-label="${escapeAttr(sidebarToggleStr)}">` +
                             `<svg width="16" height="16" viewBox="0 0 16 16" fill="none">` +
                             `<path d="M10 4l-4 4 4 4" stroke="currentColor" stroke-width="1.5" ` +
                             `stroke-linecap="round" stroke-linejoin="round"/></svg>` +
                         `</button>
                         <div class="tiny_c4lauthor__editor-wrap">
-                            <textarea id="${textareaId}" style="visibility:hidden">${html}</textarea>
+                            <textarea id="${textareaId}" style="visibility:hidden"></textarea>
                         </div>
                     </div>
                 </div>
@@ -1226,6 +1248,10 @@ export const getSetup = async() => {
         });
 
         const root = modal.getRoot();
+
+        // Hand the content to the textarea as a value, never as markup: as markup it
+        // could close the textarea and run in the page.
+        root[0].querySelector('#' + textareaId).value = html;
 
         // Inject the unified view switcher into the modal header.
         const headerEl = root[0].querySelector('.modal-header');
@@ -1824,8 +1850,40 @@ export const getSetup = async() => {
             enableAiBtn();
         };
 
+        /**
+         * Make sure the user has accepted the AI policy, asking them first if needed.
+         *
+         * After acceptance the AI view opens once the server has stored it, because the
+         * suggest service checks the policy too.
+         *
+         * @returns {Promise<boolean>} true if the policy is accepted now
+         */
+        const ensureAiPolicyAccepted = async() => {
+            const userId = M.cfg.userId;
+            AiPolicy.preconfigurePolicyState(userId, isAiPolicyAgreed(editor));
+            if (await AiPolicy.getPolicyStatus(userId)) {
+                return true;
+            }
+            const policyModal = await AiPolicyModal.create();
+            policyModal.getModal().on(CustomEvents.events.activate, policyModal.getActionSelector('save'), async() => {
+                for (let attempt = 0; attempt < 10; attempt++) {
+                    const result = await fetchAiPolicyStatus(userId);
+                    if (result.status) {
+                        openAiView();
+                        return;
+                    }
+                    await new Promise((resolve) => setTimeout(resolve, 300));
+                }
+            });
+            return false;
+        };
+
         const openAiView = async() => {
             if (!innerEditor || !aiContainer) {
+                return;
+            }
+            // Nothing is sent to the AI provider before the user has accepted the site's AI policy.
+            if (!await ensureAiPolicyAccepted()) {
                 return;
             }
             // Apply, destroy & hide current view — we'll rebuild on return.
@@ -1885,7 +1943,7 @@ export const getSetup = async() => {
                     result = await callSuggest({contextid, paragraphs, lang});
                 } catch (e) {
                     Notification.exception(e);
-                    await aiController.setSuggestions([], [e.message || 'Error']);
+                    await aiController.setSuggestions([], [aiErrorStr]);
                     return;
                 }
                 const protectedIdx = aiGetProtectedIndices(activeHtml);

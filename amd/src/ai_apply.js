@@ -24,7 +24,7 @@
 import {getC4LSelector} from './ai_content';
 import Mustache from 'core/mustache';
 
-const PARAGRAPH_TEMPLATE = '<p>{{{content}}}</p>';
+const PARAGRAPH_TEMPLATE = '<p>{{content}}</p>';
 
 const wrapWithComponent = (component, innerHtml, learningOutcomesTitle) => {
     switch (component) {
@@ -34,7 +34,7 @@ const wrapWithComponent = (component, innerHtml, learningOutcomesTitle) => {
             return `<p class="c4l-spacer">&nbsp;</p><div class="c4lv-attention">${innerHtml}</div><p class="c4l-spacer">&nbsp;</p>`;
         case 'learning_outcomes':
             return `<p class="c4l-spacer">&nbsp;</p><div class="c4lv-learningoutcomes">` +
-                `<h6 class="c4l-learningoutcomes-title">${learningOutcomesTitle || 'Learning outcomes'}</h6>` +
+                `<h6 class="c4l-learningoutcomes-title">${learningOutcomesTitle}</h6>` +
                 `<ul class="c4l-learningoutcomes-list"><li>${innerHtml}</li></ul></div><p class="c4l-spacer">&nbsp;</p>`;
         case 'keyconcept':
             return `<p class="c4l-spacer">&nbsp;</p><div class="c4lv-keyconcept">${innerHtml}</div>` +
