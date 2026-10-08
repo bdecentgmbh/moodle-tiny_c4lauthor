@@ -83,7 +83,10 @@ class plugininfo extends plugin implements plugin_with_buttons, plugin_with_conf
         $showoverlay = $config->showoverlay ?? '';
         $viewc4l = has_capability('tiny/c4lauthor:viewplugin', $context);
         $showdocs = isset($config->enabledocs) && $config->enabledocs !== '' ? (bool) $config->enabledocs : false;
-        $isstudent = !has_capability('gradereport/grader:view', $context);
+        // Users without useallcomponents only see the components listed for students.
+        // This steers authoring; it is not access control, since components are plain HTML
+        // that anyone can also write in the code view.
+        $isstudent = !has_capability('tiny/c4lauthor:useallcomponents', $context);
 
         $allowedcomps = [];
         if ($isstudent) {
