@@ -25,6 +25,8 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import {isWebAddress} from './sanitise';
+
 const setTextContent = (el, val) => {
     el.textContent = val;
 };
@@ -86,6 +88,18 @@ const handlers = {
     captiontext: {
         extract: (comp) => extractDirectText(comp.querySelector('.c4l-embedded-caption')),
         apply: (comp, val) => applyDirectText(comp.querySelector('.c4l-embedded-caption'), val),
+    },
+    // The address of a link block: shown as text, and the link's target if it is a web or mail
+    // address. Anything else, including an address half typed, leaves the link going nowhere.
+    linkurl: {
+        extract: (comp) => (comp.querySelector('.link-url') || {textContent: ''}).textContent.trim(),
+        apply: (comp, val) => {
+            const url = comp.querySelector('.link-url');
+            if (url) {
+                url.textContent = val;
+            }
+            comp.setAttribute('href', isWebAddress(val) ? val.trim() : '#');
+        },
     },
     // The events of a timeline, as rows of year and text. Extracting uses the subfields.
     timelineevents: {

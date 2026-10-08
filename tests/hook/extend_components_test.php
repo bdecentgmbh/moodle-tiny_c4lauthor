@@ -32,6 +32,7 @@ use tiny_c4lauthor\local\components;
  * @covers     \tiny_c4lauthor\hook\extend_components
  * @covers     \tiny_c4lauthor\local\components
  * @covers     \tiny_c4lauthor\local\admin_setting_student_components
+ * @covers     \tiny_c4lauthor\hook_callbacks
  */
 final class extend_components_test extends \advanced_testcase {
     /**
@@ -152,8 +153,8 @@ final class extend_components_test extends \advanced_testcase {
 
         $components = components::get_components();
         $this->assertDebuggingCalled();
-        $this->assertCount(28, $components);
-        $this->assertSame('tiny_c4lauthor', $components['tip']['component']);
+        $this->assertSame(['tiny_c4lauthor'], array_unique(array_column($components, 'component')));
+        $this->assertArrayHasKey('tip', $components);
     }
 
     /**
@@ -180,7 +181,8 @@ final class extend_components_test extends \advanced_testcase {
 
         $components = components::get_components();
         $this->assertDebuggingCalled();
-        $this->assertCount(28, $components);
+        $this->assertArrayNotHasKey('testbox', $components);
+        $this->assertArrayHasKey('keyconcept', $components);
     }
 
     /**
@@ -198,6 +200,28 @@ final class extend_components_test extends \advanced_testcase {
         );
         $this->assertCount(1, $configuration['editorcss']);
         $this->assertStringEndsWith('/lib/editor/tiny/plugins/c4lauthor/editor_styles.css', $configuration['editorcss'][0]);
+    }
+
+    /**
+     * Every page loads the behaviour of interactive components, and the modules other plugins add.
+     */
+    public function test_page_modules(): void {
+        global $PAGE;
+        $this->redirectHook(extend_components::class, function (extend_components $hook) {
+            $hook->add_page_module('tiny_c4lauthor/testruntime');
+            $hook->add_page_module('not a module');
+        });
+        $PAGE->set_url('/');
+        $PAGE->set_context(\core\context\system::instance());
+
+        \tiny_c4lauthor\hook_callbacks::before_footer_html_generation(
+            new \core\hook\output\before_footer_html_generation($PAGE->get_renderer('core'))
+        );
+
+        $code = $PAGE->requires->get_end_code();
+        $this->assertStringContainsString('tiny_c4lauthor/runtime', $code);
+        $this->assertStringContainsString('tiny_c4lauthor/testruntime', $code);
+        $this->assertStringNotContainsString('not a module', $code);
     }
 
     /**

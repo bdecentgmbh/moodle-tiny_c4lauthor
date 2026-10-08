@@ -1,0 +1,153 @@
+/**
+ * Tabs and carousel controls inside the C4L Author editor (amd/src/editor_widgets.js).
+ *
+ * The controls are editor-only and never saved.
+ *
+ * @package     tiny_c4lauthor
+ * @copyright   2026 Roger Segú <rogersegu@gmail.com>, bdecent gmbh <https://bdecent.de>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+.c4l-editor-tabbar,
+.c4l-editor-toolbar,
+.c4l-editor-carousel {
+    user-select: none;
+}
+
+.c4l-editor-button,
+.c4l-editor-tab,
+.c4l-editor-carousel-prev,
+.c4l-editor-carousel-next {
+    cursor: pointer;
+}
+
+/* Tabs: one tab at a time, its title editable above its content. */
+
+.c4lv-tabs[data-c4l-editing] > .c4l-tab:not([data-c4l-active]) {
+    display: none;
+}
+
+.c4lv-tabs[data-c4l-editing] > .c4l-tab {
+    margin-bottom: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.c4lv-tabs[data-c4l-editing] .c4l-tab-title {
+    padding-bottom: 4px;
+    border-bottom: 1px dashed var(--c4l-tabs-rule);
+    color: var(--c4l-text-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.c4l-editor-tabbar {
+    display: flex;
+    gap: 2px;
+    margin-bottom: -1px;
+}
+
+.c4l-editor-tab {
+    flex: 1 1 0;
+    padding: 8px 12px 7px;
+    border: 1px solid transparent;
+    border-bottom-color: var(--c4l-tabs-rule);
+    border-radius: 4px 4px 0 0;
+    background-color: var(--c4l-tabs-tab-bg);
+    color: var(--c4l-tabs-tab-ink);
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+
+    &.active {
+        border-color: var(--c4l-tabs-rule);
+        border-bottom-color: var(--c4l-tabs-panel-bg);
+        background-color: var(--c4l-tabs-panel-bg);
+    }
+}
+
+.c4l-editor-toolbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.c4l-editor-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border: 1px solid var(--c4l-tabs-rule);
+    border-radius: 4px;
+    background-color: var(--c4l-surface);
+    color: var(--c4l-text-muted);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.2;
+
+    &:hover {
+        border-color: var(--c4l-text-muted);
+    }
+}
+
+/* Carousel: one slide at a time, with its controls over it. */
+
+.c4lv-carousel[data-c4l-editing] > .c4l-slide:not([data-c4l-active]) {
+    display: none;
+}
+
+.c4l-editor-carousel {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+
+    > * {
+        pointer-events: auto;
+    }
+
+    .c4l-editor-toolbar {
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        margin: 0;
+        transform: translateX(-50%);
+    }
+}
+
+.c4l-editor-carousel-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    padding: 16px 24px;
+    border-style: dashed;
+    font-size: 13px;
+    transform: translate(-50%, -50%);
+}
+
+.c4l-editor-carousel-prev,
+.c4l-editor-carousel-next {
+    position: absolute;
+    top: 50%;
+    padding: 0 12px;
+    color: var(--c4l-carousel-control);
+    font-size: 40px;
+    line-height: 1;
+    transform: translateY(-50%);
+}
+
+.c4l-editor-carousel-prev {
+    left: 0;
+}
+
+.c4l-editor-carousel-next {
+    right: 0;
+}
+
+.c4l-editor-carousel-count {
+    padding: 4px 8px;
+    border-radius: 4px;
+    background-color: var(--c4l-surface);
+    color: var(--c4l-text-muted);
+    font-size: 12px;
+}

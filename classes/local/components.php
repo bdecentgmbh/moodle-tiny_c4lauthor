@@ -106,6 +106,10 @@ class components {
             self::$extensions[$context->id] = [
                 'components' => $components,
                 'stylesheets' => $hook->get_editor_stylesheets(),
+                'pagemodules' => array_values(array_filter(
+                    $hook->get_page_modules(),
+                    fn($module) => preg_match('~^[a-z][a-z0-9_]*/[a-z0-9_/-]+$~', $module)
+                )),
             ];
         }
         return self::$extensions[$context->id];
@@ -215,6 +219,16 @@ class components {
      */
     public static function get_editor_stylesheets(context $context): array {
         return self::extensions($context)['stylesheets'];
+    }
+
+    /**
+     * Get the AMD modules other plugins add for the behaviour of their components on pages.
+     *
+     * @param context $context
+     * @return string[]
+     */
+    public static function get_page_modules(context $context): array {
+        return self::extensions($context)['pagemodules'];
     }
 
     /**

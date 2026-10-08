@@ -12,6 +12,8 @@
   /* Surfaces */
   --c4l-surface: #fff;
   --c4l-border: transparent;
+  --c4l-rule: #cbd1e1; /* visible lines: tab and table borders */
+  --c4l-text-strong: #454952; /* text that must not take a link's colour */
   --c4l-text: inherit;
   --c4l-text-muted: #686d79;
   --c4l-on-accent: #fff; /* text on --c4l-solid-* fills */
@@ -123,6 +125,8 @@
   /* Surfaces */
   --c4l-surface: #181c20;
   --c4l-border: #2a3037;
+  --c4l-rule: #3a414b;
+  --c4l-text-strong: #e6e9ec;
   --c4l-text: #e6e9ec;
   --c4l-text-muted: #8d959d;
   --c4l-on-accent: #0f1214;
@@ -298,6 +302,24 @@
   --c4l-combo-title: var(--c4l-ink-brand);
   --c4l-combo-bullet: var(--c4l-solid-brand);
   --c4l-combo-lead: var(--c4l-text-muted);
+  --c4l-styledlist-bullet: var(--c4l-solid-brand);
+  --c4l-linkblock-bg: var(--c4l-surface);
+  --c4l-linkblock-stripe: var(--c4l-tint-brand);
+  --c4l-linkblock-icon: var(--c4l-ink-brand);
+  --c4l-linkblock-name: var(--c4l-text-strong);
+  --c4l-linkblock-url: var(--c4l-ink-brand);
+  --c4l-tabs-rule: var(--c4l-rule);
+  --c4l-tabs-tab-bg: var(--c4l-tint-brand);
+  --c4l-tabs-tab-ink: var(--c4l-ink-brand);
+  --c4l-tabs-panel-bg: var(--c4l-surface);
+  --c4l-carousel-slide-bg: var(--c4l-tint-brand);
+  --c4l-carousel-control: var(--c4l-text-muted);
+  --c4l-collapsible-trigger: var(--c4l-ink-brand);
+  --c4l-collapsible-bg: var(--c4l-tint-brand);
+  --c4l-table-head-bg: var(--c4l-solid-brand);
+  --c4l-table-head-ink: var(--c4l-on-accent);
+  --c4l-table-row-head-bg: var(--c4l-tint-brand);
+  --c4l-table-rule: var(--c4l-rule);
   --c4l-statement-bg: var(--c4l-surface);
   --c4l-assessment-bg: var(--c4l-surface);
   --c4l-assessment-frame-bg: var(--c4l-tint-blue);
@@ -1966,6 +1988,610 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+/**
+ * Styled list, link block, tabs, carousel, collapsible and styled table.
+ *
+ * Tabs, carousel and collapsible are readable without JavaScript: every tab, slide and
+ * content is shown. The page script (amd/src/runtime.js) adds .c4l-ready and the controls.
+ *
+ * @package     tiny_c4lauthor
+ * @copyright   2026 Roger Segú <rogersegu@gmail.com>, bdecent gmbh <https://bdecent.de>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+/* Styled list */
+.c4lv-styledlist {
+  list-style: none;
+  padding-left: 0;
+  margin: 24px 0;
+  line-height: 1.6;
+}
+
+.c4lv-styledlist > li {
+  position: relative;
+  margin-left: 28px;
+  margin-bottom: 6px;
+}
+
+.c4lv-styledlist.c4l-checkmarks-variant > li::before,
+.c4lv-styledlist.c4l-chevrons-variant > li::before {
+  content: "";
+  position: absolute;
+  left: -27px;
+  background-color: var(--c4l-styledlist-bullet);
+}
+
+.c4lv-styledlist.c4l-checkmarks-variant > li::before {
+  top: 5px;
+  width: 16px;
+  height: 16px;
+  -webkit-mask-image: url([[pix:tiny_c4lauthor|c4l-checkmarks-icon]]);
+  mask-image: url([[pix:tiny_c4lauthor|c4l-checkmarks-icon]]);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.c4lv-styledlist.c4l-chevrons-variant > li::before {
+  top: 8px;
+  width: 10px;
+  height: 10px;
+  -webkit-mask-image: url([[pix:tiny_c4lauthor|c4l-chevrons-icon]]);
+  mask-image: url([[pix:tiny_c4lauthor|c4l-chevrons-icon]]);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+/* Link block */
+.c4l-linkblock {
+  display: flex;
+  align-items: stretch;
+  min-width: 260px;
+  max-width: 75%;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 10px;
+  background-color: var(--c4l-linkblock-bg);
+  box-shadow: 0 4px 12px var(--c4l-shadow-soft);
+  transition: box-shadow 0.2s ease-in-out;
+  text-decoration: none !important;
+}
+.c4l-linkblock:hover, .c4l-linkblock:focus {
+  box-shadow: 0 4px 14px var(--c4l-shadow-mid);
+}
+.c4l-linkblock .link-stripe {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 48px;
+  min-width: 48px;
+  margin: 12px 0 12px 12px;
+  border-radius: 6px;
+  background-color: var(--c4l-linkblock-stripe);
+  font-size: 0;
+}
+.c4l-linkblock .link-stripe::before {
+  content: "";
+  width: 22px;
+  height: 22px;
+  background-color: var(--c4l-linkblock-icon);
+  -webkit-mask-image: url([[pix:tiny_c4lauthor|fi_external-link]]);
+  mask-image: url([[pix:tiny_c4lauthor|fi_external-link]]);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+@media (min-width: 576px) {
+  .c4l-linkblock .link-stripe {
+    width: 60px;
+    min-width: 60px;
+  }
+}
+.c4l-linkblock .link-content {
+  padding: 24px 28px;
+  line-height: 24px;
+}
+.c4l-linkblock .link-name {
+  display: block;
+  color: var(--c4l-linkblock-name);
+  font-size: 17px;
+}
+.c4l-linkblock .link-url {
+  display: block;
+  color: var(--c4l-linkblock-url);
+  font-size: 14px;
+  font-weight: 400;
+  word-break: break-all;
+}
+
+/* Tabs. Without the page script every tab shows, its title as a heading. */
+.c4lv-tabs {
+  margin: 24px auto;
+}
+
+.c4lv-tabs > .c4l-tab {
+  margin-bottom: 8px;
+  padding: 16px 24px;
+  border: 1px solid var(--c4l-tabs-rule);
+  border-radius: 4px;
+  background-color: var(--c4l-tabs-panel-bg);
+}
+
+.c4lv-tabs .c4l-tab-title {
+  margin-bottom: 8px;
+  color: var(--c4l-tabs-tab-ink);
+  font-weight: 600;
+}
+
+.c4lv-tabs .c4l-tab-content > :last-child {
+  margin-bottom: 0;
+}
+
+.c4lv-tabs.c4l-ready > .c4l-tab {
+  margin-bottom: 0;
+  padding: 24px 36px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.c4lv-tabs.c4l-ready > .c4l-tab > .c4l-tab-title {
+  display: none;
+}
+
+.c4l-tablist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-bottom: -1px;
+}
+
+.c4l-tablist-button {
+  flex: 1 1 0;
+  padding: 8px 12px 7px;
+  border: 1px solid transparent;
+  border-bottom-color: var(--c4l-tabs-rule);
+  border-radius: 4px 4px 0 0;
+  background-color: var(--c4l-tabs-tab-bg);
+  color: var(--c4l-tabs-tab-ink);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.c4l-tablist-button.active {
+  border-color: var(--c4l-tabs-rule);
+  border-bottom-color: var(--c4l-tabs-panel-bg);
+  background-color: var(--c4l-tabs-panel-bg);
+}
+.c4l-tablist-button:focus-visible {
+  outline: 2px solid var(--c4l-brand);
+  outline-offset: 2px;
+}
+
+/* Carousel. Without the page script every slide shows. */
+.c4lv-carousel {
+  position: relative;
+  max-width: 75%;
+  margin: 24px auto;
+}
+
+.c4lv-carousel.c4l-full-width-variant {
+  max-width: 100%;
+}
+
+.c4lv-carousel.c4l-white-indicators-variant {
+  --c4l-carousel-control: #fff;
+}
+
+.c4lv-carousel > .c4l-slide {
+  position: relative;
+  height: 380px;
+  overflow: hidden;
+  background-color: var(--c4l-carousel-slide-bg);
+}
+
+.c4lv-carousel > .c4l-slide + .c4l-slide {
+  margin-top: 8px;
+}
+
+.c4lv-carousel.c4l-ready > .c4l-slide + .c4l-slide {
+  margin-top: 0;
+}
+
+.c4lv-carousel > .c4l-slide:has(img) {
+  background-color: transparent;
+}
+
+.c4lv-carousel > .c4l-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.c4l-carousel-prev,
+.c4l-carousel-next {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 10%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.c4l-carousel-prev::before,
+.c4l-carousel-next::before {
+  content: "";
+  width: 1.75rem;
+  height: 1.75rem;
+  background-color: var(--c4l-carousel-control);
+}
+
+.c4l-carousel-prev {
+  left: 0;
+}
+.c4l-carousel-prev::before {
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'><path d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/></svg>");
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'><path d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/></svg>");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 100%;
+  mask-size: 100%;
+}
+
+.c4l-carousel-next {
+  right: 0;
+}
+.c4l-carousel-next::before {
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'><path d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/></svg>");
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'><path d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/></svg>");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 100%;
+  mask-size: 100%;
+}
+
+.c4l-carousel-indicators {
+  position: absolute;
+  right: 0;
+  bottom: 12px;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.c4l-carousel-indicator {
+  width: 30px;
+  height: 4px;
+  padding: 0;
+  border: 0;
+  background-color: var(--c4l-carousel-control);
+  opacity: 0.5;
+  cursor: pointer;
+}
+.c4l-carousel-indicator.active {
+  opacity: 1;
+}
+
+/* Collapsible. Without the page script the content stays open. */
+.c4lv-collapsible {
+  margin: 24px 0;
+}
+
+.c4lv-collapsible > .c4l-collapsible-title {
+  margin: 12px 0 12px 2px;
+  color: var(--c4l-collapsible-trigger);
+  font-weight: 600;
+}
+
+.c4lv-collapsible > .c4l-collapsible-content {
+  padding: 24px 36px 30px;
+  border-radius: 8px;
+  background-color: var(--c4l-collapsible-bg);
+}
+
+.c4lv-collapsible > .c4l-collapsible-content > :last-child {
+  margin-bottom: 0;
+}
+
+.c4lv-collapsible.c4l-ready > .c4l-collapsible-title {
+  font-weight: 400;
+}
+
+.c4l-collapsible-toggle {
+  display: inline-flex;
+  align-items: center;
+  color: var(--c4l-collapsible-trigger);
+  font: inherit;
+  cursor: pointer;
+}
+.c4l-collapsible-toggle::after {
+  content: "";
+  width: 1em;
+  height: 1em;
+  margin-left: 0.5em;
+  background-color: currentColor;
+  transition: transform 0.3s ease-in-out;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+.c4l-collapsible-toggle[aria-expanded=true]::after {
+  transform: rotate(180deg);
+}
+
+.c4lv-collapsible.c4l-buttondropdown-variant .c4l-collapsible-toggle {
+  padding: 6px 12px;
+  border: 1px solid var(--c4l-collapsible-trigger);
+  border-radius: 4px;
+  background-color: var(--c4l-surface);
+}
+
+.c4lv-collapsible.c4l-linkdropdown-variant .c4l-collapsible-toggle {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-decoration: underline;
+}
+.c4lv-collapsible.c4l-linkdropdown-variant .c4l-collapsible-toggle::after {
+  margin-left: 0.2em;
+}
+
+/* Styled table */
+.c4l-table-container .c4l-styled-table {
+  margin-bottom: 0;
+  border-top: none;
+}
+
+.c4l-table-container .c4l-styled-table > :not(caption) > * > * {
+  box-shadow: none;
+}
+
+.c4l-table-container.c4l-solid-variant .c4l-styled-table thead th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  background-color: var(--c4l-table-head-bg);
+  color: var(--c4l-table-head-ink);
+  text-align: center;
+}
+.c4l-table-container.c4l-solid-variant .c4l-styled-table thead th:first-of-type {
+  color: transparent;
+}
+.c4l-table-container.c4l-solid-variant .c4l-styled-table tbody th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border: 1px solid var(--c4l-surface);
+  background-color: var(--c4l-table-row-head-bg);
+  color: inherit;
+}
+.c4l-table-container.c4l-solid-variant .c4l-styled-table tbody tr {
+  border-bottom: 1px dotted var(--c4l-table-rule);
+  white-space: nowrap;
+}
+.c4l-table-container.c4l-solid-variant .c4l-styled-table tbody tr:last-child {
+  border-bottom-style: solid;
+}
+
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th {
+  padding-top: 12px;
+  padding-bottom: 3px;
+  border: 0;
+  background-color: transparent;
+  color: var(--c4l-text);
+  text-align: center;
+  white-space: nowrap;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th:nth-of-type(8n + 1) {
+  border-bottom: 4px solid #415ae6;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th:nth-of-type(8n + 2) {
+  border-bottom: 4px solid #1cc460;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th:nth-of-type(8n + 3) {
+  border-bottom: 4px solid #ffd058;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th:nth-of-type(8n + 4) {
+  border-bottom: 4px solid #fd6f66;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th:nth-of-type(8n + 5) {
+  border-bottom: 4px solid #16b9ff;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th:nth-of-type(8n + 6) {
+  border-bottom: 4px solid #ffaf59;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th:nth-of-type(8n + 7) {
+  border-bottom: 4px solid #8f95fe;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th:nth-of-type(8n + 8) {
+  border-bottom: 4px solid #f78aaa;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th:first-of-type {
+  border-bottom-color: var(--c4l-table-rule);
+  color: transparent;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table tbody th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--c4l-surface);
+  background-color: var(--c4l-table-row-head-bg);
+  white-space: nowrap;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table tbody tr {
+  border-bottom: 1px dotted var(--c4l-table-rule);
+}
+
+/**
+ * Tabs and carousel controls inside the C4L Author editor (amd/src/editor_widgets.js).
+ *
+ * The controls are editor-only and never saved.
+ *
+ * @package     tiny_c4lauthor
+ * @copyright   2026 Roger Segú <rogersegu@gmail.com>, bdecent gmbh <https://bdecent.de>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+.c4l-editor-tabbar,
+.c4l-editor-toolbar,
+.c4l-editor-carousel {
+  user-select: none;
+}
+
+.c4l-editor-button,
+.c4l-editor-tab,
+.c4l-editor-carousel-prev,
+.c4l-editor-carousel-next {
+  cursor: pointer;
+}
+
+/* Tabs: one tab at a time, its title editable above its content. */
+.c4lv-tabs[data-c4l-editing] > .c4l-tab:not([data-c4l-active]) {
+  display: none;
+}
+
+.c4lv-tabs[data-c4l-editing] > .c4l-tab {
+  margin-bottom: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.c4lv-tabs[data-c4l-editing] .c4l-tab-title {
+  padding-bottom: 4px;
+  border-bottom: 1px dashed var(--c4l-tabs-rule);
+  color: var(--c4l-text-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.c4l-editor-tabbar {
+  display: flex;
+  gap: 2px;
+  margin-bottom: -1px;
+}
+
+.c4l-editor-tab {
+  flex: 1 1 0;
+  padding: 8px 12px 7px;
+  border: 1px solid transparent;
+  border-bottom-color: var(--c4l-tabs-rule);
+  border-radius: 4px 4px 0 0;
+  background-color: var(--c4l-tabs-tab-bg);
+  color: var(--c4l-tabs-tab-ink);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+.c4l-editor-tab.active {
+  border-color: var(--c4l-tabs-rule);
+  border-bottom-color: var(--c4l-tabs-panel-bg);
+  background-color: var(--c4l-tabs-panel-bg);
+}
+
+.c4l-editor-toolbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.c4l-editor-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border: 1px solid var(--c4l-tabs-rule);
+  border-radius: 4px;
+  background-color: var(--c4l-surface);
+  color: var(--c4l-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+.c4l-editor-button:hover {
+  border-color: var(--c4l-text-muted);
+}
+
+/* Carousel: one slide at a time, with its controls over it. */
+.c4lv-carousel[data-c4l-editing] > .c4l-slide:not([data-c4l-active]) {
+  display: none;
+}
+
+.c4l-editor-carousel {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.c4l-editor-carousel > * {
+  pointer-events: auto;
+}
+.c4l-editor-carousel .c4l-editor-toolbar {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  margin: 0;
+  transform: translateX(-50%);
+}
+
+.c4l-editor-carousel-image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  padding: 16px 24px;
+  border-style: dashed;
+  font-size: 13px;
+  transform: translate(-50%, -50%);
+}
+
+.c4l-editor-carousel-prev,
+.c4l-editor-carousel-next {
+  position: absolute;
+  top: 50%;
+  padding: 0 12px;
+  color: var(--c4l-carousel-control);
+  font-size: 40px;
+  line-height: 1;
+  transform: translateY(-50%);
+}
+
+.c4l-editor-carousel-prev {
+  left: 0;
+}
+
+.c4l-editor-carousel-next {
+  right: 0;
+}
+
+.c4l-editor-carousel-count {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: var(--c4l-surface);
+  color: var(--c4l-text-muted);
+  font-size: 12px;
+}
+
 body.mce-content-body .collapse:not(.show),
 .c4l-code-preview .collapse:not(.show) {
   display: block !important;
