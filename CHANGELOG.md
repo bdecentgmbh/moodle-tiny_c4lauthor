@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.7.1-beta
+
+### Changed
+
+- The labels and documentation of components that other plugins add through the hook
+  are shown as text in the sidebar, so they cannot carry markup into the editor's page.
+  C4L Author's own strings are unchanged. Suggested by the MDL Shield review of
+  1.6.0-beta (grade A+, no findings).
+
 ## 1.7.0-beta
 
 ### Added
