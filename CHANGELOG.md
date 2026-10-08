@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.3.0-beta
+
+### Added
+
+- Three helpers, contributed by bdecent from the eduHub project:
+  - *Panel list*: a list of panels, numbered or with checkmarks, optionally compact
+    or full width.
+  - *Timeline*: events with a year and a text, optionally full width or split, with
+    continuity marks before or after. Precision mode edits each event's year and
+    text.
+  - *Combo*: text and image side by side, in either order.
+- Variants can form groups (exactly one active, such as numbered or checkmarks) and
+  exclude others (full width and split).
+- A component can declare its own wrapper class instead of a `c4lv-` one.
+- Brand colour tokens (`--c4l-brand` and its tints) that follow the site's primary
+  colour, also inside the editor, with dark-mode values. The new helpers use them.
+- The mobile app styles cover the three helpers.
+
 ## 1.2.1-beta
 
 ### Security
