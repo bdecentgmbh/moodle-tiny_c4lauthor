@@ -1,5 +1,35 @@
 # Changelog
 
+## 1.2.1-beta
+
+### Security
+
+- Editor content is only ever handled as data outside the editor: the modal passes it
+  to its editor as a value, the precision preview runs in a sandboxed frame that cannot
+  execute scripts, and the AI view sanitises the component previews it shows.
+- AI suggest checks the site's AI policy (asking the user to accept it first), the
+  per-course and per-activity AI setting where Moodle has one, the `aisuggest`
+  capability and the plugin setting, both in the editor and in the web service. The
+  web service takes the paragraphs as a structured, size-limited list.
+- AI provider error messages are no longer shown in the browser; they are logged as
+  debugging output instead.
+- Text selected in the editor is inserted into a component as text, never as markup.
+- `pluginfile` serves only the plugin's own file areas.
+
+### Changed
+
+- AI suggest is switched off by default on new installations. Existing sites keep
+  their current setting.
+- The plugin loads only for users with both `tiny/c4lauthor:use` and
+  `tiny/c4lauthor:viewplugin`, on every supported Moodle version.
+- Admin-defined custom component HTML is cleaned with `clean_text()` instead of
+  `format_text()`, so text filters no longer run over it.
+- The precision view no longer leaves its internal `data-c4l-idx` attributes in the
+  content.
+- Uninstalling removes the plugin's user preference.
+- Tests: a Behat smoke test for the modal; CI covers Moodle 4.5 to 5.3 and runs on pull
+  requests.
+
 ## 1.2.0-beta
 
 ### Added
