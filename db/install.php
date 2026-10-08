@@ -27,7 +27,8 @@
  */
 function xmldb_tiny_c4lauthor_install() {
     // AI Suggest defaults.
-    set_config('ai_enabled', 1, 'tiny_c4lauthor');
+    // AI suggest stays off until an administrator switches it on.
+    set_config('ai_enabled', 0, 'tiny_c4lauthor');
     set_config('ai_comp_enabled_attention', 1, 'tiny_c4lauthor');
     set_config('ai_comp_enabled_tip', 1, 'tiny_c4lauthor');
     set_config('ai_comp_enabled_keyconcept', 1, 'tiny_c4lauthor');

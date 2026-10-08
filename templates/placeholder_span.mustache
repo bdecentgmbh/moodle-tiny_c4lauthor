@@ -19,13 +19,18 @@
 
     Renders a span with a data-id used as placeholder inside C4L components.
 
+    placeholdertext is text the author selected and is always escaped.
+    placeholderhtml is the component's default text from its definition (code or
+    admin setting) and may contain markup; it is never taken from the editor.
+
     @copyright  2026 Roger Segú <rogersegu@gmail.com>
     @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 
     Example context (json):
     {
         "id": "R12345-1717000000",
-        "placeholder": "Sample text"
+        "placeholdertext": "Selected text",
+        "placeholderhtml": ""
     }
 }}
-<span data-id="{{id}}">{{{placeholder}}}</span>
+<span data-id="{{id}}">{{#placeholderhtml}}{{{placeholderhtml}}}{{/placeholderhtml}}{{^placeholderhtml}}{{placeholdertext}}{{/placeholderhtml}}</span>

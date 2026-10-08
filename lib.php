@@ -61,10 +61,12 @@ function tiny_c4lauthor_pluginfile(
     $forcedownload,
     array $options = []
 ) {
-    $compicon = strpos($filearea, 'compicon') !== false;
-    $compimage = strpos($filearea, 'customimagesbank') !== false;
+    // These are the administrator's custom component icons and images. They are shown
+    // inside content to everyone who can see that content, like theme images, so they are
+    // served without a login check. Only the plugin's own file areas are served.
+    $allowedarea = $filearea === 'customimagesbank' || preg_match('/^customcompicon\d+$/', $filearea);
 
-    if ($context->contextlevel == CONTEXT_SYSTEM && ($compicon || $compimage)) {
+    if ($context->contextlevel == CONTEXT_SYSTEM && $allowedarea) {
         $fs = get_file_storage();
         $relativepath = implode('/', $args);
         $fullpath = "/$context->id/tiny_c4lauthor/$filearea/$relativepath";
@@ -77,8 +79,9 @@ function tiny_c4lauthor_pluginfile(
         if (PHPUNIT_TEST) {
             return $file;
         }
-        send_stored_file($file, null, 0, false, $options);
-    } else {
-        send_file_not_found();
+        send_stored_file($file, null, 0, $forcedownload, $options);
     }
+
+    // Anything else is not ours to serve; core answers with "not found".
+    return false;
 }

@@ -23,203 +23,13 @@
 
 import {get_string as getString} from 'core/str';
 import {component} from './common';
+import {brandColourRule} from './brand';
+import {buildFieldRegistry} from './precise_handlers';
+import Pending from 'core/pending';
 import Templates from 'core/templates';
 
-// ── Shared apply/extract helpers for the registry ──
-
-const setTextContent = (el, val) => {
-    el.textContent = val;
-};
-
-const extractCaptionText = (comp) => extractDirectText(comp.querySelector('.c4l-embedded-caption'));
-const applyCaptionText = (comp, val) => applyDirectText(comp.querySelector('.c4l-embedded-caption'), val);
-
-/**
- * Field registry — maps component names to arrays of field descriptors.
- *
- * type: 'textarea' | 'input' | 'list' | 'image-src' | 'image-alt'
- * extract: custom function(compEl) => string (overrides default extraction)
- * apply: custom function(compEl, value) (overrides default apply)
- */
-const FIELD_REGISTRY = {
-    keyconcept: [
-        {selector: 'span[data-id]', label: 'precision_field_text', type: 'textarea', innerHTML: true, fallback: true},
-    ],
-    tip: [
-        {selector: 'span[data-id]', label: 'precision_field_text', type: 'textarea', innerHTML: true, fallback: true},
-    ],
-    reminder: [
-        {selector: 'span[data-id]', label: 'precision_field_text', type: 'textarea', innerHTML: true, fallback: true},
-    ],
-    attention: [
-        {selector: 'span[data-id]', label: 'precision_field_text', type: 'textarea', innerHTML: true, fallback: true},
-    ],
-    conceptreview: [
-        {selector: '.c4l-concept-review-title', label: 'precision_field_title', type: 'input'},
-        {selector: 'span[data-id]', label: 'precision_field_text', type: 'textarea', innerHTML: true, fallback: true},
-    ],
-    expectedfeedback: [
-        {selector: 'span[data-id]', label: 'precision_field_text', type: 'textarea', innerHTML: true, fallback: true},
-    ],
-    allpurposecard: [
-        {selector: 'span[data-id]', label: 'precision_field_text', type: 'textarea', innerHTML: true, fallback: true},
-    ],
-    proceduralcontext: [
-        {selector: null, label: 'precision_field_text', type: 'textarea',
-            extract: (comp) => comp.textContent,
-            apply: setTextContent},
-    ],
-    statement: [
-        {selector: '.task-statement p', label: 'precision_field_text', type: 'textarea'},
-    ],
-    assessment: [
-        {selector: '.teacher-assessment-text p', label: 'precision_field_text', type: 'textarea'},
-    ],
-    tag: [
-        {selector: null, label: 'precision_field_text', type: 'input',
-            extract: (comp) => comp.textContent.trim(),
-            apply: setTextContent},
-    ],
-    inlinetag: [
-        {selector: null, label: 'precision_field_text', type: 'input',
-            extract: (comp) => comp.textContent,
-            apply: setTextContent},
-    ],
-    duedate: [
-        {selector: null, label: 'precision_field_value', type: 'input',
-            extract: (comp) => comp.textContent.trim(),
-            apply: setTextContent},
-    ],
-    estimatedtime: [
-        {selector: null, label: 'precision_field_value', type: 'input',
-            extract: (comp) => {
-                const span = comp.querySelector('span:not([data-id])');
-                const suffix = span ? span.textContent : '';
-                const full = comp.textContent.trim();
-                return suffix ? full.replace(new RegExp('\\s*' + escapeRegExp(suffix) + '\\s*$'), '').trim() : full;
-            },
-            apply: (comp, val) => {
-                const span = comp.querySelector('span:not([data-id])');
-                const suffixText = span ? span.textContent : '';
-                const doc = comp.ownerDocument;
-                comp.innerHTML = '';
-                comp.appendChild(doc.createTextNode(val + ' '));
-                const newSpan = doc.createElement('span');
-                newSpan.textContent = suffixText;
-                comp.appendChild(newSpan);
-            }},
-    ],
-    gradingvalue: [
-        {selector: null, label: 'precision_field_value', type: 'input',
-            extract: (comp) => {
-                const span = comp.querySelector('span:not([data-id])');
-                const prefix = span ? span.textContent : '';
-                const full = comp.textContent.trim();
-                return prefix ? full.replace(new RegExp('^\\s*' + escapeRegExp(prefix) + '\\s*'), '').trim() : full;
-            },
-            apply: (comp, val) => {
-                const span = comp.querySelector('span:not([data-id])');
-                const prefixText = span ? span.textContent : '';
-                const doc = comp.ownerDocument;
-                comp.innerHTML = '';
-                const newSpan = doc.createElement('span');
-                newSpan.textContent = prefixText;
-                comp.appendChild(newSpan);
-                comp.appendChild(doc.createTextNode(val));
-            }},
-    ],
-    aiuseallowed: [
-        {selector: null, label: 'precision_field_text', type: 'input',
-            extract: (comp) => comp.textContent.trim(),
-            apply: setTextContent},
-    ],
-    aiusenotallowed: [
-        {selector: null, label: 'precision_field_text', type: 'input',
-            extract: (comp) => comp.textContent.trim(),
-            apply: setTextContent},
-    ],
-    aiusereported: [
-        {selector: null, label: 'precision_field_text', type: 'input',
-            extract: (comp) => comp.textContent.trim(),
-            apply: setTextContent},
-    ],
-    quote: [
-        {selector: '.c4l-quote-text p', label: 'precision_field_text', type: 'textarea'},
-        {selector: '.c4l-embedded-caption span', label: 'precision_field_author', type: 'input', optional: true},
-        {selector: '.c4l-embedded-caption', label: 'precision_field_source', type: 'input', optional: true,
-            extract: extractCaptionText,
-            apply: applyCaptionText},
-    ],
-    readingcontext: [
-        {selector: 'p', label: 'precision_field_text', type: 'textarea'},
-        {selector: '.c4l-embedded-caption span', label: 'precision_field_author', type: 'input', optional: true},
-        {selector: '.c4l-embedded-caption', label: 'precision_field_source', type: 'input', optional: true,
-            extract: extractCaptionText,
-            apply: applyCaptionText},
-    ],
-    example: [
-        {selector: 'h1', label: 'precision_field_title', type: 'input'},
-        {selector: 'p', label: 'precision_field_text', type: 'textarea'},
-    ],
-    dodontcards: [
-        {selector: '.c4l-dodontcards-do', label: 'precision_field_do', type: 'textarea'},
-        {selector: '.c4l-dodontcards-dont', label: 'precision_field_dont', type: 'textarea'},
-    ],
-    learningoutcomes: [
-        {selector: '.c4l-learningoutcomes-title', label: 'precision_field_title', type: 'input'},
-        {selector: '.c4l-learningoutcomes-list > li:not(.c4l-learningoutcomes-title)',
-            label: 'precision_field_item', type: 'list'},
-    ],
-    furtherreading: [
-        {selector: '.c4l-further-reading-title', label: 'precision_field_title', type: 'input'},
-        {selector: '.c4l-furtherreading-list > li:not(.c4l-further-reading-title)',
-            label: 'precision_field_item', type: 'list'},
-    ],
-    figure: [
-        {selector: 'img', label: 'precision_field_image_alt', type: 'image-alt'},
-        {selector: '.c4l-figure-footer', label: 'precision_field_caption', type: 'input', optional: true},
-        {selector: '.c4l-figure-caption', label: 'precision_field_source', type: 'input', optional: true},
-    ],
-};
-
-/**
- * Extract only direct text nodes from an element (skip child elements).
- *
- * @param {HTMLElement} el
- * @returns {string}
- */
-const extractDirectText = (el) => {
-    if (!el) {
-        return '';
-    }
-    let text = '';
-    for (const child of el.childNodes) {
-        if (child.nodeType === 3) {
-            text += child.textContent;
-        }
-    }
-    return text.trim();
-};
-
-/**
- * Replace direct text nodes in an element.
- *
- * @param {HTMLElement} el
- * @param {string} val
- */
-const applyDirectText = (el, val) => {
-    if (!el) {
-        return;
-    }
-    const toRemove = [];
-    for (const child of el.childNodes) {
-        if (child.nodeType === 3) {
-            toRemove.push(child);
-        }
-    }
-    toRemove.forEach((n) => n.remove());
-    el.appendChild(el.ownerDocument.createTextNode(val));
-};
+/** @type {Object} Field descriptors by component name, built from the declarations on mount. */
+let fieldRegistry = {};
 
 // ── Component identification ──
 
@@ -240,11 +50,11 @@ const identifyComponent = (el) => {
     }
     // Fallback for components that use the legacy `c4l-` wrapper prefix
     // (e.g. statement, assessment). Only match when the name corresponds to
-    // an entry in FIELD_REGISTRY so we don't pick up utility classes.
+    // an entry in fieldRegistry so we don't pick up utility classes.
     for (const cls of el.classList) {
         if (cls.startsWith('c4l-')) {
             const name = cls.substring(4);
-            if (FIELD_REGISTRY[name]) {
+            if (fieldRegistry[name]) {
                 return name;
             }
         }
@@ -297,7 +107,7 @@ const getStandardValue = (el, desc) => {
  * @returns {Array<{descriptor: Object, value: string, values?: Array, elements: NodeList|Array}>}
  */
 const extractFields = (compEl, compName) => {
-    const registry = FIELD_REGISTRY[compName];
+    const registry = fieldRegistry[compName];
     if (!registry) {
         return [];
     }
@@ -364,7 +174,18 @@ const extractListField = (compEl, desc) => {
         return null;
     }
     const values = [];
-    items.forEach((li) => values.push(li.textContent.trim()));
+    if (desc.subfields) {
+        items.forEach((item) => {
+            const row = {};
+            desc.subfields.forEach((sf) => {
+                const el = item.querySelector(sf.selector);
+                row[sf.key] = el ? el.textContent.trim() : '';
+            });
+            values.push(row);
+        });
+    } else {
+        items.forEach((li) => values.push(li.textContent.trim()));
+    }
     return {descriptor: desc, values, elements: items, listParent: items[0].parentNode};
 };
 
@@ -379,15 +200,30 @@ const extractListField = (compEl, desc) => {
  */
 const populateFormValues = (panel, fields) => {
     fields.forEach((field, fIdx) => {
-        if (field.descriptor.type === 'list') {
-            const textareas = panel.querySelectorAll(
-                'textarea[data-field="' + fIdx + '"]'
-            );
-            field.values.forEach((val, i) => {
-                if (textareas[i]) {
-                    textareas[i].value = val;
-                }
-            });
+        const desc = field.descriptor;
+        if (desc.type === 'list') {
+            if (desc.subfields) {
+                field.values.forEach((row, i) => {
+                    desc.subfields.forEach((sf, sIdx) => {
+                        const input = panel.querySelector(
+                            '[data-field="' + fIdx + '"][data-item="' + i +
+                            '"][data-sub="' + sIdx + '"]'
+                        );
+                        if (input) {
+                            input.value = row[sf.key] || '';
+                        }
+                    });
+                });
+            } else {
+                const textareas = panel.querySelectorAll(
+                    'textarea[data-field="' + fIdx + '"]'
+                );
+                field.values.forEach((val, i) => {
+                    if (textareas[i]) {
+                        textareas[i].value = val;
+                    }
+                });
+            }
         } else {
             const input = panel.querySelector('[data-field="' + fIdx + '"]');
             if (input) {
@@ -425,8 +261,6 @@ const autoResizeAll = (panel) => {
  * @param {string} str
  * @returns {string}
  */
-const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
 const escapeAttr = (str) => {
     return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;')
         .replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -487,11 +321,11 @@ const buildFieldHtml = (field, fIdx, strings) => {
 const buildListFieldHtml = (field, fIdx, strings) => {
     let html = '';
     field.values.forEach((_val, i) => {
-        html += buildListItemHtml(fIdx, i, strings);
+        html += buildListItemHtml(fIdx, i, strings, field.descriptor);
     });
     html += '<button type="button" class="tiny_c4lauthor__precision-add-btn"' +
         ' data-field="' + fIdx + '">' +
-        (strings.get('precision_add_item') || 'Add item') + '</button>';
+        strings.get('precision_add_item') + '</button>';
     return html;
 };
 
@@ -501,15 +335,41 @@ const buildListFieldHtml = (field, fIdx, strings) => {
  * @param {number} fIdx
  * @param {number} itemIdx
  * @param {Map} strings
+ * @param {Object} [desc] field descriptor, used when subfields are configured
  * @returns {string}
  */
-const buildListItemHtml = (fIdx, itemIdx, strings) => {
-    return '<div class="tiny_c4lauthor__precision-list-item" data-item-idx="' + itemIdx + '">' +
-        '<textarea class="tiny_c4lauthor__precision-input tiny_c4lauthor__precision-textarea"' +
-        ' data-field="' + fIdx + '" data-item="' + itemIdx + '"></textarea>' +
-        '<button type="button" class="tiny_c4lauthor__precision-remove-btn"' +
+const buildListItemHtml = (fIdx, itemIdx, strings, desc) => {
+    let html = '<div class="tiny_c4lauthor__precision-list-item" data-item-idx="' + itemIdx + '">';
+    if (desc && desc.subfields) {
+        html += '<div class="tiny_c4lauthor__precision-subfields">';
+        desc.subfields.forEach((sf, sIdx) => {
+            const labelText = sf.label ? strings.get(sf.label) : '';
+            html += '<div class="tiny_c4lauthor__precision-subfield">';
+            if (labelText) {
+                html += '<label class="tiny_c4lauthor__precision-sublabel">' + labelText + '</label>';
+            }
+            if (sf.type === 'textarea') {
+                html += '<textarea class="tiny_c4lauthor__precision-input' +
+                    ' tiny_c4lauthor__precision-textarea"' +
+                    ' data-field="' + fIdx + '" data-item="' + itemIdx +
+                    '" data-sub="' + sIdx + '"></textarea>';
+            } else {
+                html += '<input type="text" class="tiny_c4lauthor__precision-input"' +
+                    ' data-field="' + fIdx + '" data-item="' + itemIdx +
+                    '" data-sub="' + sIdx + '" value="">';
+            }
+            html += '</div>';
+        });
+        html += '</div>';
+    } else {
+        html += '<textarea class="tiny_c4lauthor__precision-input' +
+            ' tiny_c4lauthor__precision-textarea"' +
+            ' data-field="' + fIdx + '" data-item="' + itemIdx + '"></textarea>';
+    }
+    html += '<button type="button" class="tiny_c4lauthor__precision-remove-btn"' +
         ' data-field="' + fIdx + '" data-item="' + itemIdx + '" title="' +
-        (strings.get('precision_remove_item') || 'Remove') + '">&times;</button></div>';
+        escapeAttr(strings.get('precision_remove_item')) + '">&times;</button></div>';
+    return html;
 };
 
 // ── Applying form values ──
@@ -547,6 +407,29 @@ const applyStandardField = (compEl, desc, val) => {
  * @param {number} fIdx
  */
 const applyListField = (compEl, desc, field, formPanel, fIdx) => {
+    if (desc.apply) {
+        const values = [];
+        if (desc.subfields) {
+            const items = formPanel.querySelectorAll(
+                '.tiny_c4lauthor__precision-field-group[data-field-idx="' + fIdx + '"]' +
+                ' .tiny_c4lauthor__precision-list-item'
+            );
+            items.forEach((item) => {
+                const row = {};
+                desc.subfields.forEach((sf, sIdx) => {
+                    const input = item.querySelector('[data-sub="' + sIdx + '"]');
+                    row[sf.key] = input ? input.value : '';
+                });
+                values.push(row);
+            });
+        } else {
+            formPanel.querySelectorAll('textarea[data-field="' + fIdx + '"]').forEach((ta) => {
+                values.push(ta.value);
+            });
+        }
+        desc.apply(compEl, values, field);
+        return;
+    }
     const textareas = formPanel.querySelectorAll('textarea[data-field="' + fIdx + '"]');
     const listParent = field.listParent || (field.elements[0] ? field.elements[0].parentNode : null);
     if (!listParent) {
@@ -604,8 +487,9 @@ const applyFormToComponent = (compEl, fields, formPanel) => {
  * @param {HTMLElement} formPanel
  * @param {Map} strings
  * @param {Function} onFieldInput — callback to trigger reactive apply
+ * @param {Array} [fields] — extracted fields, used to look up descriptors for new items
  */
-const wireListButtons = (formPanel, strings, onFieldInput) => {
+const wireListButtons = (formPanel, strings, onFieldInput, fields) => {
     formPanel.querySelectorAll('.tiny_c4lauthor__precision-remove-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
             const listItem = btn.closest('.tiny_c4lauthor__precision-list-item');
@@ -627,7 +511,8 @@ const wireListButtons = (formPanel, strings, onFieldInput) => {
             }
             const items = group.querySelectorAll('.tiny_c4lauthor__precision-list-item');
             const newIdx = items.length;
-            const itemHtml = buildListItemHtml(fIdx, newIdx, strings);
+            const desc = fields && fields[fIdx] ? fields[fIdx].descriptor : null;
+            const itemHtml = buildListItemHtml(fIdx, newIdx, strings, desc);
             btn.insertAdjacentHTML('beforebegin', itemHtml);
             // Wire the new item.
             const newItem = group.querySelectorAll('.tiny_c4lauthor__precision-list-item');
@@ -641,10 +526,11 @@ const wireListButtons = (formPanel, strings, onFieldInput) => {
                     }
                 });
             }
-            const newTextarea = last.querySelector('.tiny_c4lauthor__precision-input');
-            if (newTextarea && onFieldInput) {
-                newTextarea.addEventListener('input', onFieldInput);
-            }
+            last.querySelectorAll('.tiny_c4lauthor__precision-input').forEach((inp) => {
+                if (onFieldInput) {
+                    inp.addEventListener('input', onFieldInput);
+                }
+            });
             if (onFieldInput) {
                 onFieldInput();
             }
@@ -662,9 +548,12 @@ const wireListButtons = (formPanel, strings, onFieldInput) => {
  * @param {Function} handlers.getEditorContent — returns innerHTML from inner editor
  * @param {Function} handlers.setEditorContent — writes HTML back to inner editor
  * @param {Function} handlers.getContentCss — returns array of CSS URLs
+ * @param {Object} catalogue — the components the editor offers, from registry.createCatalogue()
  * @returns {Promise<{destroy: Function}>}
  */
-export const mountPreciseView = async(container, handlers) => {
+export const mountPreciseView = async(container, handlers, catalogue) => {
+    fieldRegistry = buildFieldRegistry(catalogue.components);
+
     const templateHtml = await Templates.render('tiny_c4lauthor/precision_mode', {});
     container.innerHTML = templateHtml;
 
@@ -672,25 +561,22 @@ export const mountPreciseView = async(container, handlers) => {
     const formPanel = container.querySelector('.tiny_c4lauthor__precision-form');
     const placeholder = container.querySelector('.tiny_c4lauthor__precision-placeholder');
 
-    // Resolve needed lang strings — collect every label used in the registry
-    // plus the few UI strings the form needs (add/remove item).
-    const stringKeySet = new Set(['precision_add_item', 'precision_remove_item']);
-    Object.values(FIELD_REGISTRY).forEach((fields) => {
-        fields.forEach((field) => {
-            if (field.label) {
-                stringKeySet.add(field.label);
-            }
-        });
-    });
-    const stringKeys = Array.from(stringKeySet);
-    const resolved = await Promise.all(stringKeys.map((k) => getString(k, component)));
-    const strings = new Map();
-    stringKeys.forEach((k, i) => strings.set(k, resolved[i]));
+    // The field labels come with the declarations; the form adds the add/remove item strings.
+    const [addItemStr, removeItemStr] = await Promise.all([
+        getString('precision_add_item', component),
+        getString('precision_remove_item', component),
+    ]);
+    const strings = new Map(catalogue.strings);
+    strings.set('precision_add_item', addItemStr);
+    strings.set('precision_remove_item', removeItemStr);
 
     const editorHtml = handlers.getEditorContent();
     const cssUrls = handlers.getContentCss();
     const iframe = document.createElement('iframe');
     iframe.className = 'tiny_c4lauthor__precision-iframe';
+    // The preview shows stored content, which can contain scripts. Keep them inert:
+    // same origin so this module can read the document, but no scripts in the frame.
+    iframe.setAttribute('sandbox', 'allow-same-origin');
 
     let linkTags = '';
     cssUrls.forEach((url) => {
@@ -706,18 +592,36 @@ export const mountPreciseView = async(container, handlers) => {
         '<style>body{margin:1rem;font-family:-apple-system,BlinkMacSystemFont,' +
         '"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}' +
         '.c4l-spacer{margin:.25rem 0}' +
+        brandColourRule() +
         '[data-c4l-selected]{outline:2px solid #b8d7ff;outline-offset:2px;border-radius:0}' +
         'html[data-bs-theme=dark] [data-c4l-selected]{outline-color:var(--c4l-ui-accent)}</style>' +
         '</head><body class="tiny_c4lauthor__precision-body">' + editorHtml + '</body></html>';
+    // Track the preview until it has loaded and is clickable, so Behat waits for it.
+    const pending = new Pending('tiny_c4lauthor/precisionPreview');
     iframe.setAttribute('srcdoc', srcdoc);
     previewContainer.appendChild(iframe);
 
     let currentCompEl = null;
     let currentFields = null;
 
+    /**
+     * Get the preview's HTML without the attributes this view adds for its own use.
+     *
+     * @returns {string}
+     */
+    const getCleanHtml = () => {
+        const body = iframe.contentDocument.body.cloneNode(true);
+        body.querySelectorAll('[data-c4l-idx], [data-c4l-selected]').forEach((el) => {
+            el.removeAttribute('data-c4l-idx');
+            el.removeAttribute('data-c4l-selected');
+        });
+        return body.innerHTML;
+    };
+
     iframe.addEventListener('load', () => {
         const iDoc = iframe.contentDocument;
         if (!iDoc) {
+            pending.resolve();
             return;
         }
 
@@ -730,6 +634,7 @@ export const mountPreciseView = async(container, handlers) => {
             e.preventDefault();
             handlePreviewClick(e.target, iDoc);
         });
+        pending.resolve();
     });
 
     /**
@@ -750,7 +655,7 @@ export const mountPreciseView = async(container, handlers) => {
         }
 
         const compName = identifyComponent(compEl);
-        if (!compName || !FIELD_REGISTRY[compName]) {
+        if (!compName || !fieldRegistry[compName]) {
             clearForm();
             return;
         }
@@ -763,7 +668,7 @@ export const mountPreciseView = async(container, handlers) => {
             return;
         }
 
-        showForm(iDoc);
+        showForm();
     };
 
     let syncTimer = null;
@@ -775,7 +680,7 @@ export const mountPreciseView = async(container, handlers) => {
         if (syncTimer) {
             clearTimeout(syncTimer);
             syncTimer = null;
-            handlers.setEditorContent(iframe.contentDocument.body.innerHTML);
+            handlers.setEditorContent(getCleanHtml());
         }
     };
 
@@ -797,10 +702,8 @@ export const mountPreciseView = async(container, handlers) => {
 
     /**
      * Show the form for the currently selected component.
-     *
-     * @param {Document} iDoc
      */
-    const showForm = (iDoc) => {
+    const showForm = () => {
         if (placeholder) {
             placeholder.style.display = 'none';
         }
@@ -825,7 +728,7 @@ export const mountPreciseView = async(container, handlers) => {
             clearTimeout(syncTimer);
             syncTimer = setTimeout(() => {
                 syncTimer = null;
-                handlers.setEditorContent(iDoc.body.innerHTML);
+                handlers.setEditorContent(getCleanHtml());
             }, 300);
         };
 
@@ -838,7 +741,7 @@ export const mountPreciseView = async(container, handlers) => {
             input.addEventListener('input', onFieldInput);
         });
 
-        wireListButtons(formPanel, strings, onFieldInput);
+        wireListButtons(formPanel, strings, onFieldInput, currentFields);
     };
 
     const destroy = () => {
@@ -851,7 +754,7 @@ export const mountPreciseView = async(container, handlers) => {
             syncTimer = null;
         }
         if (iframe && iframe.contentDocument) {
-            handlers.setEditorContent(iframe.contentDocument.body.innerHTML);
+            handlers.setEditorContent(getCleanHtml());
         }
         container.innerHTML = '';
         currentCompEl = null;

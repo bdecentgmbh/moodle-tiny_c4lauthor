@@ -25,18 +25,14 @@ import {render as renderTemplate} from 'core/templates';
 import {get_string as getString, get_strings as getStrings} from 'core/str';
 import {component as stringComponent} from './common';
 import {extractBlocks} from './ai_content';
+import {sanitiseHtml} from './sanitise';
 
 const SELECTABLE_COMPONENTS = new Set([
     'keyconcept', 'tip', 'reminder', 'attention', 'learning_outcomes',
 ]);
 
-let COMPONENT_LABELS = {
-    tip: 'Tip',
-    attention: 'Attention',
-    learning_outcomes: 'Learning outcomes', // eslint-disable-line camelcase
-    keyconcept: 'Key concept',
-    reminder: 'Reminder',
-};
+// Filled from the language strings by loadComponentLabels() before the view renders.
+let COMPONENT_LABELS = {};
 
 const loadComponentLabels = async() => {
     const keys = ['tip', 'attention', 'learning_outcomes', 'keyconcept', 'reminder'];
@@ -117,7 +113,8 @@ export const mountAiView = async(container, handlers) => {
                 isC4L,
                 isDisplayOnly,
                 componentClass: isC4L ? 'c4lv-' + (b.c4lComponent || '').replace(/_/g, '') : null,
-                c4lHtml: isDisplayOnly ? (b.html || '') : '',
+                // Rendered unescaped in the template, so it must be sanitised here.
+                c4lHtml: isDisplayOnly ? sanitiseHtml(b.html) : '',
                 animDelay: (animIdx++) * 40,
                 suggestion: sug ? {
                     ...sug,
@@ -144,7 +141,8 @@ export const mountAiView = async(container, handlers) => {
                     const next = blocks[j];
                     if (next.isMath) {
                         next.isGrouped = true;
-                        blocks[i].followingHtml = next.html || '';
+                        // Rendered unescaped in the template, so it must be sanitised here.
+                        blocks[i].followingHtml = sanitiseHtml(next.html);
                         blocks[i].followingText = next.text;
                         blocks[i].hasFollowingHtml = !!next.html;
                         blocks[i].hasFollowingText = true;

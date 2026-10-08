@@ -153,6 +153,30 @@
     content: url([[pix:tiny_c4lauthor|c4l_allpurposecard_icon]]);
 }
 
+.c4l-panellist-icon::before {
+    content: '';
+}
+
+.c4l-panellist-icon .c4l-button-text::before {
+    content: url([[pix:tiny_c4lauthor|c4l_panellist_icon]]);
+}
+
+.c4l-timeline-icon::before {
+    content: '';
+}
+
+.c4l-timeline-icon .c4l-button-text::before {
+    content: url([[pix:tiny_c4lauthor|c4l_timeline_icon]]);
+}
+
+.c4l-combo-icon::before {
+    content: '';
+}
+
+.c4l-combo-icon .c4l-button-text::before {
+    content: url([[pix:tiny_c4lauthor|c4l-combo-icon]]);
+}
+
 .c4l-inlinetag-icon::before {
     content: '';
 }
@@ -170,6 +194,54 @@
 }
 
 /* Dark mode — masks from pix/mask/, coloured by --c4l-ui-icon-* */
+
+.c4l-styledlist-icon::before {
+    content: '';
+}
+
+.c4l-styledlist-icon .c4l-button-text::before {
+    content: url([[pix:tiny_c4lauthor|c4l-styledlist-icon]]);
+}
+
+.c4l-linkblock-icon::before {
+    content: '';
+}
+
+.c4l-linkblock-icon .c4l-button-text::before {
+    content: url([[pix:tiny_c4lauthor|c4l-linkblock-icon]]);
+}
+
+.c4l-tabs-icon::before {
+    content: '';
+}
+
+.c4l-tabs-icon .c4l-button-text::before {
+    content: url([[pix:tiny_c4lauthor|c4l-tabs-icon]]);
+}
+
+.c4l-carousel-icon::before {
+    content: '';
+}
+
+.c4l-carousel-icon .c4l-button-text::before {
+    content: url([[pix:tiny_c4lauthor|c4l-carousel-icon]]);
+}
+
+.c4l-collapsible-icon::before {
+    content: '';
+}
+
+.c4l-collapsible-icon .c4l-button-text::before {
+    content: url([[pix:tiny_c4lauthor|c4l-collapsible-icon]]);
+}
+
+.c4l-styledtable-icon::before {
+    content: '';
+}
+
+.c4l-styledtable-icon .c4l-button-text::before {
+    content: url([[pix:tiny_c4lauthor|c4l-styledtable-icon]]);
+}
 
 [data-bs-theme=dark] {
     .c4l-keyconcept-icon .c4l-button-text::before {
@@ -277,6 +349,21 @@
         content: "" !important;
     }
 
+    .c4l-panellist-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l_panellist_icon]]), 18px, 22px, var(--c4l-ui-icon-helper));
+        content: "" !important;
+    }
+
+    .c4l-timeline-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l_timeline_icon]]), 18px, 23px, var(--c4l-ui-icon-helper));
+        content: "" !important;
+    }
+
+    .c4l-combo-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l-combo-icon]]), 22px, 17px, var(--c4l-ui-icon-helper));
+        content: "" !important;
+    }
+
     .c4l-allpurposecard-icon .c4l-button-text::before {
         @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l_allpurposecard_icon]]), 17px, 18px, var(--c4l-ui-icon-helper));
         content: "" !important;
@@ -294,6 +381,36 @@
 
     .c4l-assessment-icon .c4l-button-text::before {
         @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l-assessment-icon]]), 15px, 18px, var(--c4l-ui-icon-evaluative));
+        content: "" !important;
+    }
+
+    .c4l-styledlist-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l-styledlist-icon]]), 17px, 16px, var(--c4l-ui-icon-helper));
+        content: "" !important;
+    }
+
+    .c4l-linkblock-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l-linkblock-icon]]), 19px, 11px, var(--c4l-ui-icon-helper));
+        content: "" !important;
+    }
+
+    .c4l-tabs-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l-tabs-icon]]), 23px, 18px, var(--c4l-ui-icon-helper));
+        content: "" !important;
+    }
+
+    .c4l-carousel-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l-carousel-icon]]), 21px, 14px, var(--c4l-ui-icon-helper));
+        content: "" !important;
+    }
+
+    .c4l-collapsible-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l-collapsible-icon]]), 21px, 18px, var(--c4l-ui-icon-helper));
+        content: "" !important;
+    }
+
+    .c4l-styledtable-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l-styledtable-icon]]), 18px, 18px, var(--c4l-ui-icon-helper));
         content: "" !important;
     }
 }

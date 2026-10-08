@@ -200,13 +200,16 @@ class ai_classifier {
             $response = $manager->process_action($action);
 
             if (!$response->get_success()) {
-                $warnings[] = get_string('ai_error', 'tiny_c4lauthor', $response->get_errormessage());
+                // Provider messages can expose configuration details, so keep them out of the browser.
+                debugging('AI suggest failed: ' . $response->get_errormessage(), DEBUG_DEVELOPER);
+                $warnings[] = get_string('ai_error', 'tiny_c4lauthor');
                 return ['suggestions' => [], 'warnings' => $warnings];
             }
 
             $content = $response->get_response_data()['generatedcontent'] ?? '';
         } catch (\Throwable $e) {
-            $warnings[] = get_string('ai_error', 'tiny_c4lauthor', $e->getMessage());
+            debugging('AI suggest failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            $warnings[] = get_string('ai_error', 'tiny_c4lauthor');
             return ['suggestions' => [], 'warnings' => $warnings];
         }
 

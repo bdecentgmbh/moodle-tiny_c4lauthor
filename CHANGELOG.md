@@ -1,5 +1,163 @@
 # Changelog
 
+## 1.7.1-beta
+
+### Changed
+
+- The labels and documentation of components that other plugins add through the hook
+  are shown as text in the sidebar, so they cannot carry markup into the editor's page.
+  C4L Author's own strings are unchanged. Suggested by the MDL Shield review of
+  1.6.0-beta (grade A+, no findings).
+
+## 1.7.0-beta
+
+### Added
+
+- A standalone fallback, as in the bdecent build but lighter: an admin page offers the
+  content styles and the page script to copy into the site before uninstalling the
+  plugin, so content keeps its look and its tabs, carousels and collapsibles keep
+  working. The styles are 102 KB (22 KB compressed) instead of 324 KB: content only,
+  with each icon inlined once. The script needs no Moodle JavaScript and has none of
+  the build's link block issue.
+
+## 1.6.0-beta
+
+### Added
+
+- Six helpers from the C4L Author bdecent build join the free set: styled list, link
+  block, tabs, carousel, collapsible and styled table, with their variants (checkmarks
+  or chevrons, button or link, solid or coloured, white controls).
+- Tabs, carousel and collapsible use new markup made of classes only, so it survives
+  Moodle's HTML cleaning and works with Bootstrap 4 and 5. Without JavaScript, and in
+  the Moodle app, all their content shows. A page script adds the buttons, ARIA
+  attributes and keyboard support.
+- In the editor, tabs and slides can be switched, added and deleted, and a slide gets
+  its image through the editor's image dialog, as in the bdecent build.
+- The extension hook can add page modules, scripts for the behaviour of interactive
+  components that other plugins add.
+
+### Security
+
+- The bdecent build copied a link block's visible address into the link on every page,
+  so an address such as `javascript:` ran when clicked. Link blocks now store their
+  address in the link; for content from that build, the page script copies only http,
+  https and mailto addresses.
+
+### Changed
+
+- Content made with the bdecent build's tabs, carousel and collapsible is turned into
+  the new markup when the page loads, so it keeps working, also where Moodle cleaned
+  away its buttons.
+- The helpers' styles follow the site's brand colour and dark mode. Unlike in the
+  bdecent build, they do not restyle Moodle's own navigation tabs.
+
+## 1.5.0-beta
+
+### Added
+
+- Other plugins can add components and editor stylesheets through a new hook,
+  `\tiny_c4lauthor\hook\extend_components`, without changing C4L Author. Their
+  components can use their own templates, strings and icons, appear under a new
+  *Templates* category in the sidebar, work with variants and precision mode, and can
+  insert what an AMD module of theirs returns instead of a template. See the README.
+
+### Changed
+
+- The two student settings list every component, including the ones other plugins
+  add. Each component declares whether it is aimed at students. Saved choices stay
+  as they are; a component an admin has not seen in the settings yet counts with its
+  default. The components that were in neither list (concept review, further reading,
+  statement, assessment, panel list, timeline, combo) are listed as not intended for
+  students, so students still do not get them until an admin ticks them.
+
+## 1.4.1-beta
+
+### Fixed
+
+- Precision mode on *Estimated time* and *Grading value* replaced the whole
+  component with the new value, losing "min" and "Grading value:". It looked for
+  the span around that fixed text, which the editor removes. The field now edits
+  the span around the value, which the editor keeps, so it also works on content
+  inserted earlier.
+
+## 1.4.0-beta
+
+### Changed
+
+- Components are declared in `db/components.php` and their markup lives in Mustache
+  templates (`templates/components/`), instead of in JavaScript. The editor fetches
+  the declarations through a new web service, `tiny_c4lauthor_get_components`. The
+  inserted markup is unchanged; a test compares every component with the markup
+  1.3.0-beta inserted.
+- Precision mode reads its fields from the declarations. Fields that need custom
+  code name a handler in `precise_handlers.js`.
+- `commands.js` is split into modules: the convert menu, the sidebar, the variant
+  toolbar, the dropdown, the icons and the component markup each have their own.
+
+### Fixed
+
+- `variantslib.js` imported the variant list under a name `variants.js` did not
+  export, so restoring a variant preference that named a variant failed with an
+  error. It now gets the variants from the declarations.
+
+## 1.3.0-beta
+
+### Added
+
+- Three helpers, contributed by bdecent from the eduHub project:
+  - *Panel list*: a list of panels, numbered or with checkmarks, optionally compact
+    or full width.
+  - *Timeline*: events with a year and a text, optionally full width or split, with
+    continuity marks before or after. Precision mode edits each event's year and
+    text.
+  - *Combo*: text and image side by side, in either order.
+- Variants can form groups (exactly one active, such as numbered or checkmarks) and
+  exclude others (full width and split).
+- A component can declare its own wrapper class instead of a `c4lv-` one.
+- Brand colour tokens (`--c4l-brand` and its tints) that follow the site's primary
+  colour, also inside the editor, with dark-mode values. The new helpers use them.
+- The mobile app styles cover the three helpers.
+## 1.2.2-beta
+
+### Changed
+
+- A new capability, `tiny/c4lauthor:useallcomponents`, decides who sees all
+  components in the sidebar. It replaces the check on `gradereport/grader:view`
+  and has the same default roles (teacher, editing teacher, manager), so standard
+  roles see no change. Users without it see only the components listed for
+  students. This guides authoring and is not access control.
+- The README no longer mentions the Figtree font, which the plugin does not ship.
+
+## 1.2.1-beta
+
+### Security
+
+- Editor content is only ever handled as data outside the editor: the modal passes it
+  to its editor as a value, the precision preview runs in a sandboxed frame that cannot
+  execute scripts, and the AI view sanitises the component previews it shows.
+- AI suggest checks the site's AI policy (asking the user to accept it first), the
+  per-course and per-activity AI setting where Moodle has one, the `aisuggest`
+  capability and the plugin setting, both in the editor and in the web service. The
+  web service takes the paragraphs as a structured, size-limited list.
+- AI provider error messages are no longer shown in the browser; they are logged as
+  debugging output instead.
+- Text selected in the editor is inserted into a component as text, never as markup.
+- `pluginfile` serves only the plugin's own file areas.
+
+### Changed
+
+- AI suggest is switched off by default on new installations. Existing sites keep
+  their current setting.
+- The plugin loads only for users with both `tiny/c4lauthor:use` and
+  `tiny/c4lauthor:viewplugin`, on every supported Moodle version.
+- Admin-defined custom component HTML is cleaned with `clean_text()` instead of
+  `format_text()`, so text filters no longer run over it.
+- The precision view no longer leaves its internal `data-c4l-idx` attributes in the
+  content.
+- Uninstalling removes the plugin's user preference.
+- Tests: a Behat smoke test for the modal; CI covers Moodle 4.5 to 5.3 and runs on pull
+  requests.
+
 ## 1.2.0-beta
 
 ### Added

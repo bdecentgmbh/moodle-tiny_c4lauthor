@@ -32,8 +32,10 @@ const viewc4lName = getPluginOptionName(pluginName, 'viewc4l');
 const showdocsName = getPluginOptionName(pluginName, 'showdocs');
 const previewCSSName = getPluginOptionName(pluginName, 'previewcss');
 const customCompsName = getPluginOptionName(pluginName, 'customcomps');
+const editorCssName = getPluginOptionName(pluginName, 'editorcss');
 const aienabledName = getPluginOptionName(pluginName, 'aienabled');
 const airatesName = getPluginOptionName(pluginName, 'airates');
+const aipolicyagreedName = getPluginOptionName(pluginName, 'aipolicyagreed');
 
 export const register = (editor) => {
     const registerOption = editor.options.register;
@@ -73,9 +75,19 @@ export const register = (editor) => {
         "default": [],
     });
 
+    registerOption(editorCssName, {
+        processor: 'array',
+        "default": [],
+    });
+
     registerOption(aienabledName, {
         processor: 'boolean',
         "default": true,
+    });
+
+    registerOption(aipolicyagreedName, {
+        processor: 'boolean',
+        "default": false,
     });
 
     registerOption(airatesName, {
@@ -90,8 +102,10 @@ export const isStudent = (editor) => editor.options.get(isstudentName);
 export const showDocs = (editor) => editor.options.get(showdocsName);
 export const getallowedComponents = (editor) => editor.options.get(allowedcompsName);
 export const getcustomComponents = (editor) => editor.options.get(customCompsName);
+export const getEditorCss = (editor) => editor.options.get(editorCssName);
 export const getpreviewCSS = (editor) => editor.options.get(previewCSSName);
 export const isAiEnabled = (editor) => editor.options.get(aienabledName);
+export const isAiPolicyAgreed = (editor) => editor.options.get(aipolicyagreedName);
 export const getAiRates = (editor) => {
     const raw = editor.options.get(airatesName);
     if (!raw || typeof raw !== 'string') {

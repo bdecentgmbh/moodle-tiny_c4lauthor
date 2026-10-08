@@ -12,6 +12,8 @@
   /* Surfaces */
   --c4l-surface: #fff;
   --c4l-border: transparent;
+  --c4l-rule: #cbd1e1; /* visible lines: tab and table borders */
+  --c4l-text-strong: #454952; /* text that must not take a link's colour */
   --c4l-text: inherit;
   --c4l-text-muted: #686d79;
   --c4l-on-accent: #fff; /* text on --c4l-solid-* fills */
@@ -52,6 +54,14 @@
   /* Solid fills */
   --c4l-solid-blue: #3171e3;
   --c4l-solid-blue-deep: #497ae9;
+  /* Brand: the site's primary colour, as set by the theme. Bootstrap 5 names it
+     --bs-primary, Bootstrap 4 (Moodle 4.5) --primary. The editor iframes get the
+     page's resolved value from tiny_c4lauthor/brand. */
+  --c4l-brand: var(--bs-primary, var(--primary, #0f6cbf));
+  --c4l-tint-brand: color-mix(in srgb, var(--c4l-brand) 7%, #fff);
+  --c4l-accent-brand: color-mix(in srgb, var(--c4l-brand) 50%, #fff);
+  --c4l-solid-brand: var(--c4l-brand);
+  --c4l-ink-brand: var(--c4l-brand);
   /* Picker toolbar icons */
   --c4l-ui-icon-contextual: #1679f9;
   --c4l-ui-icon-procedural: #d93562;
@@ -115,6 +125,8 @@
   /* Surfaces */
   --c4l-surface: #181c20;
   --c4l-border: #2a3037;
+  --c4l-rule: #3a414b;
+  --c4l-text-strong: #e6e9ec;
   --c4l-text: #e6e9ec;
   --c4l-text-muted: #8d959d;
   --c4l-on-accent: #0f1214;
@@ -154,6 +166,11 @@
   /* Solid fills */
   --c4l-solid-blue: #81abf5;
   --c4l-solid-blue-deep: #81abf5;
+  /* Brand: lightened like the other solids, pale fills become the surface. */
+  --c4l-tint-brand: var(--c4l-surface);
+  --c4l-accent-brand: color-mix(in srgb, var(--c4l-brand) 45%, var(--c4l-text-muted));
+  --c4l-solid-brand: color-mix(in srgb, var(--c4l-brand) 40%, #fff);
+  --c4l-ink-brand: color-mix(in srgb, var(--c4l-brand) 40%, #fff);
   /* ACTIVE 2 — PICKER TOOLBAR ICONS */
   --c4l-ui-icon-contextual: #64a4f9;
   --c4l-ui-icon-procedural: #e46487;
@@ -273,12 +290,43 @@
   --c4l-aiusereported-ink: var(--c4l-ink-amber);
   /* Helper */
   --c4l-allpurposecard-bg: var(--c4l-tint-blue);
+  --c4l-panellist-bg: var(--c4l-tint-brand);
+  --c4l-panellist-marker: var(--c4l-solid-brand);
+  --c4l-panellist-marker-ink: var(--c4l-on-accent);
+  --c4l-timeline-rule: var(--c4l-accent-brand);
+  --c4l-timeline-pill-bg: var(--c4l-tint-brand);
+  --c4l-timeline-marker: var(--c4l-solid-brand);
+  --c4l-timeline-marker-dot: var(--c4l-on-accent);
+  --c4l-timeline-year: var(--c4l-ink-brand);
+  --c4l-combo-bg: var(--c4l-tint-brand);
+  --c4l-combo-title: var(--c4l-ink-brand);
+  --c4l-combo-bullet: var(--c4l-solid-brand);
+  --c4l-combo-lead: var(--c4l-text-muted);
+  --c4l-styledlist-bullet: var(--c4l-solid-brand);
+  --c4l-linkblock-bg: var(--c4l-surface);
+  --c4l-linkblock-stripe: var(--c4l-tint-brand);
+  --c4l-linkblock-icon: var(--c4l-ink-brand);
+  --c4l-linkblock-name: var(--c4l-text-strong);
+  --c4l-linkblock-url: var(--c4l-ink-brand);
+  --c4l-tabs-rule: var(--c4l-rule);
+  --c4l-tabs-tab-bg: var(--c4l-tint-brand);
+  --c4l-tabs-tab-ink: var(--c4l-ink-brand);
+  --c4l-tabs-panel-bg: var(--c4l-surface);
+  --c4l-carousel-slide-bg: var(--c4l-tint-brand);
+  --c4l-carousel-control: var(--c4l-text-muted);
+  --c4l-collapsible-trigger: var(--c4l-ink-brand);
+  --c4l-collapsible-bg: var(--c4l-tint-brand);
+  --c4l-table-head-bg: var(--c4l-solid-brand);
+  --c4l-table-head-ink: var(--c4l-on-accent);
+  --c4l-table-row-head-bg: var(--c4l-tint-brand);
+  --c4l-table-rule: var(--c4l-rule);
   --c4l-statement-bg: var(--c4l-surface);
   --c4l-assessment-bg: var(--c4l-surface);
   --c4l-assessment-frame-bg: var(--c4l-tint-blue);
 }
 
-/* C4L MIXINS */ /* Collapse adjacent spacers (e.g. trailing spacer of one component
+/* C4L MIXINS */
+/* Collapse adjacent spacers (e.g. trailing spacer of one component
    followed by leading spacer of the next). */
 p.c4l-spacer + p.c4l-spacer {
   display: none;
@@ -2496,6 +2544,840 @@ svg.tiny_c4lauthor__code-header-icon {
     padding-bottom: 24px;
   }
 }
+/* Panel list (helper) */
+.c4lv-panellist {
+  list-style: none;
+  padding-left: 0;
+  margin: 24px auto;
+  max-width: 75%;
+}
+
+/* Numbered variant — panel rows with a circular counter badge. */
+.c4lv-panellist.c4l-numbered-variant {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  counter-reset: c4l-panellist-counter;
+}
+
+.c4lv-panellist.c4l-numbered-variant > li {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  margin: 0;
+  padding: 8px 6px 8px 8px;
+  background-color: var(--c4l-panellist-bg);
+  border-radius: 23px;
+  counter-increment: c4l-panellist-counter;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--c4l-text);
+}
+
+.c4lv-panellist.c4l-numbered-variant > li::before {
+  content: counter(c4l-panellist-counter);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  margin-right: 12px;
+  background-color: var(--c4l-panellist-marker);
+  border-radius: 50%;
+  color: var(--c4l-panellist-marker-ink);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* Checkmarks variant — panel rows with a circular check icon. The SVG
+   is embedded inline as a data URI so the rendered colour comes from
+   the element's background-color, which follows the site's brand colour
+   through --c4l-panellist-marker (mask-image uses the SVG only for shape). */
+.c4lv-panellist.c4l-checkmarks-variant {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.c4lv-panellist.c4l-checkmarks-variant > li {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  margin: 0;
+  padding: 8px 13px;
+  background-color: var(--c4l-panellist-bg);
+  border-radius: 23px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--c4l-text);
+}
+
+.c4lv-panellist.c4l-checkmarks-variant.c4l-compact-variant > li {
+  min-height: 40px;
+  padding: 8px 4px;
+}
+
+.c4lv-panellist.c4l-checkmarks-variant > li::before {
+  content: "";
+  display: inline-block;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  margin-right: 14px;
+  background-color: var(--c4l-panellist-marker);
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 0C8.81703 0 5.76583 1.2641 3.51409 3.51409C1.2641 5.7656 0 8.81692 0 12C0 15.1831 1.2641 18.2341 3.51409 20.4859C5.7656 22.7359 8.81692 24 12 24C15.1831 24 18.2341 22.7359 20.4859 20.4859C22.7359 18.2344 24 15.1831 24 12C24 8.81692 22.7359 5.76583 20.4859 3.51409C18.2344 1.2641 15.1831 0 12 0ZM12 21.6773C9.43399 21.6773 6.9724 20.6583 5.15771 18.8421C3.34168 17.0277 2.32253 14.566 2.32253 11.9999C2.32253 9.43383 3.34168 6.97229 5.15771 5.15759C6.97221 3.34156 9.43395 2.32241 12 2.32241C14.566 2.32241 17.0276 3.34156 18.8423 5.15759C20.6583 6.97209 21.6775 9.43383 21.6775 11.9999C21.6775 14.566 20.6583 17.0275 18.8423 18.8421C17.0277 20.6583 14.566 21.6773 12 21.6773Z'/><path d='M18.1869 8.26563C18.388 8.45477 18.3978 8.77116 18.2087 8.97235L11.3714 16.2467C11.1243 16.5095 10.7809 16.6611 10.4202 16.6667C10.0597 16.6721 9.71237 16.531 9.45736 16.276L5.80124 12.6199C5.60594 12.4246 5.60598 12.108 5.80133 11.9127L6.97984 10.7348C7.17509 10.5397 7.49156 10.5397 7.6868 10.7349L10.3704 13.4176L16.2662 7.14621C16.4554 6.94501 16.7718 6.93525 16.973 7.1244L18.1869 8.26563Z'/></svg>") no-repeat center/24px 24px;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 0C8.81703 0 5.76583 1.2641 3.51409 3.51409C1.2641 5.7656 0 8.81692 0 12C0 15.1831 1.2641 18.2341 3.51409 20.4859C5.7656 22.7359 8.81692 24 12 24C15.1831 24 18.2341 22.7359 20.4859 20.4859C22.7359 18.2344 24 15.1831 24 12C24 8.81692 22.7359 5.76583 20.4859 3.51409C18.2344 1.2641 15.1831 0 12 0ZM12 21.6773C9.43399 21.6773 6.9724 20.6583 5.15771 18.8421C3.34168 17.0277 2.32253 14.566 2.32253 11.9999C2.32253 9.43383 3.34168 6.97229 5.15771 5.15759C6.97221 3.34156 9.43395 2.32241 12 2.32241C14.566 2.32241 17.0276 3.34156 18.8423 5.15759C20.6583 6.97209 21.6775 9.43383 21.6775 11.9999C21.6775 14.566 20.6583 17.0275 18.8423 18.8421C17.0277 20.6583 14.566 21.6773 12 21.6773Z'/><path d='M18.1869 8.26563C18.388 8.45477 18.3978 8.77116 18.2087 8.97235L11.3714 16.2467C11.1243 16.5095 10.7809 16.6611 10.4202 16.6667C10.0597 16.6721 9.71237 16.531 9.45736 16.276L5.80124 12.6199C5.60594 12.4246 5.60598 12.108 5.80133 11.9127L6.97984 10.7348C7.17509 10.5397 7.49156 10.5397 7.6868 10.7349L10.3704 13.4176L16.2662 7.14621C16.4554 6.94501 16.7718 6.93525 16.973 7.1244L18.1869 8.26563Z'/></svg>") no-repeat center/24px 24px;
+}
+
+/* Compact variant — wraps all items in a single rounded panel. When
+   combined with the numbered variant the per-item pill is dropped
+   and the rows share the outer panel background. */
+.c4lv-panellist.c4l-compact-variant {
+  background-color: var(--c4l-panellist-bg);
+  border-radius: 16px;
+  padding: 26px 32px;
+}
+
+.c4lv-panellist.c4l-compact-variant.c4l-numbered-variant {
+  gap: 11px;
+}
+
+.c4lv-panellist.c4l-compact-variant.c4l-numbered-variant > li {
+  background-color: transparent;
+  border-radius: 0;
+  min-height: 32px;
+  padding: 0;
+}
+
+/* Timeline (helper) */
+.c4lv-timeline {
+  margin: 24px auto;
+  max-width: 75%;
+  display: flex;
+  flex-direction: column;
+}
+
+.c4l-timeline-events {
+  position: relative;
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.c4l-timeline-events::before {
+  content: "";
+  position: absolute;
+  top: 25px;
+  bottom: 25px;
+  left: 21px;
+  width: 2px;
+  background-color: var(--c4l-timeline-rule);
+  z-index: 0;
+}
+
+.c4l-timeline-event {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  position: relative;
+  z-index: 1;
+}
+
+.c4l-timeline-pill {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 7px 24px 7px 8px;
+  background-color: var(--c4l-timeline-pill-bg);
+  border-radius: 100px;
+}
+
+.c4l-timeline-marker {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--c4l-timeline-marker);
+  background-image: radial-gradient(circle at center, var(--c4l-timeline-marker-dot) 6px, transparent 6.5px);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.c4l-timeline-year {
+  color: var(--c4l-timeline-year);
+  font-weight: 700;
+  font-size: 21px;
+  line-height: 23px;
+  min-width: 1em;
+  outline: none;
+  padding-left: 12px;
+}
+
+.c4l-timeline-text {
+  margin: 6px 0 28px 52px;
+  padding: 0 8px;
+  font-size: 17px;
+  line-height: 26px;
+  color: var(--c4l-text);
+}
+
+/* Continuity variants — independent (non-grouped) block pseudo-elements
+   rendered as direct children of .c4lv-timeline, before and after the
+   .c4l-timeline-events container, so they don't interfere with the
+   main guide line geometry. */
+.c4lv-timeline.c4l-continuitybefore-variant::before {
+  content: "";
+  display: block;
+  align-self: flex-start;
+  margin-left: 21px;
+  width: 2px;
+  height: 24px;
+  background-image: repeating-linear-gradient(to bottom, var(--c4l-timeline-rule) 0, var(--c4l-timeline-rule) 4px, transparent 4px, transparent 10px);
+}
+
+.c4lv-timeline.c4l-continuityafter-variant::after {
+  content: "";
+  display: block;
+  align-self: flex-start;
+  margin-left: 21px;
+  margin-top: -20px;
+  width: 2px;
+  height: 24px;
+  background-image: repeating-linear-gradient(to bottom, var(--c4l-timeline-rule) 0, var(--c4l-timeline-rule) 4px, transparent 4px, transparent 10px);
+}
+
+/* Split variant — alternating events on either side of a centred guide
+   line. Mutually exclusive with full-width via the variants registry
+   excludes mechanism. */
+.c4lv-timeline.c4l-split-variant {
+  max-width: 100%;
+}
+
+.c4lv-timeline.c4l-split-variant .c4l-timeline-events {
+  width: 100%;
+}
+
+.c4lv-timeline.c4l-split-variant .c4l-timeline-events::before {
+  left: calc(50% - 1px);
+}
+
+.c4lv-timeline.c4l-split-variant .c4l-timeline-event {
+  width: 50%;
+  box-sizing: border-box;
+}
+
+.c4lv-timeline.c4l-split-variant .c4l-timeline-event:nth-child(odd) {
+  align-self: flex-end;
+  transform: translateX(-22px);
+}
+
+.c4lv-timeline.c4l-split-variant .c4l-timeline-event:nth-child(even) {
+  align-self: flex-start;
+  transform: translateX(22px);
+}
+
+.c4lv-timeline.c4l-split-variant .c4l-timeline-event:nth-child(even) .c4l-timeline-pill {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+  padding: 7px 8px 7px 24px;
+}
+
+.c4lv-timeline.c4l-split-variant .c4l-timeline-event:nth-child(even) .c4l-timeline-text {
+  text-align: right;
+  margin: 6px 52px 28px 0;
+}
+
+.c4lv-timeline.c4l-split-variant.c4l-continuitybefore-variant::before,
+.c4lv-timeline.c4l-split-variant.c4l-continuityafter-variant::after {
+  align-self: center;
+  margin-left: 0;
+}
+
+/* Combo */
+.c4l-spacer + .c4l-combo {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.c4l-combo {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  grid-gap: 20px;
+  align-items: stretch;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+.c4l-combo .text {
+  background: var(--c4l-combo-bg);
+  border-radius: 16px;
+  padding: 48px;
+}
+.c4l-combo .text h2,
+.c4l-combo .text h3,
+.c4l-combo .text h4 {
+  margin-bottom: 22px;
+  color: var(--c4l-combo-title);
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+.c4l-combo .text p {
+  color: var(--c4l-text);
+  font-size: 17px;
+  line-height: 1.5;
+}
+.c4l-combo .text ul {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+.c4l-combo .text ul li {
+  position: relative;
+  margin-bottom: 12px;
+  padding-left: 27px;
+  font-size: 17px;
+  line-height: 1.5;
+}
+.c4l-combo .text ul li:last-child {
+  margin-bottom: 0;
+}
+.c4l-combo .text ul li::before {
+  content: "";
+  background-color: var(--c4l-combo-bullet);
+  -webkit-mask-image: url([[pix:tiny_c4lauthor|c4l-combo-bullet]]);
+  mask-image: url([[pix:tiny_c4lauthor|c4l-combo-bullet]]);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 9px 11px;
+  mask-size: 9px 11px;
+  display: inline-block;
+  width: 9px;
+  height: 11px;
+  position: absolute;
+  top: 7px;
+  left: 0;
+}
+.c4l-combo .image {
+  position: relative;
+  min-height: 200px;
+}
+.c4l-combo img {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  object-position: 50% 50%;
+  border-radius: 16px;
+}
+.c4l-combo img:not([src]), .c4l-combo img[src=""] {
+  position: static;
+  content: var(--c4l-figure-placeholder);
+}
+
+.c4l-combo .c4l-leading-text {
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--c4l-combo-lead);
+  margin-bottom: 24px;
+  line-height: 1.4;
+}
+
+.c4l-combo.c4l-text-image-variant .text {
+  order: 1;
+}
+
+.c4l-combo.c4l-text-image-variant .image {
+  order: 2;
+}
+
+.c4l-combo.c4l-image-text-variant .text {
+  order: 2;
+}
+
+.c4l-combo.c4l-image-text-variant .image {
+  order: 1;
+}
+
+@media (max-width: 399.98px) {
+  .c4l-combo .text {
+    padding: 24px;
+  }
+}
+@media (min-width: 630px) {
+  .c4l-combo,
+  .c4l-combo.c4l-text-image-variant,
+  .c4l-combo.c4l-image-text-variant {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+/**
+ * Styled list, link block, tabs, carousel, collapsible and styled table.
+ *
+ * Tabs, carousel and collapsible are readable without JavaScript: every tab, slide and
+ * content is shown. The page script (amd/src/runtime.js) adds .c4l-ready and the controls.
+ *
+ * @package     tiny_c4lauthor
+ * @copyright   2026 Roger Segú <rogersegu@gmail.com>, bdecent gmbh <https://bdecent.de>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+/* Styled list */
+.c4lv-styledlist {
+  list-style: none;
+  padding-left: 0;
+  margin: 24px 0;
+  line-height: 1.6;
+}
+
+.c4lv-styledlist > li {
+  position: relative;
+  margin-left: 28px;
+  margin-bottom: 6px;
+}
+
+.c4lv-styledlist.c4l-checkmarks-variant > li::before,
+.c4lv-styledlist.c4l-chevrons-variant > li::before {
+  content: "";
+  position: absolute;
+  left: -27px;
+  background-color: var(--c4l-styledlist-bullet);
+}
+
+.c4lv-styledlist.c4l-checkmarks-variant > li::before {
+  top: 5px;
+  width: 16px;
+  height: 16px;
+  -webkit-mask-image: url([[pix:tiny_c4lauthor|c4l-checkmarks-icon]]);
+  mask-image: url([[pix:tiny_c4lauthor|c4l-checkmarks-icon]]);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.c4lv-styledlist.c4l-chevrons-variant > li::before {
+  top: 8px;
+  width: 10px;
+  height: 10px;
+  -webkit-mask-image: url([[pix:tiny_c4lauthor|c4l-chevrons-icon]]);
+  mask-image: url([[pix:tiny_c4lauthor|c4l-chevrons-icon]]);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+/* Link block */
+.c4l-linkblock {
+  display: flex;
+  align-items: stretch;
+  min-width: 260px;
+  max-width: 75%;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 10px;
+  background-color: var(--c4l-linkblock-bg);
+  box-shadow: 0 4px 12px var(--c4l-shadow-soft);
+  transition: box-shadow 0.2s ease-in-out;
+  text-decoration: none !important;
+}
+.c4l-linkblock:hover, .c4l-linkblock:focus {
+  box-shadow: 0 4px 14px var(--c4l-shadow-mid);
+}
+.c4l-linkblock .link-stripe {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 48px;
+  min-width: 48px;
+  margin: 12px 0 12px 12px;
+  border-radius: 6px;
+  background-color: var(--c4l-linkblock-stripe);
+  font-size: 0;
+}
+.c4l-linkblock .link-stripe::before {
+  content: "";
+  width: 22px;
+  height: 22px;
+  background-color: var(--c4l-linkblock-icon);
+  -webkit-mask-image: url([[pix:tiny_c4lauthor|fi_external-link]]);
+  mask-image: url([[pix:tiny_c4lauthor|fi_external-link]]);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+@media (min-width: 576px) {
+  .c4l-linkblock .link-stripe {
+    width: 60px;
+    min-width: 60px;
+  }
+}
+.c4l-linkblock .link-content {
+  padding: 24px 28px;
+  line-height: 24px;
+}
+.c4l-linkblock .link-name {
+  display: block;
+  color: var(--c4l-linkblock-name);
+  font-size: 17px;
+}
+.c4l-linkblock .link-url {
+  display: block;
+  color: var(--c4l-linkblock-url);
+  font-size: 14px;
+  font-weight: 400;
+  word-break: break-all;
+}
+
+/* Tabs. Without the page script every tab shows, its title as a heading. */
+.c4lv-tabs {
+  margin: 24px auto;
+}
+
+.c4lv-tabs > .c4l-tab {
+  margin-bottom: 8px;
+  padding: 16px 24px;
+  border: 1px solid var(--c4l-tabs-rule);
+  border-radius: 4px;
+  background-color: var(--c4l-tabs-panel-bg);
+}
+
+.c4lv-tabs .c4l-tab-title {
+  margin-bottom: 8px;
+  color: var(--c4l-tabs-tab-ink);
+  font-weight: 600;
+}
+
+.c4lv-tabs .c4l-tab-content > :last-child {
+  margin-bottom: 0;
+}
+
+.c4lv-tabs.c4l-ready > .c4l-tab {
+  margin-bottom: 0;
+  padding: 24px 36px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.c4lv-tabs.c4l-ready > .c4l-tab > .c4l-tab-title {
+  display: none;
+}
+
+.c4l-tablist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-bottom: -1px;
+}
+
+.c4l-tablist-button {
+  flex: 1 1 0;
+  padding: 8px 12px 7px;
+  border: 1px solid transparent;
+  border-bottom-color: var(--c4l-tabs-rule);
+  border-radius: 4px 4px 0 0;
+  background-color: var(--c4l-tabs-tab-bg);
+  color: var(--c4l-tabs-tab-ink);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.c4l-tablist-button.active {
+  border-color: var(--c4l-tabs-rule);
+  border-bottom-color: var(--c4l-tabs-panel-bg);
+  background-color: var(--c4l-tabs-panel-bg);
+}
+.c4l-tablist-button:focus-visible {
+  outline: 2px solid var(--c4l-brand);
+  outline-offset: 2px;
+}
+
+/* Carousel. Without the page script every slide shows. */
+.c4lv-carousel {
+  position: relative;
+  max-width: 75%;
+  margin: 24px auto;
+}
+
+.c4lv-carousel.c4l-full-width-variant {
+  max-width: 100%;
+}
+
+.c4lv-carousel.c4l-white-indicators-variant {
+  --c4l-carousel-control: #fff;
+}
+
+.c4lv-carousel > .c4l-slide {
+  position: relative;
+  height: 380px;
+  overflow: hidden;
+  background-color: var(--c4l-carousel-slide-bg);
+}
+
+.c4lv-carousel > .c4l-slide + .c4l-slide {
+  margin-top: 8px;
+}
+
+.c4lv-carousel.c4l-ready > .c4l-slide + .c4l-slide {
+  margin-top: 0;
+}
+
+.c4lv-carousel > .c4l-slide:has(img) {
+  background-color: transparent;
+}
+
+.c4lv-carousel > .c4l-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.c4l-carousel-prev,
+.c4l-carousel-next {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 10%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.c4l-carousel-prev::before,
+.c4l-carousel-next::before {
+  content: "";
+  width: 1.75rem;
+  height: 1.75rem;
+  background-color: var(--c4l-carousel-control);
+}
+
+.c4l-carousel-prev {
+  left: 0;
+}
+.c4l-carousel-prev::before {
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'><path d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/></svg>");
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'><path d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/></svg>");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 100%;
+  mask-size: 100%;
+}
+
+.c4l-carousel-next {
+  right: 0;
+}
+.c4l-carousel-next::before {
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'><path d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/></svg>");
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'><path d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/></svg>");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 100%;
+  mask-size: 100%;
+}
+
+.c4l-carousel-indicators {
+  position: absolute;
+  right: 0;
+  bottom: 12px;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.c4l-carousel-indicator {
+  width: 30px;
+  height: 4px;
+  padding: 0;
+  border: 0;
+  background-color: var(--c4l-carousel-control);
+  opacity: 0.5;
+  cursor: pointer;
+}
+.c4l-carousel-indicator.active {
+  opacity: 1;
+}
+
+/* Collapsible. Without the page script the content stays open. */
+.c4lv-collapsible {
+  margin: 24px 0;
+}
+
+.c4lv-collapsible > .c4l-collapsible-title {
+  margin: 12px 0 12px 2px;
+  color: var(--c4l-collapsible-trigger);
+  font-weight: 600;
+}
+
+.c4lv-collapsible > .c4l-collapsible-content {
+  padding: 24px 36px 30px;
+  border-radius: 8px;
+  background-color: var(--c4l-collapsible-bg);
+}
+
+.c4lv-collapsible > .c4l-collapsible-content > :last-child {
+  margin-bottom: 0;
+}
+
+.c4lv-collapsible.c4l-ready > .c4l-collapsible-title {
+  font-weight: 400;
+}
+
+.c4l-collapsible-toggle {
+  display: inline-flex;
+  align-items: center;
+  color: var(--c4l-collapsible-trigger);
+  font: inherit;
+  cursor: pointer;
+}
+.c4l-collapsible-toggle::after {
+  content: "";
+  width: 1em;
+  height: 1em;
+  margin-left: 0.5em;
+  background-color: currentColor;
+  transition: transform 0.3s ease-in-out;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+.c4l-collapsible-toggle[aria-expanded=true]::after {
+  transform: rotate(180deg);
+}
+
+.c4lv-collapsible.c4l-buttondropdown-variant .c4l-collapsible-toggle {
+  padding: 6px 12px;
+  border: 1px solid var(--c4l-collapsible-trigger);
+  border-radius: 4px;
+  background-color: var(--c4l-surface);
+}
+
+.c4lv-collapsible.c4l-linkdropdown-variant .c4l-collapsible-toggle {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-decoration: underline;
+}
+.c4lv-collapsible.c4l-linkdropdown-variant .c4l-collapsible-toggle::after {
+  margin-left: 0.2em;
+}
+
+/* Styled table */
+.c4l-table-container .c4l-styled-table {
+  margin-bottom: 0;
+  border-top: none;
+}
+
+.c4l-table-container .c4l-styled-table > :not(caption) > * > * {
+  box-shadow: none;
+}
+
+.c4l-table-container.c4l-solid-variant .c4l-styled-table thead th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  background-color: var(--c4l-table-head-bg);
+  color: var(--c4l-table-head-ink);
+  text-align: center;
+}
+.c4l-table-container.c4l-solid-variant .c4l-styled-table thead th:first-of-type {
+  color: transparent;
+}
+.c4l-table-container.c4l-solid-variant .c4l-styled-table tbody th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border: 1px solid var(--c4l-surface);
+  background-color: var(--c4l-table-row-head-bg);
+  color: inherit;
+}
+.c4l-table-container.c4l-solid-variant .c4l-styled-table tbody tr {
+  border-bottom: 1px dotted var(--c4l-table-rule);
+  white-space: nowrap;
+}
+.c4l-table-container.c4l-solid-variant .c4l-styled-table tbody tr:last-child {
+  border-bottom-style: solid;
+}
+
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th {
+  padding-top: 12px;
+  padding-bottom: 3px;
+  border: 0;
+  background-color: transparent;
+  color: var(--c4l-text);
+  text-align: center;
+  white-space: nowrap;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th:nth-of-type(8n + 1) {
+  border-bottom: 4px solid #415ae6;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th:nth-of-type(8n + 2) {
+  border-bottom: 4px solid #1cc460;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th:nth-of-type(8n + 3) {
+  border-bottom: 4px solid #ffd058;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th:nth-of-type(8n + 4) {
+  border-bottom: 4px solid #fd6f66;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th:nth-of-type(8n + 5) {
+  border-bottom: 4px solid #16b9ff;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th:nth-of-type(8n + 6) {
+  border-bottom: 4px solid #ffaf59;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th:nth-of-type(8n + 7) {
+  border-bottom: 4px solid #8f95fe;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th:nth-of-type(8n + 8) {
+  border-bottom: 4px solid #f78aaa;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table thead th:first-of-type {
+  border-bottom-color: var(--c4l-table-rule);
+  color: transparent;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table tbody th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--c4l-surface);
+  background-color: var(--c4l-table-row-head-bg);
+  white-space: nowrap;
+}
+.c4l-table-container.c4l-colored-variant .c4l-styled-table tbody tr {
+  border-bottom: 1px dotted var(--c4l-table-rule);
+}
+
 /* Contextual components buttons */
 .c4l-keyconcept-icon::before {
   content: "";
@@ -2649,6 +3531,30 @@ svg.tiny_c4lauthor__code-header-icon {
   content: url([[pix:tiny_c4lauthor|c4l_allpurposecard_icon]]);
 }
 
+.c4l-panellist-icon::before {
+  content: "";
+}
+
+.c4l-panellist-icon .c4l-button-text::before {
+  content: url([[pix:tiny_c4lauthor|c4l_panellist_icon]]);
+}
+
+.c4l-timeline-icon::before {
+  content: "";
+}
+
+.c4l-timeline-icon .c4l-button-text::before {
+  content: url([[pix:tiny_c4lauthor|c4l_timeline_icon]]);
+}
+
+.c4l-combo-icon::before {
+  content: "";
+}
+
+.c4l-combo-icon .c4l-button-text::before {
+  content: url([[pix:tiny_c4lauthor|c4l-combo-icon]]);
+}
+
 .c4l-inlinetag-icon::before {
   content: "";
 }
@@ -2666,6 +3572,54 @@ svg.tiny_c4lauthor__code-header-icon {
 }
 
 /* Dark mode — masks from pix/mask/, coloured by --c4l-ui-icon-* */
+.c4l-styledlist-icon::before {
+  content: "";
+}
+
+.c4l-styledlist-icon .c4l-button-text::before {
+  content: url([[pix:tiny_c4lauthor|c4l-styledlist-icon]]);
+}
+
+.c4l-linkblock-icon::before {
+  content: "";
+}
+
+.c4l-linkblock-icon .c4l-button-text::before {
+  content: url([[pix:tiny_c4lauthor|c4l-linkblock-icon]]);
+}
+
+.c4l-tabs-icon::before {
+  content: "";
+}
+
+.c4l-tabs-icon .c4l-button-text::before {
+  content: url([[pix:tiny_c4lauthor|c4l-tabs-icon]]);
+}
+
+.c4l-carousel-icon::before {
+  content: "";
+}
+
+.c4l-carousel-icon .c4l-button-text::before {
+  content: url([[pix:tiny_c4lauthor|c4l-carousel-icon]]);
+}
+
+.c4l-collapsible-icon::before {
+  content: "";
+}
+
+.c4l-collapsible-icon .c4l-button-text::before {
+  content: url([[pix:tiny_c4lauthor|c4l-collapsible-icon]]);
+}
+
+.c4l-styledtable-icon::before {
+  content: "";
+}
+
+.c4l-styledtable-icon .c4l-button-text::before {
+  content: url([[pix:tiny_c4lauthor|c4l-styledtable-icon]]);
+}
+
 [data-bs-theme=dark] .c4l-keyconcept-icon .c4l-button-text::before {
   content: "";
   background-color: var(--c4l-ui-icon-contextual);
@@ -2939,6 +3893,45 @@ svg.tiny_c4lauthor__code-header-icon {
   mask-size: 20px 18px;
   content: "" !important;
 }
+[data-bs-theme=dark] .c4l-panellist-icon .c4l-button-text::before {
+  content: "";
+  background-color: var(--c4l-ui-icon-helper);
+  -webkit-mask-image: url([[pix:tiny_c4lauthor|mask/c4l_panellist_icon]]);
+  mask-image: url([[pix:tiny_c4lauthor|mask/c4l_panellist_icon]]);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 18px 22px;
+  mask-size: 18px 22px;
+  content: "" !important;
+}
+[data-bs-theme=dark] .c4l-timeline-icon .c4l-button-text::before {
+  content: "";
+  background-color: var(--c4l-ui-icon-helper);
+  -webkit-mask-image: url([[pix:tiny_c4lauthor|mask/c4l_timeline_icon]]);
+  mask-image: url([[pix:tiny_c4lauthor|mask/c4l_timeline_icon]]);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 18px 23px;
+  mask-size: 18px 23px;
+  content: "" !important;
+}
+[data-bs-theme=dark] .c4l-combo-icon .c4l-button-text::before {
+  content: "";
+  background-color: var(--c4l-ui-icon-helper);
+  -webkit-mask-image: url([[pix:tiny_c4lauthor|mask/c4l-combo-icon]]);
+  mask-image: url([[pix:tiny_c4lauthor|mask/c4l-combo-icon]]);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 22px 17px;
+  mask-size: 22px 17px;
+  content: "" !important;
+}
 [data-bs-theme=dark] .c4l-allpurposecard-icon .c4l-button-text::before {
   content: "";
   background-color: var(--c4l-ui-icon-helper);
@@ -2989,6 +3982,84 @@ svg.tiny_c4lauthor__code-header-icon {
   mask-position: center;
   -webkit-mask-size: 15px 18px;
   mask-size: 15px 18px;
+  content: "" !important;
+}
+[data-bs-theme=dark] .c4l-styledlist-icon .c4l-button-text::before {
+  content: "";
+  background-color: var(--c4l-ui-icon-helper);
+  -webkit-mask-image: url([[pix:tiny_c4lauthor|mask/c4l-styledlist-icon]]);
+  mask-image: url([[pix:tiny_c4lauthor|mask/c4l-styledlist-icon]]);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 17px 16px;
+  mask-size: 17px 16px;
+  content: "" !important;
+}
+[data-bs-theme=dark] .c4l-linkblock-icon .c4l-button-text::before {
+  content: "";
+  background-color: var(--c4l-ui-icon-helper);
+  -webkit-mask-image: url([[pix:tiny_c4lauthor|mask/c4l-linkblock-icon]]);
+  mask-image: url([[pix:tiny_c4lauthor|mask/c4l-linkblock-icon]]);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 19px 11px;
+  mask-size: 19px 11px;
+  content: "" !important;
+}
+[data-bs-theme=dark] .c4l-tabs-icon .c4l-button-text::before {
+  content: "";
+  background-color: var(--c4l-ui-icon-helper);
+  -webkit-mask-image: url([[pix:tiny_c4lauthor|mask/c4l-tabs-icon]]);
+  mask-image: url([[pix:tiny_c4lauthor|mask/c4l-tabs-icon]]);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 23px 18px;
+  mask-size: 23px 18px;
+  content: "" !important;
+}
+[data-bs-theme=dark] .c4l-carousel-icon .c4l-button-text::before {
+  content: "";
+  background-color: var(--c4l-ui-icon-helper);
+  -webkit-mask-image: url([[pix:tiny_c4lauthor|mask/c4l-carousel-icon]]);
+  mask-image: url([[pix:tiny_c4lauthor|mask/c4l-carousel-icon]]);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 21px 14px;
+  mask-size: 21px 14px;
+  content: "" !important;
+}
+[data-bs-theme=dark] .c4l-collapsible-icon .c4l-button-text::before {
+  content: "";
+  background-color: var(--c4l-ui-icon-helper);
+  -webkit-mask-image: url([[pix:tiny_c4lauthor|mask/c4l-collapsible-icon]]);
+  mask-image: url([[pix:tiny_c4lauthor|mask/c4l-collapsible-icon]]);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 21px 18px;
+  mask-size: 21px 18px;
+  content: "" !important;
+}
+[data-bs-theme=dark] .c4l-styledtable-icon .c4l-button-text::before {
+  content: "";
+  background-color: var(--c4l-ui-icon-helper);
+  -webkit-mask-image: url([[pix:tiny_c4lauthor|mask/c4l-styledtable-icon]]);
+  mask-image: url([[pix:tiny_c4lauthor|mask/c4l-styledtable-icon]]);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 18px 18px;
+  mask-size: 18px 18px;
   content: "" !important;
 }
 
@@ -3211,6 +4282,14 @@ p.c4l-spacer + p.c4l-spacer {
   max-width: 94%;
 }
 
+.c4lv-timeline.c4l-full-width-variant {
+  max-width: 100%;
+}
+
+.c4lv-panellist.c4l-full-width-variant {
+  max-width: 100%;
+}
+
 /**
  * Precision Mode UI styles — two-panel field editor for the C4L Author plugin.
  *
@@ -3338,6 +4417,26 @@ p.c4l-spacer + p.c4l-spacer {
 .tiny_c4lauthor__precision-list-item .tiny_c4lauthor__precision-textarea {
   flex: 1;
   min-height: 48px;
+}
+
+.tiny_c4lauthor__precision-subfields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tiny_c4lauthor__precision-subfield {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tiny_c4lauthor__precision-sublabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--c4l-ui-text);
+  margin: 0;
 }
 
 .tiny_c4lauthor__precision-remove-btn {

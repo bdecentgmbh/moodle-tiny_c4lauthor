@@ -24,12 +24,11 @@
 
 import Ajax from 'core/ajax';
 import Notification from 'core/notification';
-import {variants as VARIANTS} from './variants';
 
 const variantsPreferenceName = 'c4lauthor_components_variants';
 let variantPreferences = {};
 
-export const loadVariantPreferences = async(components) => {
+export const loadVariantPreferences = async(catalogue) => {
     const request = {
         methodname: 'core_user_get_user_preferences',
         args: {
@@ -51,11 +50,11 @@ export const loadVariantPreferences = async(components) => {
 
             if (rawPreferences !== null) {
                 Object.keys(rawPreferences).forEach(preference => {
-                    comp = components.find(component => component.id == preference);
+                    comp = catalogue.components.find(component => component.id == preference);
                     if (comp != undefined) {
                         variantPreferences[comp.name] = [];
                         rawPreferences[preference].forEach((variant) => {
-                            variantObj = VARIANTS.find(element => element.id == variant);
+                            variantObj = catalogue.variants.find(element => element.id == variant);
                             if (variantObj != undefined) {
                                 variantComp = comp.variants.find(element => element == variantObj.name);
                                 if (variantComp != undefined) {
@@ -70,16 +69,16 @@ export const loadVariantPreferences = async(components) => {
     }).catch(Notification.exception);
 };
 
-export const saveVariantPreferences = (components) => {
+export const saveVariantPreferences = (catalogue) => {
     let comp = {};
     let rawPreferences = {};
     let variantObj = {};
     Object.keys(variantPreferences).forEach(preference => {
-        comp = components.find(component => component.name == preference);
+        comp = catalogue.components.find(component => component.name == preference);
         if (comp != undefined) {
             rawPreferences[comp.id] = [];
             variantPreferences[preference].forEach((variant) => {
-                variantObj = VARIANTS.find(element => element.name == variant);
+                variantObj = catalogue.findVariant(variant);
                 if (variantObj != undefined) {
                     rawPreferences[comp.id].push(variantObj.id);
                 }
@@ -116,28 +115,18 @@ export const getVariantsClass = (component) => {
     return variants;
 };
 
-export const getVariantsHtml = (component) => {
+export const getVariantsHtml = (component, catalogue) => {
     let variantsHtml = '';
     let variantObj = {};
     if (variantPreferences?.[component]) {
         variantPreferences[component].forEach(variant => {
-            variantObj = VARIANTS.find(element => element.name == variant);
+            variantObj = catalogue.findVariant(variant);
             if (variantObj != undefined) {
                 variantsHtml += variantObj.html;
             }
         });
     }
     return variantsHtml;
-};
-
-export const getVariantHtml = (variant) => {
-    let variantHtml = [];
-    let variantObj = {};
-    variantObj = VARIANTS.find(element => element.name == variant);
-    if (variantObj != undefined) {
-        variantHtml = variantObj.html;
-    }
-    return variantHtml;
 };
 
 export const addVariant = (component, variant) => {

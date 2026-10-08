@@ -25,11 +25,19 @@
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
+    'tiny_c4lauthor_get_components' => [
+        'classname'    => 'tiny_c4lauthor\external\get_components',
+        'methodname'   => 'execute',
+        'description'  => 'Return the components and variants C4L Author offers.',
+        'type'         => 'read',
+        'ajax'         => true,
+        'capabilities' => 'tiny/c4lauthor:use, tiny/c4lauthor:viewplugin',
+    ],
     'tiny_c4lauthor_suggest' => [
         'classname'    => 'tiny_c4lauthor\external\suggest',
         'methodname'   => 'execute',
         'description'  => 'Return C4L component suggestions for a fragment of editor content.',
-        'type'         => 'read',
+        'type'         => 'write',
         'ajax'         => true,
         'capabilities' => 'tiny/c4lauthor:aisuggest',
     ],
