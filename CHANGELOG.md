@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.5.0-beta
+
+### Added
+
+- Other plugins can add components and editor stylesheets through a new hook,
+  `\tiny_c4lauthor\hook\extend_components`, without changing C4L Author. Their
+  components can use their own templates, strings and icons, appear under a new
+  *Templates* category in the sidebar, work with variants and precision mode, and can
+  insert what an AMD module of theirs returns instead of a template. See the README.
+
+### Changed
+
+- The two student settings list every component, including the ones other plugins
+  add. Each component declares whether it is aimed at students. Saved choices stay
+  as they are; a component an admin has not seen in the settings yet counts with its
+  default. The components that were in neither list (concept review, further reading,
+  statement, assessment, panel list, timeline, combo) are listed as not intended for
+  students, so students still do not get them until an admin ticks them.
+
 ## 1.4.1-beta
 
 ### Fixed
