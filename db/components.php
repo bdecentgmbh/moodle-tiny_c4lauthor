@@ -334,10 +334,10 @@ $components = [
         'variants' => ['align-left'],
         'precision' => [
             [
-                'selector' => null,
+                'selector' => 'span[data-id]',
                 'label' => 'precision_field_value',
                 'type' => 'input',
-                'handler' => 'valuebeforesuffix',
+                'fallback' => true,
             ],
         ],
     ],
@@ -427,10 +427,10 @@ $components = [
         'variants' => ['align-left'],
         'precision' => [
             [
-                'selector' => null,
+                'selector' => 'span[data-id]',
                 'label' => 'precision_field_value',
                 'type' => 'input',
-                'handler' => 'valueafterprefix',
+                'fallback' => true,
             ],
         ],
     ],
