@@ -195,6 +195,54 @@
 
 /* Dark mode — masks from pix/mask/, coloured by --c4l-ui-icon-* */
 
+.c4l-styledlist-icon::before {
+    content: '';
+}
+
+.c4l-styledlist-icon .c4l-button-text::before {
+    content: url([[pix:tiny_c4lauthor|c4l-styledlist-icon]]);
+}
+
+.c4l-linkblock-icon::before {
+    content: '';
+}
+
+.c4l-linkblock-icon .c4l-button-text::before {
+    content: url([[pix:tiny_c4lauthor|c4l-linkblock-icon]]);
+}
+
+.c4l-tabs-icon::before {
+    content: '';
+}
+
+.c4l-tabs-icon .c4l-button-text::before {
+    content: url([[pix:tiny_c4lauthor|c4l-tabs-icon]]);
+}
+
+.c4l-carousel-icon::before {
+    content: '';
+}
+
+.c4l-carousel-icon .c4l-button-text::before {
+    content: url([[pix:tiny_c4lauthor|c4l-carousel-icon]]);
+}
+
+.c4l-collapsible-icon::before {
+    content: '';
+}
+
+.c4l-collapsible-icon .c4l-button-text::before {
+    content: url([[pix:tiny_c4lauthor|c4l-collapsible-icon]]);
+}
+
+.c4l-styledtable-icon::before {
+    content: '';
+}
+
+.c4l-styledtable-icon .c4l-button-text::before {
+    content: url([[pix:tiny_c4lauthor|c4l-styledtable-icon]]);
+}
+
 [data-bs-theme=dark] {
     .c4l-keyconcept-icon .c4l-button-text::before {
         @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/noun_project_icons/c4l_keyconcept_icon]]), 18px, 18px, var(--c4l-ui-icon-contextual));
@@ -333,6 +381,36 @@
 
     .c4l-assessment-icon .c4l-button-text::before {
         @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l-assessment-icon]]), 15px, 18px, var(--c4l-ui-icon-evaluative));
+        content: "" !important;
+    }
+
+    .c4l-styledlist-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l-styledlist-icon]]), 17px, 16px, var(--c4l-ui-icon-helper));
+        content: "" !important;
+    }
+
+    .c4l-linkblock-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l-linkblock-icon]]), 19px, 11px, var(--c4l-ui-icon-helper));
+        content: "" !important;
+    }
+
+    .c4l-tabs-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l-tabs-icon]]), 23px, 18px, var(--c4l-ui-icon-helper));
+        content: "" !important;
+    }
+
+    .c4l-carousel-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l-carousel-icon]]), 21px, 14px, var(--c4l-ui-icon-helper));
+        content: "" !important;
+    }
+
+    .c4l-collapsible-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l-collapsible-icon]]), 21px, 18px, var(--c4l-ui-icon-helper));
+        content: "" !important;
+    }
+
+    .c4l-styledtable-icon .c4l-button-text::before {
+        @include c4l-mask-glyph(url([[pix:tiny_c4lauthor|mask/c4l-styledtable-icon]]), 18px, 18px, var(--c4l-ui-icon-helper));
         content: "" !important;
     }
 }

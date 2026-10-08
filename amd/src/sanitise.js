@@ -69,6 +69,15 @@ const isSafeUrl = (value) => {
 };
 
 /**
+ * Whether a value is an absolute web or mail address (http, https or mailto), the only
+ * addresses a link block may point to.
+ *
+ * @param {string} value
+ * @returns {boolean}
+ */
+export const isWebAddress = (value) => /^(https?:\/\/|mailto:)/i.test(value.trim()) && isSafeUrl(value.trim());
+
+/**
  * Clean the attributes of one element in place.
  *
  * @param {Element} el

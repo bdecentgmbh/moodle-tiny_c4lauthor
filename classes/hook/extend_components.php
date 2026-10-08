@@ -35,11 +35,15 @@ use moodle_url;
  * The stylesheets are added to the editor's content, where the theme's stylesheets for
  * the page do not apply. A plugin's styles.css already applies on the page.
  *
+ * Page modules are AMD modules whose init() runs on every page, to add behaviour to
+ * interactive components, the way tiny_c4lauthor/runtime does for tabs and carousels.
+ * They should do nothing on pages without their components.
+ *
  * @package    tiny_c4lauthor
  * @copyright  2026 bdecent gmbh <https://bdecent.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-#[\core\attribute\label('Add components to C4L Author, and stylesheets to the editor that shows them.')]
+#[\core\attribute\label('Add components to C4L Author, stylesheets to the editor that shows them and scripts for their behaviour.')]
 #[\core\attribute\tags('editor', 'tiny_c4lauthor')]
 final class extend_components {
     /** @var array Components added, as [component, name, declaration]. */
@@ -47,6 +51,9 @@ final class extend_components {
 
     /** @var moodle_url[] Stylesheets added. */
     private array $stylesheets = [];
+
+    /** @var string[] AMD modules added for pages. */
+    private array $pagemodules = [];
 
     /**
      * Create the hook.
@@ -80,6 +87,15 @@ final class extend_components {
     }
 
     /**
+     * Add an AMD module whose init() runs on every page, for the behaviour of components.
+     *
+     * @param string $module AMD module name, such as local_example/runtime
+     */
+    public function add_page_module(string $module): void {
+        $this->pagemodules[] = $module;
+    }
+
+    /**
      * Get the components added, unchecked.
      *
      * @return array of [component, name, declaration]
@@ -95,5 +111,14 @@ final class extend_components {
      */
     public function get_editor_stylesheets(): array {
         return $this->stylesheets;
+    }
+
+    /**
+     * Get the page modules added.
+     *
+     * @return string[]
+     */
+    public function get_page_modules(): array {
+        return $this->pagemodules;
     }
 }

@@ -1,0 +1,32 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template tiny_c4lauthor/components/tabs
+
+    The markup C4L Author inserts for the Tabs component.
+
+    Each tab is a title and a content. Without JavaScript they show one below the
+    other; the page script (tiny_c4lauthor/runtime) turns them into tabs.
+
+    Context variables required for this template:
+    * placeholder - HTML of the placeholder span (tiny_c4lauthor/placeholder_span)
+    * variantclasses - classes of the active variants
+
+    Example context (json):
+    {"placeholder":"<span data-id=\"R1-1\">Text</span>","variantclasses":"","variantshtml":"","uniqid":"R2-2"}
+}}
+<p class="c4l-spacer">&nbsp;</p><div class="c4lv-tabs {{variantclasses}}"><div class="c4l-tab"><p class="c4l-tab-title">{{#str}}tab, tiny_c4lauthor{{/str}} 1</p><div class="c4l-tab-content"><p>{{{placeholder}}}</p></div></div><div class="c4l-tab"><p class="c4l-tab-title">{{#str}}tab, tiny_c4lauthor{{/str}} 2</p><div class="c4l-tab-content"><p>{{#str}}tab_content, tiny_c4lauthor{{/str}} 2.</p></div></div><div class="c4l-tab"><p class="c4l-tab-title">{{#str}}tab, tiny_c4lauthor{{/str}} 3</p><div class="c4l-tab-content"><p>{{#str}}tab_content, tiny_c4lauthor{{/str}} 3.</p></div></div></div><p class="c4l-spacer">&nbsp;</p>

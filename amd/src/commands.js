@@ -42,6 +42,7 @@ import {showCustomDropdown} from './dropdown';
 import {registerComponentIcons} from './icons';
 import {buildSidebar, setupTabOverflow} from './sidebar';
 import {setupVariantToolbar} from './variant_toolbar';
+import {attach as attachEditorWidgets} from './editor_widgets';
 import {
     isShowOverlay,
     isC4LVisible,
@@ -489,6 +490,9 @@ export const getSetup = async() => {
 
         // Set up contextual variant toolbar.
         setupVariantToolbar(innerEditor, catalogue, deleteComponentStr, moveUpStr, moveDownStr);
+
+        // Tabs and carousel controls.
+        attachEditorWidgets(innerEditor).catch(Notification.exception);
 
         // When pressing Enter at the end of a C4L component, exit the
         // component and place the cursor in a new paragraph below it.

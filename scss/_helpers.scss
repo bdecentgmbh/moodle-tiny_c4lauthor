@@ -1,0 +1,445 @@
+/**
+ * Styled list, link block, tabs, carousel, collapsible and styled table.
+ *
+ * Tabs, carousel and collapsible are readable without JavaScript: every tab, slide and
+ * content is shown. The page script (amd/src/runtime.js) adds .c4l-ready and the controls.
+ *
+ * @package     tiny_c4lauthor
+ * @copyright   2026 Roger Segú <rogersegu@gmail.com>, bdecent gmbh <https://bdecent.de>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+@mixin c4l-helper-mask($image, $size: contain) {
+    -webkit-mask-image: $image;
+    mask-image: $image;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: $size;
+    mask-size: $size;
+}
+
+$c4l-chevron-left: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'><path d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/></svg>");
+$c4l-chevron-right: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'><path d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/></svg>");
+$c4l-chevron-down: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+
+/* Styled list */
+
+.c4lv-styledlist {
+    list-style: none;
+    padding-left: 0;
+    margin: 24px 0;
+    line-height: 1.6;
+}
+
+.c4lv-styledlist > li {
+    position: relative;
+    margin-left: 28px;
+    margin-bottom: 6px;
+}
+
+.c4lv-styledlist.c4l-checkmarks-variant > li::before,
+.c4lv-styledlist.c4l-chevrons-variant > li::before {
+    content: "";
+    position: absolute;
+    left: -27px;
+    background-color: var(--c4l-styledlist-bullet);
+}
+
+.c4lv-styledlist.c4l-checkmarks-variant > li::before {
+    top: 5px;
+    width: 16px;
+    height: 16px;
+    @include c4l-helper-mask(url([[pix:tiny_c4lauthor|c4l-checkmarks-icon]]));
+}
+
+.c4lv-styledlist.c4l-chevrons-variant > li::before {
+    top: 8px;
+    width: 10px;
+    height: 10px;
+    @include c4l-helper-mask(url([[pix:tiny_c4lauthor|c4l-chevrons-icon]]));
+}
+
+/* Link block */
+
+.c4l-linkblock {
+    display: flex;
+    align-items: stretch;
+    min-width: 260px;
+    max-width: 75%;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 10px;
+    background-color: var(--c4l-linkblock-bg);
+    box-shadow: 0 4px 12px var(--c4l-shadow-soft);
+    transition: box-shadow .2s ease-in-out;
+    text-decoration: none !important;
+
+    &:hover,
+    &:focus {
+        box-shadow: 0 4px 14px var(--c4l-shadow-mid);
+    }
+
+    .link-stripe {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 48px;
+        min-width: 48px;
+        margin: 12px 0 12px 12px;
+        border-radius: 6px;
+        background-color: var(--c4l-linkblock-stripe);
+        font-size: 0;
+
+        &::before {
+            content: "";
+            width: 22px;
+            height: 22px;
+            background-color: var(--c4l-linkblock-icon);
+            @include c4l-helper-mask(url([[pix:tiny_c4lauthor|fi_external-link]]));
+        }
+
+        @media (min-width: 576px) {
+            width: 60px;
+            min-width: 60px;
+        }
+    }
+
+    .link-content {
+        padding: 24px 28px;
+        line-height: 24px;
+    }
+
+    .link-name {
+        display: block;
+        color: var(--c4l-linkblock-name);
+        font-size: 17px;
+    }
+
+    .link-url {
+        display: block;
+        color: var(--c4l-linkblock-url);
+        font-size: 14px;
+        font-weight: 400;
+        word-break: break-all;
+    }
+}
+
+/* Tabs. Without the page script every tab shows, its title as a heading. */
+
+.c4lv-tabs {
+    margin: 24px auto;
+}
+
+.c4lv-tabs > .c4l-tab {
+    margin-bottom: 8px;
+    padding: 16px 24px;
+    border: 1px solid var(--c4l-tabs-rule);
+    border-radius: 4px;
+    background-color: var(--c4l-tabs-panel-bg);
+}
+
+.c4lv-tabs .c4l-tab-title {
+    margin-bottom: 8px;
+    color: var(--c4l-tabs-tab-ink);
+    font-weight: 600;
+}
+
+.c4lv-tabs .c4l-tab-content > :last-child {
+    margin-bottom: 0;
+}
+
+.c4lv-tabs.c4l-ready > .c4l-tab {
+    margin-bottom: 0;
+    padding: 24px 36px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.c4lv-tabs.c4l-ready > .c4l-tab > .c4l-tab-title {
+    display: none;
+}
+
+.c4l-tablist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-bottom: -1px;
+}
+
+.c4l-tablist-button {
+    flex: 1 1 0;
+    padding: 8px 12px 7px;
+    border: 1px solid transparent;
+    border-bottom-color: var(--c4l-tabs-rule);
+    border-radius: 4px 4px 0 0;
+    background-color: var(--c4l-tabs-tab-bg);
+    color: var(--c4l-tabs-tab-ink);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &.active {
+        border-color: var(--c4l-tabs-rule);
+        border-bottom-color: var(--c4l-tabs-panel-bg);
+        background-color: var(--c4l-tabs-panel-bg);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--c4l-brand);
+        outline-offset: 2px;
+    }
+}
+
+/* Carousel. Without the page script every slide shows. */
+
+.c4lv-carousel {
+    position: relative;
+    max-width: 75%;
+    margin: 24px auto;
+}
+
+.c4lv-carousel.c4l-full-width-variant {
+    max-width: 100%;
+}
+
+.c4lv-carousel.c4l-white-indicators-variant {
+    --c4l-carousel-control: #fff;
+}
+
+.c4lv-carousel > .c4l-slide {
+    position: relative;
+    height: 380px;
+    overflow: hidden;
+    background-color: var(--c4l-carousel-slide-bg);
+}
+
+.c4lv-carousel > .c4l-slide + .c4l-slide {
+    margin-top: 8px;
+}
+
+.c4lv-carousel.c4l-ready > .c4l-slide + .c4l-slide {
+    margin-top: 0;
+}
+
+.c4lv-carousel > .c4l-slide:has(img) {
+    background-color: transparent;
+}
+
+.c4lv-carousel > .c4l-slide img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.c4l-carousel-prev,
+.c4l-carousel-next {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 10%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+
+    &::before {
+        content: "";
+        width: 1.75rem;
+        height: 1.75rem;
+        background-color: var(--c4l-carousel-control);
+    }
+}
+
+.c4l-carousel-prev {
+    left: 0;
+
+    &::before {
+        @include c4l-helper-mask($c4l-chevron-left, 100%);
+    }
+}
+
+.c4l-carousel-next {
+    right: 0;
+
+    &::before {
+        @include c4l-helper-mask($c4l-chevron-right, 100%);
+    }
+}
+
+.c4l-carousel-indicators {
+    position: absolute;
+    right: 0;
+    bottom: 12px;
+    left: 0;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+}
+
+.c4l-carousel-indicator {
+    width: 30px;
+    height: 4px;
+    padding: 0;
+    border: 0;
+    background-color: var(--c4l-carousel-control);
+    opacity: .5;
+    cursor: pointer;
+
+    &.active {
+        opacity: 1;
+    }
+}
+
+/* Collapsible. Without the page script the content stays open. */
+
+.c4lv-collapsible {
+    margin: 24px 0;
+}
+
+.c4lv-collapsible > .c4l-collapsible-title {
+    margin: 12px 0 12px 2px;
+    color: var(--c4l-collapsible-trigger);
+    font-weight: 600;
+}
+
+.c4lv-collapsible > .c4l-collapsible-content {
+    padding: 24px 36px 30px;
+    border-radius: 8px;
+    background-color: var(--c4l-collapsible-bg);
+}
+
+.c4lv-collapsible > .c4l-collapsible-content > :last-child {
+    margin-bottom: 0;
+}
+
+.c4lv-collapsible.c4l-ready > .c4l-collapsible-title {
+    font-weight: 400;
+}
+
+.c4l-collapsible-toggle {
+    display: inline-flex;
+    align-items: center;
+    color: var(--c4l-collapsible-trigger);
+    font: inherit;
+    cursor: pointer;
+
+    &::after {
+        content: "";
+        width: 1em;
+        height: 1em;
+        margin-left: .5em;
+        background-color: currentColor;
+        transition: transform .3s ease-in-out;
+        @include c4l-helper-mask($c4l-chevron-down);
+    }
+
+    &[aria-expanded="true"]::after {
+        transform: rotate(180deg);
+    }
+}
+
+.c4lv-collapsible.c4l-buttondropdown-variant .c4l-collapsible-toggle {
+    padding: 6px 12px;
+    border: 1px solid var(--c4l-collapsible-trigger);
+    border-radius: 4px;
+    background-color: var(--c4l-surface);
+}
+
+.c4lv-collapsible.c4l-linkdropdown-variant .c4l-collapsible-toggle {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    text-decoration: underline;
+
+    &::after {
+        margin-left: .2em;
+    }
+}
+
+/* Styled table */
+
+.c4l-table-container .c4l-styled-table {
+    margin-bottom: 0;
+    border-top: none;
+}
+
+.c4l-table-container .c4l-styled-table > :not(caption) > * > * {
+    box-shadow: none;
+}
+
+.c4l-table-container.c4l-solid-variant .c4l-styled-table {
+    thead th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        background-color: var(--c4l-table-head-bg);
+        color: var(--c4l-table-head-ink);
+        text-align: center;
+    }
+
+    thead th:first-of-type {
+        color: transparent;
+    }
+
+    tbody th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        border: 1px solid var(--c4l-surface);
+        background-color: var(--c4l-table-row-head-bg);
+        color: inherit;
+    }
+
+    tbody tr {
+        border-bottom: 1px dotted var(--c4l-table-rule);
+        white-space: nowrap;
+    }
+
+    tbody tr:last-child {
+        border-bottom-style: solid;
+    }
+}
+
+$c4l-table-colours: (1: #415ae6, 2: #1cc460, 3: #ffd058, 4: #fd6f66, 5: #16b9ff, 6: #ffaf59, 7: #8f95fe, 8: #f78aaa);
+
+.c4l-table-container.c4l-colored-variant .c4l-styled-table {
+    thead th {
+        padding-top: 12px;
+        padding-bottom: 3px;
+        border: 0;
+        background-color: transparent;
+        color: var(--c4l-text);
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    @each $index, $colour in $c4l-table-colours {
+        thead th:nth-of-type(8n + #{$index}) {
+            border-bottom: 4px solid $colour;
+        }
+    }
+
+    thead th:first-of-type {
+        border-bottom-color: var(--c4l-table-rule);
+        color: transparent;
+    }
+
+    tbody th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--c4l-surface);
+        background-color: var(--c4l-table-row-head-bg);
+        white-space: nowrap;
+    }
+
+    tbody tr {
+        border-bottom: 1px dotted var(--c4l-table-rule);
+    }
+}
