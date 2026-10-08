@@ -22,11 +22,10 @@
  */
 
 import {getButtonImage} from 'editor_tiny/utils';
-import {get_string as getString, get_strings as getStrings} from 'core/str';
+import {get_string as getString} from 'core/str';
 import {getTinyMCE} from 'editor_tiny/loader';
 import Modal from 'core/modal';
 import Pending from 'core/pending';
-import Templates from 'core/templates';
 import {
     register as registerMoodleOptions,
     getContextId,
@@ -36,8 +35,13 @@ import {
     getCurrentLanguage,
 } from 'editor_tiny/options';
 import {component, buttonName, buttonIcon, quickInsertMenuName, convertMenuName} from './common';
-import {components as c4lComponents} from './components';
-import variantsModule from './variants';
+import {loadRegistry, createCatalogue} from './registry';
+import {buildCustomComponents, renderComponent} from './component_html';
+import {registerConvertMenu} from './convert';
+import {showCustomDropdown} from './dropdown';
+import {registerComponentIcons} from './icons';
+import {buildSidebar, setupTabOverflow} from './sidebar';
+import {setupVariantToolbar} from './variant_toolbar';
 import {
     isShowOverlay,
     isC4LVisible,
@@ -50,12 +54,7 @@ import {
     isAiPolicyAgreed,
     getAiRates,
 } from './options';
-import {
-    loadVariantPreferences,
-    saveVariantPreferences,
-    getVariantsClass,
-    getVariantsHtml,
-} from './variantslib';
+import {loadVariantPreferences, saveVariantPreferences} from './variantslib';
 import Notification from 'core/notification';
 import CustomEvents from 'core/custom_interaction_events';
 import AiPolicy from 'core_ai/policy';
@@ -85,156 +84,6 @@ import {
     filterSuggestions as aiFilterSuggestions,
 } from './ai_guards';
 
-const compPrefix = 'c4lv-';
-let langStrings = null;
-
-/**
- * Components that can be converted between each other.
- * These all share a simple wrapper structure (div.c4lv-NAME + content).
- */
-const convertibleComponents = [
-    'keyconcept', 'tip', 'reminder', 'attention', 'allpurposecard',
-    'expectedfeedback', 'proceduralcontext', 'readingcontext', 'quote',
-    'example', 'conceptreview',
-];
-
-/**
- * Find the nearest c4lv-* ancestor element from the current selection
- * and return both the element and its component name, but only if
- * the component is in the convertible list.
- *
- * @param {object} ed - TinyMCE editor instance.
- * @returns {{el: HTMLElement, name: string}|null}
- */
-const getComponentFromSelection = (ed) => {
-    let node = ed.selection.getNode();
-    while (node && node !== ed.getBody()) {
-        if (node.nodeType === 1 && node.className) {
-            const name = getC4lComponentName(node);
-            if (name) {
-                const convertible = convertibleComponents.indexOf(name) !== -1;
-                return {el: node, name, convertible};
-            }
-        }
-        node = node.parentNode;
-    }
-    return null;
-};
-
-/**
- * Convert a c4lv-* element from one component type to another.
- * Swaps the class and aria-label, removes incompatible variant classes.
- *
- * @param {HTMLElement} el - The component wrapper element.
- * @param {string} oldName - Current component name.
- * @param {string} newName - Target component name.
- */
-const convertComponent = (el, oldName, newName) => {
-    // Swap the main c4lv- class.
-    el.classList.remove(compPrefix + oldName);
-    el.classList.add(compPrefix + newName);
-
-    // Update aria-label.
-    const newLabel = langStrings.get(newName) || newName;
-    el.setAttribute('aria-label', newLabel);
-
-    // Find which variants the new component supports.
-    const newComp = c4lComponents.find((c) => c.name === newName);
-    const supportedVariants = newComp ? newComp.variants : [];
-
-    // Remove variant classes that the new component doesn't support.
-    const toRemove = [];
-    el.classList.forEach((cls) => {
-        if (cls.startsWith('c4l-') && cls.endsWith('-variant')) {
-            // Strip 'c4l-' and '-variant'.
-            const varName = cls.slice(4, -8);
-            if (supportedVariants.indexOf(varName) === -1) {
-                toRemove.push(cls);
-            }
-        }
-    });
-    toRemove.forEach((cls) => el.classList.remove(cls));
-};
-
-/**
- * Register the "Convert to" menu button on a TinyMCE editor instance.
- *
- * @param {object} ed - TinyMCE editor instance.
- * @param {string} convertTooltip - Tooltip text for the button.
- */
-const convertIconSvg = '<svg width="24" height="24" viewBox="-4 -3.5 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">'
-    + '<path d="M15.5 9.23V10.47C15.5 12.54 13.82 14.22 11.75 14.22H0.75C0.34 14.22 0 13.88 0 '
-    + '13.47C0 13.05 0.34 12.72 0.75 12.72H11.75C12.99 12.72 14 11.71 14 10.47V9.23C14 8.82 14.34 '
-    + '8.48 14.75 8.48C15.16 8.48 15.5 8.82 15.5 9.23Z" fill="currentColor"/>'
-    + '<path d="M3.76 11.51L1.81 13.47L3.76 15.42C4.06 15.72 4.06 16.19 3.76 16.48C3.47 16.78 3 '
-    + '16.78 2.7 16.48L0.22 14C-0.07 13.71-0.07 13.23 0.22 12.94L2.7 10.45C3 10.16 3.47 10.16 3.76 '
-    + '10.45C4.06 10.75 4.06 11.22 3.76 11.51Z" fill="currentColor"/>'
-    + '<path d="M0 7.23V6.23C0 4.16 1.68 2.48 3.75 2.48H14.75C15.16 2.48 15.5 2.82 15.5 '
-    + '3.23C15.5 3.65 15.16 3.98 14.75 3.98H3.75C2.51 3.98 1.5 4.99 1.5 6.23V7.23C1.5 7.65 1.16 '
-    + '7.98 0.75 7.98C0.34 7.98 0 7.65 0 7.23Z" fill="currentColor"/>'
-    + '<path d="M11.74 5.19L13.69 3.23L11.74 1.28C11.44 0.99 11.44 0.51 11.74 0.22C12.03-0.07 '
-    + '12.5-0.07 12.8 0.22L15.28 2.7C15.57 3 15.57 3.47 15.28 3.76L12.8 6.25C12.5 6.54 12.03 6.54 '
-    + '11.74 6.25C11.44 5.96 11.44 5.48 11.74 5.19Z" fill="currentColor"/>'
-    + '</svg>';
-
-const registerConvertMenu = (ed, convertTooltip, noComponentStr, notConvertibleStr) => {
-    ed.ui.registry.addIcon('c4l-convert', convertIconSvg);
-    ed.ui.registry.addButton(convertMenuName, {
-        icon: 'c4l-convert',
-        tooltip: convertTooltip,
-        onAction: () => {
-            // Save selection before showing the dropdown.
-            const bookmark = ed.selection.getBookmark(2, true);
-            const found = getComponentFromSelection(ed);
-            if (!found) {
-                showCustomDropdown(ed, convertTooltip, [
-                    {label: noComponentStr, enabled: false, onAction: () => {
-                        return;
-                    }},
-                ]);
-                return;
-            }
-            if (!found.convertible) {
-                showCustomDropdown(ed, convertTooltip, [
-                    {label: notConvertibleStr, enabled: false, onAction: () => {
-                        return;
-                    }},
-                ]);
-                return;
-            }
-            const items = [];
-            const allIcons = ed.ui.registry.getAll().icons;
-            convertibleComponents.forEach((targetName) => {
-                if (targetName === found.name) {
-                    return;
-                }
-                const label = langStrings.get(targetName) || targetName;
-                const iconKey = 'c4l-' + targetName;
-                items.push({
-                    label,
-                    iconHtml: allIcons[iconKey] || '',
-                    onAction: () => {
-                        ed.selection.moveToBookmark(bookmark);
-                        ed.undoManager.transact(() => {
-                            convertComponent(found.el, found.name, targetName);
-                        });
-                        ed.nodeChanged();
-                    },
-                });
-            });
-            showCustomDropdown(ed, convertTooltip, items);
-        },
-    });
-};
-
-/**
- * Generate a random ID for inserted components.
- * @returns {string}
- */
-const generateRandomID = () => {
-    return 'R' + Math.floor(Math.random() * 100000) + '-' + Date.now();
-};
-
 /**
  * Escape a string for use inside a double-quoted HTML attribute.
  *
@@ -246,962 +95,6 @@ const escapeAttr = (value) => String(value)
     .replace(/"/g, '&quot;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
-
-/**
- * Get all language strings referenced in component definitions.
- *
- * @returns {Promise<Map>}
- */
-const getAllStrings = async() => {
-    const keys = [];
-    const compRegex = /{{#([^}]*)}}/g;
-
-    // Fallback docs string.
-    keys.push('docs_nodocsavailable_desc');
-
-    c4lComponents.forEach(element => {
-        // Only add name from standard components.
-        if (element.name.indexOf("customcomp") == -1) {
-            keys.push(element.name);
-        }
-
-        // Lang strings from variants.
-        element.variants.forEach(variant => {
-            if (keys.indexOf(variant) === -1) {
-                keys.push(variant);
-            }
-        });
-
-        // Lang strings from code.
-        [...element.code.matchAll(compRegex)].forEach(strLang => {
-            if (keys.indexOf(strLang[1]) === -1) {
-                keys.push(strLang[1]);
-            }
-        });
-
-        // Lang strings from text placeholders.
-        [...element.text.matchAll(compRegex)].forEach(strLang => {
-            if (keys.indexOf(strLang[1]) === -1) {
-                keys.push(strLang[1]);
-            }
-        });
-
-        // Lang strings from docs object.
-        if (element.docs && typeof element.docs === 'object') {
-            if (element.docs.description) {
-                [...element.docs.description.matchAll(compRegex)].forEach(strLang => {
-                    if (keys.indexOf(strLang[1]) === -1) {
-                        keys.push(strLang[1]);
-                    }
-                });
-            }
-            if (element.docs.useCases && Array.isArray(element.docs.useCases)) {
-                element.docs.useCases.forEach(useCase => {
-                    [...useCase.matchAll(compRegex)].forEach(strLang => {
-                        if (keys.indexOf(strLang[1]) === -1) {
-                            keys.push(strLang[1]);
-                        }
-                    });
-                });
-            }
-        }
-    });
-
-    const stringValues = await getStrings(keys.map((key) => ({key, component})));
-    return new Map(keys.map((key, index) => ([key, stringValues[index]])));
-};
-
-/**
- * Replace all localized {{#word}} tags with resolved strings.
- *
- * @param {string} text
- * @returns {string}
- */
-const applyLangStrings = (text) => {
-    const compRegex = /{{#([^}]*)}}/g;
-    [...text.matchAll(compRegex)].forEach(strLang => {
-        const resolved = langStrings.get(strLang[1]);
-        if (resolved !== undefined) {
-            text = text.replace('{{#' + strLang[1] + '}}', resolved);
-        }
-    });
-    return text;
-};
-
-/**
- * Add admin-defined custom components into the components array.
- *
- * @param {Array} customComponents
- */
-const addCustomComponents = (customComponents) => {
-    if (customComponents.length > 0) {
-        customComponents.forEach(customcomp => {
-            if (c4lComponents.find(element => element.id == customcomp.id + 1000) == undefined) {
-                let html = customcomp.code;
-                const variants = customcomp.variants ? " {{VARIANTS}}" : "";
-                html = html.replace(
-                    '{{CUSTOMCLASS}}',
-                    compPrefix + customcomp.name + ' ' + compPrefix + "custom-component" + variants
-                );
-
-                c4lComponents.push({
-                    id: customcomp.id + 1000,
-                    name: customcomp.name,
-                    buttonname: customcomp.buttonname,
-                    type: 'custom',
-                    imageClass: 'c4l-custom-icon',
-                    code: html,
-                    text: customcomp.text.length > 0 ? customcomp.text : '{{#textplaceholder}}',
-                    variants: customcomp.variants ? ["full-width"] : [],
-                    icon: customcomp.icon,
-                    css: customcomp.css,
-                });
-            }
-        });
-    }
-};
-
-/**
- * Process a C4L component code template for insertion.
- *
- * @param {object} comp - Component definition from c4l/components.
- * @param {string} selectedText - Text currently selected in the editor (may be empty).
- * @returns {string} Ready-to-insert HTML.
- */
-const processComponentCode = async(comp, selectedText) => {
-    const context = {id: generateRandomID()};
-    if (selectedText) {
-        // Text the author selected is always inserted as text.
-        context.placeholdertext = selectedText;
-    } else {
-        // The component's default text comes from its definition and may contain markup.
-        context.placeholderhtml = applyLangStrings(comp.text || '');
-    }
-    const {html: spanHtml} = await Templates.renderForPromise('tiny_c4lauthor/placeholder_span', context);
-
-    let html = comp.code;
-    html = html.replace('{{PLACEHOLDER}}', spanHtml.trim());
-
-    // Apply saved variant preferences.
-    const variants = getVariantsClass(comp.name);
-    if (variants.length > 0) {
-        html = html.replace('{{VARIANTS}}', variants.join(' '));
-        html = html.replace('{{VARIANTSHTML}}', getVariantsHtml(comp.name));
-    } else {
-        html = html.replace('{{VARIANTS}}', '');
-        html = html.replace('{{VARIANTSHTML}}', '');
-    }
-
-    html = html.replace(/\{\{@ID\}\}/g, generateRandomID());
-    // Resolve lang strings.
-    html = applyLangStrings(html);
-
-    return html;
-};
-
-/**
- * Build the sidebar HTML with C4L component buttons.
- *
- * @param {object} filterLabels - Translated filter labels keyed by type.
- * @param {boolean} userIsStudent - Whether the current user is a student.
- * @param {Array} allowedComps - Allowed component names for students.
- * @param {boolean} enableTooltips - Whether to add docs tooltips to component buttons.
- * @returns {string} Sidebar HTML.
- */
-const buildSidebar = (filterLabels, userIsStudent, allowedComps, enableTooltips) => {
-    // Collect visible types.
-    const typeOrder = ['contextual', 'procedural', 'evaluative', 'helper', 'custom'];
-
-    // Filter components based on student/allowed.
-    const visibleComponents = c4lComponents.filter((comp) => {
-        if (!userIsStudent) {
-            return true;
-        }
-        return allowedComps.includes(comp.name);
-    });
-
-    // Determine which types have visible components.
-    const visibleTypes = new Set(visibleComponents.map((c) => c.type));
-    const types = ['all', ...typeOrder.filter((t) => visibleTypes.has(t))];
-
-    let tabsHtml = '';
-    types.forEach((type) => {
-        const active = type === 'all' ? ' tiny_c4lauthor__tab--active' : '';
-        const label = filterLabels[type] || type;
-        tabsHtml += `<button class="tiny_c4lauthor__tab${active}" data-filter="${type}">${label}</button>`;
-    });
-
-    // Group components by type.
-    const groups = {};
-    visibleComponents.forEach((comp) => {
-        if (!groups[comp.type]) {
-            groups[comp.type] = [];
-        }
-        groups[comp.type].push(comp);
-    });
-
-    let groupsHtml = '';
-    typeOrder.forEach((type) => {
-        if (!groups[type] || groups[type].length === 0) {
-            return;
-        }
-        const label = filterLabels[type] || type;
-        let itemsHtml = '';
-        groups[type].forEach((comp) => {
-            const compLabel = comp.type === 'custom'
-                ? comp.buttonname
-                : (langStrings.get(comp.name) || comp.name);
-            const iconHtml = comp.icon
-                ? `<img src="${comp.icon}" class="c4l-custom-icon-img" alt="">`
-                : `<span class="c4l-button-text"></span>`;
-
-            // Build tooltip from docs if available and enabled.
-            let tooltipAttr = '';
-            if (enableTooltips && comp.docs && comp.docs.description) {
-                let tip = applyLangStrings(comp.docs.description);
-                if (comp.docs.useCases && comp.docs.useCases.length) {
-                    const cases = comp.docs.useCases
-                        .map((uc) => applyLangStrings(uc))
-                        .filter((t) => t && !t.startsWith('{{'));
-                    if (cases.length) {
-                        tip += '<ul style="text-align:left;margin:6px 0 0;padding-left:18px">' +
-                            cases.map((c) => '<li>' + c + '</li>').join('') + '</ul>';
-                    }
-                }
-                const escaped = tip.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-                tooltipAttr = ` data-c4l-tooltip="${escaped}"`;
-            }
-
-            itemsHtml +=
-                `<button class="tiny_c4lauthor__comp-btn ${comp.imageClass}"` +
-                ` data-comp="${comp.name}" data-type="${comp.type}"${tooltipAttr}>` +
-                iconHtml +
-                `<span class="tiny_c4lauthor__comp-name">${compLabel}</span>` +
-                `</button>`;
-        });
-        groupsHtml += `<div class="tiny_c4lauthor__group" data-group="${type}">` +
-            `<div class="tiny_c4lauthor__group-header">${label}</div>` +
-            `<div class="tiny_c4lauthor__group-grid">${itemsHtml}</div>` +
-            `</div>`;
-    });
-
-    return `<div class="tiny_c4lauthor__sidebar">` +
-        `<div class="tiny_c4lauthor__tabs">${tabsHtml}</div>` +
-        `<div class="tiny_c4lauthor__sidebar-list">${groupsHtml}</div>` +
-        `</div>`;
-};
-
-
-/**
- * Get the C4L component name from a DOM element by finding its c4lv-* class,
- * or the wrapper class of a component that declares one.
- *
- * @param {HTMLElement} el
- * @returns {string|null}
- */
-const getC4lComponentName = (el) => {
-    if (!el || !el.classList) {
-        return null;
-    }
-    for (const cls of el.classList) {
-        if (cls.startsWith('c4lv-')) {
-            return cls.substring(5);
-        }
-    }
-    for (const cls of el.classList) {
-        const comp = c4lComponents.find((c) => c.wrapperClass === cls);
-        if (comp) {
-            return comp.name;
-        }
-    }
-    return null;
-};
-
-/**
- * Format a variant name for display.
- *
- * @param {string} name
- * @returns {string}
- */
-const formatVariantLabel = (name) => {
-    // Use resolved lang string if available.
-    const resolved = langStrings.get(name);
-    if (resolved) {
-        return resolved;
-    }
-    return name.charAt(0).toUpperCase() +
-        name.slice(1).replace(/-/g, ' ');
-};
-
-/**
- * Set up the contextual variant toolbar inside the
- * inner TinyMCE editor.
- *
- * @param {object} ed - The inner TinyMCE editor instance.
- * @param {string} deleteStr - Localised label for the delete button.
- * @param {string} moveUpStr - Localised label for the move-up button.
- * @param {string} moveDownStr - Localised label for the move-down button.
- */
-const setupVariantToolbar = (ed, deleteStr, moveUpStr, moveDownStr) => {
-    const iframeDoc = ed.getDoc();
-    const iframeBody = ed.getBody();
-    const allVariants = variantsModule.variants;
-
-    // Components whose wrapper is not a c4lv- class have to be named explicitly
-    // or the hover test below never reaches them.
-    const nonVariantWrappers = Array.from(new Set(
-        c4lComponents.filter((c) => c.wrapperClass).map((c) => c.wrapperClass)
-    ));
-    const hoverSelector = '[class*="c4lv-"]'
-        + (nonVariantWrappers.length
-            ? ', ' + nonVariantWrappers.map((cls) => '.' + cls).join(', ')
-            : '');
-
-    // Create toolbar (excluded from editor content).
-    const toolbar = iframeDoc.createElement('div');
-    toolbar.className = 'c4lauthor-vt';
-    toolbar.setAttribute('data-mce-bogus', 'all');
-    toolbar.setAttribute('contenteditable', 'false');
-    iframeBody.appendChild(toolbar);
-
-    let currentCompEl = null;
-    let hideTimeout = null;
-
-    const cancelHide = () => {
-        clearTimeout(hideTimeout);
-    };
-
-    const hideToolbar = () => {
-        toolbar.classList.remove('c4lauthor-vt--visible');
-        currentCompEl = null;
-    };
-
-    const scheduleHide = () => {
-        cancelHide();
-        hideTimeout = setTimeout(hideToolbar, 200);
-    };
-
-    const trashIconSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"'
-        + ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
-        + '<polyline points="3 6 5 6 21 6"/>'
-        + '<path d="M19 6l-1 14H6L5 6"/>'
-        + '<path d="M10 11v6"/><path d="M14 11v6"/>'
-        + '<path d="M9 6V4h6v2"/></svg>';
-
-    const deleteComponent = (compEl) => {
-        // If wrapped in .c4l-inline-group or .c4l-display-left, target the wrapper.
-        const wrapper = compEl.closest('.c4l-inline-group, .c4l-display-left');
-        const target = wrapper || compEl;
-
-        const prev = target.previousElementSibling;
-        const next = target.nextElementSibling;
-        if (prev && prev.classList.contains('c4l-spacer')) {
-            prev.remove();
-        }
-        if (next && next.classList.contains('c4l-spacer')) {
-            next.remove();
-        }
-        target.remove();
-        hideToolbar();
-        ed.undoManager.add();
-    };
-
-    const chevronUpSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"'
-        + ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
-        + '<polyline points="18 15 12 9 6 15"/></svg>';
-
-    const chevronDownSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"'
-        + ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
-        + '<polyline points="6 9 12 15 18 9"/></svg>';
-
-    const moveComponent = (compEl, direction) => {
-        const wrapper = compEl.closest('.c4l-inline-group, .c4l-display-left');
-        const target = wrapper || compEl;
-
-        // Walk siblings skipping spacers.
-        let sibling = target;
-        do {
-            sibling = direction === 'up' ? sibling.previousElementSibling : sibling.nextElementSibling;
-        } while (sibling && sibling.classList.contains('c4l-spacer'));
-
-        if (!sibling || sibling === toolbar) {
-            return;
-        }
-
-        if (direction === 'up') {
-            iframeBody.insertBefore(target, sibling);
-        } else {
-            sibling.after(target);
-        }
-
-        currentCompEl = null;
-        showToolbar(compEl, c4lComponents.find(
-            (c) => c.name === getC4lComponentName(compEl)
-        ) || {});
-        ed.undoManager.add();
-    };
-
-    const deactivateVariant = (compEl, varName, btn) => {
-        const varClass = 'c4l-' + varName + '-variant';
-        compEl.classList.remove(varClass);
-        if (btn) {
-            btn.classList.remove('c4lauthor-vt__btn--active');
-        }
-        if (varName === 'caption') {
-            const fc = compEl.querySelector('figcaption');
-            if (fc) {
-                fc.remove();
-            }
-        } else if (varName === 'quote') {
-            const ec = compEl.querySelector('.c4l-embedded-caption');
-            if (ec) {
-                ec.remove();
-            }
-        }
-    };
-
-    const activateVariant = (compEl, varName, btn, vDef) => {
-        const varClass = 'c4l-' + varName + '-variant';
-        compEl.classList.add(varClass);
-        if (btn) {
-            btn.classList.add('c4lauthor-vt__btn--active');
-        }
-        if (vDef && vDef.html) {
-            const tmp = iframeDoc.createElement('div');
-            tmp.innerHTML = vDef.html;
-            while (tmp.firstChild) {
-                compEl.appendChild(tmp.firstChild);
-            }
-        }
-    };
-
-    const toggleVariant = (compEl, varName, btn) => {
-        const varClass = 'c4l-' + varName + '-variant';
-        const isActive = compEl.classList.contains(varClass);
-        const vDef = allVariants.find((v) => v.name === varName);
-
-        // Mutually exclusive group: clicking the active one is a no-op
-        // (the group must always have exactly one active variant).
-        if (vDef && vDef.group && isActive) {
-            return;
-        }
-
-        if (isActive) {
-            deactivateVariant(compEl, varName, btn);
-            return;
-        }
-
-        // Activating a grouped variant: deactivate any other active
-        // variant in the same group on this component.
-        if (vDef && vDef.group) {
-            const toolbar = btn && btn.parentNode;
-            allVariants
-                .filter((v) => v.group === vDef.group && v.name !== varName)
-                .forEach((other) => {
-                    const otherClass = 'c4l-' + other.name + '-variant';
-                    if (compEl.classList.contains(otherClass)) {
-                        const otherBtn = toolbar
-                            ? toolbar.querySelector('[data-variant="' + other.name + '"]')
-                            : null;
-                        deactivateVariant(compEl, other.name, otherBtn);
-                    }
-                });
-        }
-
-        // Activating a variant that excludes others: deactivate them
-        // on this component. Unlike `group`, excludes does not change
-        // the ability to toggle the variant off later.
-        if (vDef && Array.isArray(vDef.excludes)) {
-            const toolbar = btn && btn.parentNode;
-            vDef.excludes.forEach((excludedName) => {
-                const excludedClass = 'c4l-' + excludedName + '-variant';
-                if (compEl.classList.contains(excludedClass)) {
-                    const excludedBtn = toolbar
-                        ? toolbar.querySelector('[data-variant="' + excludedName + '"]')
-                        : null;
-                    deactivateVariant(compEl, excludedName, excludedBtn);
-                }
-            });
-        }
-
-        activateVariant(compEl, varName, btn, vDef);
-    };
-
-    const showToolbar = (compEl, comp) => {
-        if (currentCompEl === compEl) {
-            return;
-        }
-        currentCompEl = compEl;
-        toolbar.innerHTML = '';
-
-        // Delete button — always first.
-        const delBtn = iframeDoc.createElement('button');
-        delBtn.className = 'c4lauthor-vt__btn c4lauthor-vt__btn--delete';
-        delBtn.innerHTML = trashIconSvg;
-        delBtn.title = deleteStr;
-        delBtn.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            deleteComponent(compEl);
-        });
-        toolbar.appendChild(delBtn);
-
-        // Move up / move down buttons.
-        const wrapper = compEl.closest('.c4l-inline-group, .c4l-display-left');
-        const target = wrapper || compEl;
-
-        const makeMoveBtn = (direction, svg, title) => {
-            const btn = iframeDoc.createElement('button');
-            btn.className = 'c4lauthor-vt__btn c4lauthor-vt__btn--move c4lauthor-vt__btn--move-' + direction;
-            btn.innerHTML = svg;
-            btn.title = title;
-
-            // Check if at edge.
-            let sib = target;
-            do {
-                sib = direction === 'up' ? sib.previousElementSibling : sib.nextElementSibling;
-            } while (sib && sib.classList.contains('c4l-spacer'));
-            if (!sib || sib === toolbar) {
-                btn.classList.add('c4lauthor-vt__btn--disabled');
-            }
-
-            btn.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (!btn.classList.contains('c4lauthor-vt__btn--disabled')) {
-                    moveComponent(compEl, direction);
-                }
-            });
-            return btn;
-        };
-
-        toolbar.appendChild(makeMoveBtn('up', chevronUpSvg, moveUpStr));
-        toolbar.appendChild(makeMoveBtn('down', chevronDownSvg, moveDownStr));
-
-        (comp.variants || []).forEach((varName) => {
-            const btn = iframeDoc.createElement('button');
-            btn.className = 'c4lauthor-vt__btn';
-            btn.textContent = formatVariantLabel(varName);
-            btn.dataset.variant = varName;
-
-            const varClass = 'c4l-' + varName + '-variant';
-            if (compEl.classList.contains(varClass)) {
-                btn.classList.add('c4lauthor-vt__btn--active');
-            }
-
-            btn.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                toggleVariant(compEl, varName, btn);
-            });
-
-            toolbar.appendChild(btn);
-        });
-
-        // Position above the component, right-aligned.
-        let top = 0;
-        let el = compEl;
-        while (el && el !== iframeBody) {
-            top += el.offsetTop;
-            el = el.offsetParent;
-        }
-        toolbar.classList.add('c4lauthor-vt--visible');
-        const tbHeight = toolbar.offsetHeight;
-        toolbar.style.top = (top - tbHeight - 6) + 'px';
-        toolbar.style.right = '16px';
-    };
-
-    const isInsideExpanded = (el, x, y, buffer) => {
-        const rect = el.getBoundingClientRect();
-        const cs = iframeDoc.defaultView
-            .getComputedStyle(el);
-        const mt = (parseInt(cs.marginTop) || 0) + buffer;
-        const mr = (parseInt(cs.marginRight) || 0) + buffer;
-        const mb = (parseInt(cs.marginBottom) || 0) + buffer;
-        const ml = (parseInt(cs.marginLeft) || 0) + buffer;
-        return x >= rect.left - ml &&
-            x <= rect.right + mr &&
-            y >= rect.top - mt &&
-            y <= rect.bottom + mb;
-    };
-
-    const ensureToolbar = () => {
-        if (!iframeBody.contains(toolbar)) {
-            const htmlEl = iframeDoc.documentElement;
-            const scrollY = htmlEl.scrollTop;
-            iframeBody.appendChild(toolbar);
-            htmlEl.scrollTop = scrollY;
-        }
-    };
-
-    ed.on('SetContent Undo Redo', ensureToolbar);
-
-    iframeBody.addEventListener('mousemove', (e) => {
-        ensureToolbar();
-
-        if (toolbar.contains(e.target)) {
-            cancelHide();
-            return;
-        }
-
-        const compEl = e.target.closest(hoverSelector);
-        if (compEl) {
-            cancelHide();
-            const compName = getC4lComponentName(compEl);
-            if (compName) {
-                const comp = c4lComponents.find(
-                    (c) => c.name === compName
-                );
-                if (comp) {
-                    showToolbar(compEl, comp);
-                    return;
-                }
-            }
-        }
-
-        if (currentCompEl &&
-            iframeBody.contains(currentCompEl)) {
-            const inComp = isInsideExpanded(
-                currentCompEl, e.clientX, e.clientY, 12
-            );
-            const tbRect = toolbar.getBoundingClientRect();
-            const inTb = e.clientX >= tbRect.left - 8 &&
-                e.clientX <= tbRect.right + 8 &&
-                e.clientY >= tbRect.top - 8 &&
-                e.clientY <= tbRect.bottom + 8;
-            if (inComp || inTb) {
-                cancelHide();
-                return;
-            }
-        }
-
-        scheduleHide();
-    });
-
-    iframeBody.addEventListener('mouseleave', scheduleHide);
-};
-
-/**
- * Map component names to their pix icon paths for TinyMCE icon registration.
- */
-const componentIconMap = {
-    keyconcept: 'noun_project_icons/c4l_keyconcept_icon',
-    tip: 'noun_project_icons/c4l_tip_icon',
-    reminder: 'noun_project_icons/c4l_reminder_icon',
-    quote: 'noun_project_icons/c4l_quote_icon',
-    dodontcards: 'c4l_dodontcards_icon',
-    readingcontext: 'noun_project_icons/c4l_readingcontext_icon',
-    example: 'c4l_example_icon',
-    figure: 'c4l_figure_icon',
-    tag: 'noun_project_icons/c4l_tag_icon',
-    inlinetag: 'c4l_inlinetag_icon',
-    attention: 'c4l_attention_icon',
-    allpurposecard: 'c4l_allpurposecard_icon',
-    estimatedtime: 'noun_project_icons/c4l_estimatedtime_icon',
-    duedate: 'noun_project_icons/c4l_duedate_icon',
-    proceduralcontext: 'c4l_proceduralcontext_icon',
-    gradingvalue: 'noun_project_icons/c4l_gradingvalue_icon',
-    expectedfeedback: 'noun_project_icons/c4l_expectedfeedback_icon',
-    learningoutcomes: 'c4l_learningoutcomes_icon',
-    aiuseallowed: 'c4l_aiuseallowed_icon',
-    aiusenotallowed: 'c4l_aiusenotallowed_icon',
-    aiusereported: 'c4l_aiusereported_icon',
-    conceptreview: 'c4l_conceptreview_icon',
-    furtherreading: 'c4l_furtherreading_icon',
-    statement: 'c4l-statement-icon',
-    assessment: 'c4l-assessment-icon',
-    panellist: 'c4l_panellist_icon',
-    timeline: 'c4l_timeline_icon',
-    combo: 'c4l-combo-icon',
-};
-
-/**
- * Load component icon SVGs and register them as TinyMCE icons.
- *
- * @param {object} ed - TinyMCE editor instance.
- * @returns {Promise}
- */
-const registerComponentIcons = async(ed) => {
-    const promises = [];
-    Object.entries(componentIconMap).forEach(([compName, pixPath]) => {
-        const iconName = 'c4l-' + compName;
-        // Skip if already registered.
-        if (ed.ui.registry.getAll().icons[iconName]) {
-            return;
-        }
-        const promise = getButtonImage(pixPath, component).then((result) => {
-            if (result && result.html) {
-                ed.ui.registry.addIcon(iconName, result.html);
-            }
-            return undefined;
-        }).catch(() => {
-            // Silently skip icons that fail to load.
-        });
-        promises.push(promise);
-    });
-    await Promise.all(promises);
-};
-
-/**
- * After a dropdown menu renders, constrain its height to the
- * available space between its top position and the viewport bottom.
- *
- * @param {HTMLElement} menu - The TinyMCE menu element.
- */
-/**
- * Show a custom DOM dropdown near a TinyMCE toolbar/quickbar button.
- * This bypasses TinyMCE's built-in MenuButton dropdown, which has a
- * positioning bug that causes the menu to render off-screen when the
- * editor is destroyed and recreated inside a modal.
- *
- * @param {object} ed - TinyMCE editor instance.
- * @param {string} btnTooltip - The tooltip of the button (used to locate it in the DOM).
- * @param {Array} items - Array of {label, icon, onAction} objects.
- */
-const showCustomDropdown = (ed, btnTooltip, items) => {
-    // Close any existing custom dropdown.
-    document.querySelectorAll('.c4l-custom-dropdown').forEach((el) => el.remove());
-
-    // Find the button by its aria-label.  The quickbar lives in
-    // .tox-tinymce-aux which is a sibling of .tox-tinymce, so we
-    // search the modal (or the whole document as fallback).
-    const edContainer = ed.getContainer();
-    const searchRoot = edContainer
-        ? (edContainer.closest('.tiny_c4lauthor') || edContainer.parentNode)
-        : document;
-    let btn = searchRoot.querySelector(
-        '.tox-tinymce-aux button[aria-label="' + btnTooltip + '"]'
-    );
-    if (!btn) {
-        btn = document.querySelector(
-            '.tox-tinymce-aux button[aria-label="' + btnTooltip + '"]'
-        );
-    }
-    if (!btn) {
-        return;
-    }
-
-    const btnRect = btn.getBoundingClientRect();
-
-    // Build dropdown element.
-    const dropdown = document.createElement('div');
-    dropdown.className = 'c4l-custom-dropdown';
-    dropdown.style.cssText =
-        'position:fixed;z-index:10070;background:#fff;' +
-        'border:1px solid rgb(222,226,230);border-radius:6px;' +
-        'box-shadow:0 4px 14px rgba(0,0,0,.18);' +
-        'max-height:280px;overflow-y:auto;min-width:160px;' +
-        'padding:4px 0;' +
-        'scrollbar-width:thin;scrollbar-color:rgba(0,0,0,0.2) transparent;';
-    dropdown.style.top = btnRect.bottom + 4 + 'px';
-    dropdown.style.left = btnRect.left + 'px';
-
-    items.forEach((item) => {
-        const row = document.createElement('div');
-        row.className = 'c4l-custom-dropdown__item';
-        row.style.cssText =
-            'padding:5px 12px 5px 8px;cursor:pointer;font-size:13px;' +
-            'white-space:nowrap;display:flex;align-items:center;gap:8px;';
-        // Add icon if provided (SVG string).
-        if (item.iconHtml) {
-            const iconWrap = document.createElement('span');
-            iconWrap.style.cssText =
-                'display:inline-flex;width:20px;height:20px;' +
-                'align-items:center;justify-content:center;flex-shrink:0;' +
-                'overflow:visible;';
-            iconWrap.innerHTML = item.iconHtml;
-            // Scale SVG and inner image to fit.
-            const svg = iconWrap.querySelector('svg');
-            if (svg) {
-                svg.style.width = '18px';
-                svg.style.height = '18px';
-            }
-            const img = iconWrap.querySelector('image');
-            if (img) {
-                img.setAttribute('width', '18');
-                img.setAttribute('height', '18');
-            }
-            row.appendChild(iconWrap);
-        }
-        const textSpan = document.createElement('span');
-        textSpan.textContent = item.label;
-        row.appendChild(textSpan);
-        if (item.enabled === false) {
-            row.style.opacity = '0.45';
-            row.style.cursor = 'default';
-        } else {
-            row.addEventListener('mouseenter', () => {
-                row.style.background = '#f0f0f0';
-            });
-            row.addEventListener('mouseleave', () => {
-                row.style.background = '';
-            });
-            row.addEventListener('click', () => {
-                dropdown.remove();
-                item.onAction();
-            });
-        }
-        dropdown.appendChild(row);
-    });
-
-    document.body.appendChild(dropdown);
-
-    // Adjust if dropdown overflows viewport.
-    const dRect = dropdown.getBoundingClientRect();
-    if (dRect.right > window.innerWidth) {
-        dropdown.style.left =
-            (window.innerWidth - dRect.width - 10) + 'px';
-    }
-    if (dRect.bottom > window.innerHeight) {
-        dropdown.style.top = (btnRect.top - dRect.height - 4) + 'px';
-    }
-
-    // Close on click outside, Escape, or any interaction inside the editor
-    // iframe (which lives in a separate document and does not bubble to
-    // the main document).
-    const close = (e) => {
-        if (e && e.type === 'keydown' && e.key !== 'Escape') {
-            return;
-        }
-        // Don't close if the click is inside the dropdown itself.
-        if (e && e.target instanceof Node && dropdown.contains(e.target)) {
-            return;
-        }
-        dropdown.remove();
-        document.removeEventListener('mousedown', close);
-        document.removeEventListener('keydown', close);
-        ed.off('click', close);
-        ed.off('NodeChange', close);
-    };
-    // Delay listener so the current click doesn't immediately close it.
-    requestAnimationFrame(() => {
-        document.addEventListener('mousedown', close);
-        document.addEventListener('keydown', close);
-        ed.on('click', close);
-        ed.on('NodeChange', close);
-    });
-};
-
-/**
- * Detect which filter tabs overflow the container and collapse
- * them behind a "More" dropdown.  Must be called after the modal
- * is visible so measurements are accurate.
- *
- * @param {HTMLElement} tabsContainer - The .tiny_c4lauthor__tabs element.
- * @param {string} moreLabel - Translated label for the "More" button.
- * @param {jQuery} root - Modal root for event delegation.
- */
-const setupTabOverflow = (tabsContainer, moreLabel, root) => {
-    // Defer until the modal transition has finished and layout is settled.
-    setTimeout(() => {
-        const tabs = Array.from(tabsContainer.querySelectorAll('.tiny_c4lauthor__tab'));
-        if (!tabs.length) {
-            return;
-        }
-
-        // Use each tab's actual rendered position to detect which ones
-        // overflow beyond the container's visible height.
-        const containerTop = tabsContainer.getBoundingClientRect().top;
-        const containerHeight = tabsContainer.clientHeight;
-        const maxBottom = containerTop + containerHeight;
-
-        // First check: do all tabs fit without a "More" button?
-        let allFit = true;
-        for (let i = 0; i < tabs.length; i++) {
-            if (tabs[i].getBoundingClientRect().bottom > maxBottom) {
-                allFit = false;
-                break;
-            }
-        }
-        if (allFit) {
-            return;
-        }
-
-        // We need a "More" button. Append it so the reflow accounts for it.
-        const moreBtn = document.createElement('button');
-        moreBtn.className = 'tiny_c4lauthor__tab tiny_c4lauthor__tab--more';
-        moreBtn.textContent = moreLabel;
-        tabsContainer.appendChild(moreBtn);
-
-        // Hide tabs from the end, one by one, until "More" fits
-        // inside the container (i.e. its bottom <= maxBottom).
-        let overflowStartIndex = tabs.length;
-        for (let i = tabs.length - 1; i >= 0; i--) {
-            if (moreBtn.getBoundingClientRect().bottom <= maxBottom) {
-                break;
-            }
-            tabs[i].style.display = 'none';
-            overflowStartIndex = i;
-        }
-
-        if (overflowStartIndex >= tabs.length) {
-            // Everything fits even with "More" — restore and remove it.
-            tabs.forEach((t) => {
-                t.style.display = '';
-            });
-            tabsContainer.removeChild(moreBtn);
-            return;
-        }
-
-        // Collect hidden tabs for the dropdown.
-        const hiddenTabs = tabs.slice(overflowStartIndex);
-
-        // Create dropdown menu — append to the modal body (outside
-        // any overflow:hidden ancestor) so it is not clipped.
-        const modalBody = tabsContainer.closest('.tiny_c4lauthor') || document.body;
-        const menu = document.createElement('div');
-        menu.className = 'tiny_c4lauthor__more-menu';
-        hiddenTabs.forEach((t) => {
-            const item = document.createElement('button');
-            item.className = 'tiny_c4lauthor__more-item';
-            item.textContent = t.textContent;
-            item.dataset.filter = t.dataset.filter;
-            menu.appendChild(item);
-        });
-        modalBody.appendChild(menu);
-
-        // Position menu below the "More" button.
-        const positionMenu = () => {
-            const btnRect = moreBtn.getBoundingClientRect();
-            const modalRect = modalBody.getBoundingClientRect();
-            menu.style.top = (btnRect.bottom - modalRect.top + 4) + 'px';
-            menu.style.left = (btnRect.left - modalRect.left) + 'px';
-        };
-
-        // Toggle menu on "More" click.
-        moreBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            positionMenu();
-            menu.classList.toggle('tiny_c4lauthor__more-menu--visible');
-        });
-
-        // Menu item click — apply filter.
-        root.on('click', '.tiny_c4lauthor__more-item', (e) => {
-            e.preventDefault();
-            const filterType = e.currentTarget.dataset.filter;
-
-            root.find('.tiny_c4lauthor__tab').removeClass('tiny_c4lauthor__tab--active');
-            moreBtn.classList.add('tiny_c4lauthor__tab--active');
-            menu.classList.remove('tiny_c4lauthor__more-menu--visible');
-
-            root.find('.tiny_c4lauthor__group').each(function() {
-                if (filterType === 'all' || this.dataset.group === filterType) {
-                    this.style.display = '';
-                } else {
-                    this.style.display = 'none';
-                }
-            });
-        });
-
-        // Close menu when clicking outside.
-        document.addEventListener('click', (e) => {
-            if (!moreBtn.contains(e.target) && !menu.contains(e.target)) {
-                menu.classList.remove('tiny_c4lauthor__more-menu--visible');
-            }
-        });
-    }, 300);
-};
 
 export const getSetup = async() => {
     const [buttonText, buttonImage, applyStr, cancelStr,
@@ -1256,22 +149,19 @@ export const getSetup = async() => {
 
     // eslint-disable-next-line complexity
     const buildModal = async(editor) => {
-        // Add custom components from admin settings.
-        const customComps = getcustomComponents(editor);
-        addCustomComponents(customComps);
-
-        // Resolve all lang strings.
-        langStrings = await getAllStrings();
+        // The components this editor offers: the declared ones and the admin's custom ones.
+        const registry = await loadRegistry(getContextId(editor));
+        const catalogue = createCatalogue(registry, buildCustomComponents(getcustomComponents(editor)));
 
         // Load variant preferences.
-        await loadVariantPreferences(c4lComponents).catch(Notification.exception);
+        await loadVariantPreferences(catalogue).catch(Notification.exception);
 
         const userIsStudent = isStudent(editor);
         const allowedComps = getallowedComponents(editor);
 
         const tinyMCE = await getTinyMCE();
         const html = editor.getContent({format: 'html'}) || '';
-        const sidebarHtml = buildSidebar(filterLabels, userIsStudent, allowedComps, showDocs(editor));
+        const sidebarHtml = buildSidebar(catalogue, filterLabels, userIsStudent, allowedComps, showDocs(editor));
         const textareaId = 'tiny_c4lauthor_inner_' + Date.now();
 
         // Copy content_css from outer editor so inner TinyMCE has all plugin styles.
@@ -1495,7 +385,7 @@ export const getSetup = async() => {
                 };
 
                 // Register component icons and quick-insert menu on the inner editor.
-                registerComponentIcons(ed);
+                registerComponentIcons(ed, catalogue);
                 ed.ui.registry.addIcon(buttonIcon, buttonImage.html);
                 ed.ui.registry.addButton(quickInsertMenuName, {
                     icon: buttonIcon,
@@ -1511,17 +401,15 @@ export const getSetup = async() => {
                         ];
                         const allIcons = ed.ui.registry.getAll().icons;
                         typeOrder.forEach((type) => {
-                            c4lComponents.filter((c) => c.type === type).forEach((comp) => {
-                                const label = comp.type === 'custom'
-                                    ? comp.buttonname
-                                    : (langStrings.get(comp.name) || comp.name);
+                            catalogue.components.filter((c) => c.category === type).forEach((comp) => {
+                                const label = comp.label;
                                 const iconKey = 'c4l-' + comp.name;
                                 items.push({
                                     label,
                                     iconHtml: allIcons[iconKey] || '',
                                     onAction: async() => {
                                         ed.selection.moveToBookmark(bookmark);
-                                        const html = await processComponentCode(comp, savedSel);
+                                        const html = await renderComponent(comp, savedSel, catalogue);
                                         ed.execCommand('mceInsertContent', false, html);
                                         ed.focus();
                                     },
@@ -1533,7 +421,7 @@ export const getSetup = async() => {
                 });
 
                 // Register "Convert to" menu on inner editor.
-                registerConvertMenu(ed, convertToStr, noComponentStr, notConvertibleStr);
+                registerConvertMenu(ed, catalogue, convertToStr, noComponentStr, notConvertibleStr);
 
                 ed.on('init', () => {
                     innerEditor = ed;
@@ -1597,7 +485,7 @@ export const getSetup = async() => {
         }
 
         // Set up contextual variant toolbar.
-        setupVariantToolbar(innerEditor, deleteComponentStr, moveUpStr, moveDownStr);
+        setupVariantToolbar(innerEditor, catalogue, deleteComponentStr, moveUpStr, moveDownStr);
 
         // When pressing Enter at the end of a C4L component, exit the
         // component and place the cursor in a new paragraph below it.
@@ -1616,7 +504,7 @@ export const getSetup = async() => {
             const body = innerEditor.getBody();
             while (compEl && compEl !== body) {
                 if (compEl.nodeType === 1 && compEl.className &&
-                    getC4lComponentName(compEl)) {
+                    catalogue.nameOf(compEl)) {
                     break;
                 }
                 compEl = compEl.parentNode;
@@ -1851,7 +739,7 @@ export const getSetup = async() => {
                     });
                 },
                 getContentCss: () => contentCss,
-            });
+            }, catalogue);
 
             // Precision iframe loads async — wait for it before restoring scroll.
             const pIframe = precisionContainer.querySelector('.tiny_c4lauthor__precision-iframe');
@@ -2151,14 +1039,14 @@ export const getSetup = async() => {
                 return;
             }
             const compName = e.currentTarget.dataset.comp;
-            const comp = c4lComponents.find((c) => c.name === compName);
+            const comp = catalogue.find(compName);
             if (!comp) {
                 return;
             }
 
             const pending = new Pending('tiny_c4lauthor/insertComponent');
             const selectedText = innerEditor.selection.getContent({format: 'text'});
-            const compHtml = await processComponentCode(comp, selectedText);
+            const compHtml = await renderComponent(comp, selectedText, catalogue);
             innerEditor.insertContent(compHtml);
             innerEditor.focus();
             pending.resolve();
@@ -2175,7 +1063,7 @@ export const getSetup = async() => {
                 innerEditor = null;
             }
             // Save variant preferences on close.
-            saveVariantPreferences(c4lComponents);
+            saveVariantPreferences(catalogue);
             // Clear the open flag so the modal can be opened again.
             const container = editor.getContainer();
             if (container) {
