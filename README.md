@@ -199,7 +199,7 @@ Its template, icon (in the plugin's `pix/`) and strings belong to the plugin tha
 it; a string key may name another plugin as `component/key`. The label is the string
 named like the component, or the one in `label`. The category may also be `templates`.
 The name must be unique: lower case letters, digits and underscores, not used by
-C4L Author. A declaration C4L Author cannot use is left out with a developer debugging
+C4L Author. Its label and documentation strings are shown as text, without markup. A declaration C4L Author cannot use is left out with a developer debugging
 message.
 
 The plugin's `styles.css` styles the component on the page. The editor's content does

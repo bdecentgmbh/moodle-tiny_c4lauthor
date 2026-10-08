@@ -22,6 +22,19 @@
  */
 
 /**
+ * Escape text for HTML.
+ *
+ * @param {string} text
+ * @returns {string}
+ */
+const escapeHtml = (text) => String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+/**
  * Build the sidebar HTML with C4L component buttons.
  *
  * @param {object} catalogue - The components the editor offers.
@@ -71,7 +84,11 @@ export const buildSidebar = (catalogue, filterLabels, userIsStudent, allowedComp
         const label = filterLabels[type] || type;
         let itemsHtml = '';
         groups[type].forEach((comp) => {
-            const compLabel = comp.label;
+            // C4L Author's strings may contain markup. Those of components another plugin
+            // adds through the hook are shown as text.
+            const added = comp.component && comp.component !== 'tiny_c4lauthor';
+            const asHtml = (text) => (added ? escapeHtml(text) : text);
+            const compLabel = asHtml(comp.label);
             const iconHtml = comp.icon
                 ? `<img src="${comp.icon}" class="c4l-custom-icon-img" alt="">`
                 : `<span class="c4l-button-text"></span>`;
@@ -79,18 +96,19 @@ export const buildSidebar = (catalogue, filterLabels, userIsStudent, allowedComp
             // Build tooltip from docs if available and enabled.
             let tooltipAttr = '';
             if (enableTooltips && comp.docs && comp.docs.description) {
-                let tip = catalogue.strings.get(comp.docs.description) || '';
+                let tip = asHtml(catalogue.strings.get(comp.docs.description) || '');
                 if (comp.docs.usecases && comp.docs.usecases.length) {
                     const cases = comp.docs.usecases
                         .map((uc) => catalogue.strings.get(uc))
-                        .filter(Boolean);
+                        .filter(Boolean)
+                        .map(asHtml);
                     if (cases.length) {
                         tip += '<ul style="text-align:left;margin:6px 0 0;padding-left:18px">' +
                             cases.map((c) => '<li>' + c + '</li>').join('') + '</ul>';
                     }
                 }
-                const escaped = tip.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-                tooltipAttr = ` data-c4l-tooltip="${escaped}"`;
+                // The tooltip reads the attribute back as HTML, so the attribute must keep it exactly.
+                tooltipAttr = ` data-c4l-tooltip="${escapeHtml(tip)}"`;
             }
 
             itemsHtml +=
