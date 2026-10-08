@@ -49,6 +49,25 @@ Feature: Components insert their declared markup
     And I press "Save and display"
     Then I should see "Week 3" in the ".c4lv-tag" "css_element"
 
+  Scenario Outline: Precision mode keeps the fixed text around a value
+    Given I am on the "Page 1" "page activity editing" page logged in as "teacher1"
+    And I click on the "C4L Author" button for the "Page content" TinyMCE editor
+    And I click on "<label>" "button" in the ".tiny_c4lauthor__sidebar" "css_element"
+    When I click on "Precision" "button" in the ".tiny_c4lauthor__view-switcher" "css_element"
+    And I switch to "tiny_c4lauthor__precision-iframe" class iframe
+    And I click on "<selector>" "css_element"
+    And I switch to the main frame
+    And I set the field with xpath "//input[@data-field='0']" to "<value>"
+    And I click on "Content" "button" in the ".tiny_c4lauthor__view-switcher" "css_element"
+    And I click on "Apply" "button" in the ".tiny_c4lauthor__footer" "css_element"
+    And I press "Save and display"
+    Then I should see "<result>" in the "<selector>" "css_element"
+
+    Examples:
+      | label          | selector            | value | result             |
+      | Estimated time | .c4lv-estimatedtime | 45    | 45 min             |
+      | Grading value  | .c4lv-gradingvalue  | 50%   | Grading value: 50% |
+
   Scenario: A custom component inserts the HTML the admin wrote
     Given the following config values are set as admin:
       | customcompcount   | 1                                                     | tiny_c4lauthor |

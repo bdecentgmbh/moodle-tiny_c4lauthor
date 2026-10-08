@@ -29,8 +29,6 @@ const setTextContent = (el, val) => {
     el.textContent = val;
 };
 
-const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
 /**
  * Extract only direct text nodes from an element (skip child elements).
  *
@@ -83,44 +81,6 @@ const handlers = {
     trimmedtext: {
         extract: (comp) => comp.textContent.trim(),
         apply: setTextContent,
-    },
-    // A value followed by a fixed suffix in a span, like "2 hours".
-    valuebeforesuffix: {
-        extract: (comp) => {
-            const span = comp.querySelector('span:not([data-id])');
-            const suffix = span ? span.textContent : '';
-            const full = comp.textContent.trim();
-            return suffix ? full.replace(new RegExp('\\s*' + escapeRegExp(suffix) + '\\s*$'), '').trim() : full;
-        },
-        apply: (comp, val) => {
-            const span = comp.querySelector('span:not([data-id])');
-            const suffixText = span ? span.textContent : '';
-            const doc = comp.ownerDocument;
-            comp.innerHTML = '';
-            comp.appendChild(doc.createTextNode(val + ' '));
-            const newSpan = doc.createElement('span');
-            newSpan.textContent = suffixText;
-            comp.appendChild(newSpan);
-        },
-    },
-    // A value preceded by a fixed prefix in a span, like "Grade: 10".
-    valueafterprefix: {
-        extract: (comp) => {
-            const span = comp.querySelector('span:not([data-id])');
-            const prefix = span ? span.textContent : '';
-            const full = comp.textContent.trim();
-            return prefix ? full.replace(new RegExp('^\\s*' + escapeRegExp(prefix) + '\\s*'), '').trim() : full;
-        },
-        apply: (comp, val) => {
-            const span = comp.querySelector('span:not([data-id])');
-            const prefixText = span ? span.textContent : '';
-            const doc = comp.ownerDocument;
-            comp.innerHTML = '';
-            const newSpan = doc.createElement('span');
-            newSpan.textContent = prefixText;
-            comp.appendChild(newSpan);
-            comp.appendChild(doc.createTextNode(val));
-        },
     },
     // The source in an embedded caption: its text outside the author's span.
     captiontext: {
